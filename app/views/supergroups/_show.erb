@@ -1,6 +1,12 @@
 <%=render 'title' %>
 
-<%= link_to 'New JoinForm', new_union_join_form_path(@supergroup), class: "btn btn-default new-button" %>
+<%= link_to 'New Join Form', new_union_join_form_path(@supergroup), class: "btn btn-default new-button" %>
+
+<% if @union.stripe_connected? %>
+	<%= link_to "Disconnect Stripe",stripe_path(@union), method: :delete, class: "btn btn-danger ", style: "margin: 15px; color: white", data: {confirm: "Are you really really sure?"} %>
+<% else %>
+	<%= link_to image_tag('stripe_connect.png'), "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=#{ENV['STRIPE_CLIENT_ID']}&scope=read_write&state=#{@union.id}" %>
+<% end %>
 
 <%=render partial: 'join_forms/join_forms' if @join_forms %>
 <p id="notice"><%= notice %></p>

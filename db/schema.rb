@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151210044118) do
+ActiveRecord::Schema.define(version: 20160321110839) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -84,8 +84,12 @@ ActiveRecord::Schema.define(version: 20151210044118) do
     t.string   "www"
     t.string   "logo"
     t.string   "short_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "stripe_access_token"
+    t.string   "stripe_refresh_token"
+    t.string   "stripe_publishable_key"
+    t.string   "stripe_user_id"
   end
 
   add_foreign_key "join_forms", "people"

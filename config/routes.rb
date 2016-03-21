@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  #get 'stripe/index'
+  resources :stripe, only: [:index, :destroy]
+
   devise_for :people, :controllers => { :invitations => 'people/invitations' }
     
   resources :unions, controller: :supergroups, type: 'Union' do
