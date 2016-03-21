@@ -4,9 +4,10 @@
     <thead>
       <tr>
         <th>Union</th>
-        <th>URL</th>
-        <th>Messages</th>
         <th>Slugs</th>
+        <th>Description</th>
+        <th>Establishment Fee</th>
+        <th>Weekly Rate</th>
       </tr>
     </thead>
 
@@ -14,17 +15,24 @@
       <% @join_forms.each do |join_form| %>
         <tr class="">
           <td><%= join_form.union.short_name if join_form.union%></td>
-          <td  class="">
-            <strong><%= link_to join_form.url, edit_union_join_form_path(join_form.union, join_form) %></strong>
+          <td>
+            <%= link_to join_form.short_name, edit_union_join_form_path(join_form.union, join_form.id) %>
           </td>
           <td>
-            <%= join_form.message_types.join(',') %>
+            <%= join_form.description %>
           </td>
           <td>
-            <%= join_form.slugs %>
+            <%= join_form.base_rate_establishment %>
+          </td>
+          <td>
+            <%= join_form.base_rate_weekly %>
           </td>
         </tr>
       <% end %>
     </tbody>
   </table>
+<% else %>
+  <h1 class="text-center">
+    You have no join forms defined
+  </h1>
 <% end %>
