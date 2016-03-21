@@ -1,0 +1,28 @@
+<p><%= t("devise.mailer.invitation_instructions.hello", first_name: @resource.first_name) %></p>
+
+<p><%= t("devise.mailer.invitation_instructions.someone_invited_you", inviter: @resource.invited_by.display_name, union: @resource.invited_by.union.name,  url: root_url) %></p>
+
+<p><%= link_to t("devise.mailer.invitation_instructions.accept"), accept_invitation_url(@resource, :invitation_token => @token) %></p>
+
+<h1>What's this for?</h1>
+<p>
+	This website has been put together by the NUW and the freeChange to help Megaphone.org.au partners and their developers receive their supporter data
+</p>
+
+<h1>Interested? What do I do next?</h1>
+<ol>
+	<li>Click <%= link_to t("devise.mailer.invitation_instructions.accept"), accept_invitation_url(@resource, :invitation_token => @token) %> and setup your account/contact details</li>
+	<li>Then <%=link_to "click here", new_join_form_path(locale: I18n.locale) %> to create a new join_form,  </li>
+</ol>
+
+<h1>Not interested?</h1>
+<p>If you are not the right person, please reply and tell me who is, so I can invite them instead.  Or accept the invite, then <%= link_to 'invite them yourself', new_person_invitation_url %>.  Thanks.</p>
+<p><%= t("devise.mailer.invitation_instructions.ignore").html_safe %></p>
+
+In Solidarity,<br/>
+<%= @resource.invited_by.display_name %><br/>
+<%= "#{@resource.invited_by.title}<br/>".html_safe if @resource.invited_by.title.present?%>
+<%= "#{@resource.invited_by.union.name}<br/>".html_safe %>
+
+<br/>
+p.s. This message was generated from <%=root_url%> 

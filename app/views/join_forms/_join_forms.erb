@@ -1,0 +1,30 @@
+
+<% unless @join_forms.blank? %>
+  <table class="table table-condensed table-striped box-shadow">
+    <thead>
+      <tr>
+        <th>Union</th>
+        <th>URL</th>
+        <th>Messages</th>
+        <th>Slugs</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @join_forms.each do |join_form| %>
+        <tr class="">
+          <td><%= join_form.union.short_name if join_form.union%></td>
+          <td  class="">
+            <strong><%= link_to join_form.url, edit_union_join_form_path(join_form.union, join_form) %></strong>
+          </td>
+          <td>
+            <%= join_form.message_types.join(',') %>
+          </td>
+          <td>
+            <%= join_form.slugs %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

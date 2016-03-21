@@ -1,0 +1,87 @@
+# Cloned from MegaConnect (mc) which was cloned from the NUW dairy work project
+
+# I stripped out all the commit history because so much was stripped out
+
+cd ~/mc
+git archive master | tar -x -C ../join/
+
+# renamed all files from webhook to join_form
+find * -exec rename 's/(.*)webhook(.*)/$1join_form$2/' {} ";"
+
+# again to catch the directories missed
+find * -exec rename 's/(.*)webhook(.*)/$1join_form$2/' {} ";"
+
+# search and replace to replace all references of webhook to join_form and Webhook to JoinForm
+
+# search and replaced all instances of IUF and replaced with NUW
+
+# Replaced the class name in application.rb
+
+# Replaced the database names in database.yml
+
+# Copied application.yml and renamed stuff
+
+# Consolidated and update migrations
+
+# Updated en.yml localization
+
+# Added fields to join_forms/_form.html.erb
+
+# updated JoinForm model
+
+# updated JoinFormController params
+
+# updated logo in layouts/_navbar.html.erb
+
+# moved select2 and bootstrap switch helpers into application_helpers.coffee
+
+# updated seeds.rb, changing owner union to nuw
+
+# moved specs and features into spec_disabled and features_disabled respectively.  gitignore these directories.
+
+# updated person fields to include address (removed fax)
+
+
+== SETUP
+
+rake db:create
+rake db:migrate
+rake db:seed
+
+== DEPLOY
+
+heroku create megaconnect
+figaro heroku:set -e production
+git push heroku master
+heroku run rake db:create
+heroku run rake db:migrate
+heroku run rake db:seed 
+
+== README
+
+This README would normally document whatever steps are necessary to get the
+application up and running.
+
+Things you may want to cover:
+
+* Ruby version
+
+* System dependencies
+
+* Configuration
+
+* Database creation
+
+* Database initialization
+
+* How to run the test suite
+
+* Services (job queues, cache servers, search engines, etc.)
+
+* Deployment instructions
+
+* ...
+
+
+Please feel free to use a different markup language if you do not plan to run
+<tt>rake doc:app</tt>.

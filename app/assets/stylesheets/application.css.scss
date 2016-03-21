@@ -1,0 +1,117 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any styles
+ * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
+ * file per style scope.
+ *
+ *= require select2
+ *= require select2-bootstrap
+ *= require bootstrap-switch.min
+ *= require_tree .
+ *= require_self
+ */
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+h1, h1, h2 {
+	color: #D33;
+	small {
+	//	color: #D33;
+	}
+  margin-left: 15px;
+}
+
+body {
+  background-color: #fee;
+  color: #555;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+/*
+.content-area {
+	border-radius: 5px;
+	border: 1px solid #111;
+	background-color: #ffe;
+}
+*/
+.content-area {
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;  
+}
+.navbar {
+  margin-bottom: 0px;
+}
+
+.navbar-fixed-top {
+    min-height: 110px;
+}
+
+.navbar-nav > li > a {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    line-height: 110px;
+}
+
+.navbar-brand > img {
+	display:inline;
+	max-height:100px; 
+	margin-top: -10px; 
+	margin-left: 0px
+}
+
+a.navbar-brand {
+  #color: #D33 !important;
+  font-weight: bold !important;
+}
+
+$a-tags: 'a, a:active, a:hover, a:visited';
+$a-tags-hover: 'a:active, a:hover';
+ 
+#{$a-tags} {
+}
+#{$a-tags-hover} {
+  background-color: transparent;
+}
+
+
+@media (max-width: 767px) {
+  .navbar-nav > li > a {
+    line-height: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .navbar-brand > img {
+  	display:inline;
+		max-height:40px; 
+	 	margin-top: -10px; 
+	 	margin-left: 0px;
+	}
+
+  .navbar-nav > li > img {
+  	height: 40px;
+  }
+}
+
+@-moz-document url-prefix() {
+  fieldset { display: table-cell; }
+}
+
+.form {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.no-left-margin {
+  margin-left: 0px;
+}
+

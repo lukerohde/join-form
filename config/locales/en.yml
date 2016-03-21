@@ -1,0 +1,43 @@
+# Files in the config/locales directory are used for internationalization
+# and are automatically loaded by Rails. If you want to use locales other
+# than English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t 'hello'
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t('hello') %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more, please read the Rails Internationalization guide
+# available at http://guides.rubyonrails.org/i18n.html.
+
+en:
+  helpers:
+    label:
+      join_form:
+        short_name: Slug
+        short_name_placeholder: Please enter an short name for this join form, for the url
+        description: Subscription Description
+        description_placeholder: Please enter a short description of the subscription, to be shown to the user. 
+        css: Inline CSS
+        css_placeholder:  Customize how your form looks using CSS
+        base_rate_establishment:  Up front payment 
+        base_rate_establishment_description: Typically $0 but when joining for a service could be something like $200.00
+        base_rate_weekly: Weekly fee 
+        base_rate_fortnightly: Fortnightly fee
+        base_rate_monthly: Monthly fee
+        base_rate_quarterly: Quarterly fee
+        base_rate_half_yearly:  Half yearly fee
+        base_rate_yearly:  Yearly fee
+  gender:
+    male: male
+    female: female
+    other: neither

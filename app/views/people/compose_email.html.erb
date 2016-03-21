@@ -1,0 +1,30 @@
+
+<div class="col-sm-8 col-sm-offset-2"/>
+	<h1 class="no-left-margin">
+		Send Private Email
+		<br><small>this will send an email from you, sharing your email address</small>
+	</h1>
+
+	<div id="compose_email">
+		<%= form_for @person, :url => url_for(:action => 'send_email') do |f| %>
+			
+			<div class="form-group">
+    		<%= f.label :to %><br>
+    		<%= content_tag :to, @person.display_name, class: "form-control" %>
+    	</div>
+			<div class="form-group">
+    		<%= f.label :subject %><br>
+    		<%= text_field_tag :subject, nil, class: "form-control" %>
+    	</div>
+  		<div>
+		  	<%= f.label :body %><br>
+    		<%= text_area_tag :body, nil, class: 'form-control', style: 'border: 1px solid #aaa; width: 100%' %>
+			</div>
+		  <div>
+		  	<%= f.hidden_field :id %>
+		  	<%= f.submit "Send", id: 'email_submit', class: 'btn btn-default', style: 'margin-top:5px;' %>
+		  	<small>You will be BCC'd</small>
+		  </div>
+		<% end %> 
+	</div>
+</div>

@@ -1,0 +1,86 @@
+  <div class="form-group">
+    <%= f.label :attachment, "Profile picture" %><br>
+    <%=profile_image%>
+    <%= f.file_field :attachment, accept: 'image/jpeg,image/gif,image/png'  %>
+  </div>
+  <div class="form-group">
+    <%= f.label :first_name %><br>
+    <%= f.text_field :first_name, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :last_name %><br>
+    <%= f.text_field :last_name, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :gender %><br>
+    <%= f.select :gender,
+      gender_options(@person), 
+      {
+          include_blank: true,
+      },
+      data: { 
+        placeholder: "Gender",
+      }, 
+      class: "form-control", 
+      style: "width: 100%;"
+    %>
+  </div>
+  <div class="form-group">
+    <%= f.label :address1 %><br>
+    <%= f.text_field :address1, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :address2 %><br>
+    <%= f.text_field :address2, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :suburb %><br>
+    <%= f.text_field :suburb, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :state %><br>
+    <%= f.text_field :state, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :postcode %><br>
+    <%= f.text_field :postcode, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :mobile %><br>
+    <%= f.text_field :mobile, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :email %><br>
+    <%= f.text_field :email, class: "form-control" %>
+  </div>
+
+
+  <div class="form-group">
+    <% if owner? %>
+      <%= f.label :union_id %> <%=link_to "new union", new_polymorphic_path(Union), class: "small", :target => "_blank"%><br>
+      <%= f.select :union_id, 
+        selected_option(@person.union || current_person.union),  
+        {
+            include_blank: false,
+        },
+        data: { 
+          placeholder: "Please select a union.",
+          url: unions_path
+        }, 
+        class: "ac-select2 form-control", 
+        style: "width: 100%;"
+      %>
+    <% else %>
+      <%= f.label :union_id %> 
+      <br/><%= (@person.union || current_person.union).name %>
+      <br/><small>you can only assign yourself and other people to your union</small>
+      <%= f.hidden_field :union_id, value: ((@person.union || current_person.union).id) %>
+    <% end %>
+  </div>
+
+  <% unless params[:action] == "new" %>
+    <div class="form-group">
+      <%= label_tag "Resend Invite" %>&nbsp;&nbsp;<small>you will be BCC'd the invitation email FYI</small><br>
+      <%= check_box_tag "resend_invite", 'true', false, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'} %> 
+    </div>
+  <% end %>

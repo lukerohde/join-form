@@ -1,0 +1,3 @@
+class UnionsController < SupergroupsController
+
+end

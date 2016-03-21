@@ -1,0 +1,36 @@
+// Place all the styles related to the supergroups controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.logo-image {
+	width:100%;
+	max-width: 400px;
+}
+
+.logo-thumb {
+	border-width: 5px;
+	background-color: #fff;
+	border-color: #AAA;
+	border-style: solid;
+	#box-shadow: 3px 3px #666;
+}
+
+.banner-placeholder .banner-title {
+	margin-top: -80px;
+	margin-left: 15px;
+}
+
+.banner-title a:visited {
+    color: #fff !important;
+}
+
+.banner-title a:hover {
+    color: #fff !important;
+    text-decoration: none;
+}
+
+.banner-title a {
+    color: #fff !important;
+    font-weight: bold;
+    text-shadow: 2px 2px #AAA;
+}

@@ -1,0 +1,6 @@
+<h2>Editing JoinForms</h2>
+
+<%= render 'form' %>
+
+	<hr/>
+	<%= link_to "Permanently Delete This #{@join_form.class}",join_form_path(@join_form), method: :delete, class: "btn btn-danger ", style: "margin: 15px; color: white", data: {confirm: "Are you really really sure?"} %>

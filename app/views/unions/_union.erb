@@ -1,0 +1,9 @@
+<span id="union">
+	<a href="<%= polymorphic_path(union) %>">
+		<% if union.logo.url.blank? %>
+			<strong><%= union.short_name || union.name %></strong>
+		<% else %>
+			<%= logo_thumb(union) %>
+		<% end %>
+	</a>
+</span>

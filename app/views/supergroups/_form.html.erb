@@ -1,0 +1,42 @@
+<%= form_for(@supergroup, :html => { class: "form"}) do |f| %>
+  <% if @supergroup.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@supergroup.errors.count, "error") %> prohibited this supergroup from being saved:</h2>
+
+      <ul>
+      <% @supergroup.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+   <div class="form-group">
+    <%= f.label :logo, "Logo" %><br>
+    <%=logo_image%>
+    <%= f.file_field :logo, class: "form-control", accept: 'image/jpeg,image/gif,image/png'  %>
+  </div>
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+  <% if owner? %>
+    <div class="field">
+      <%= f.label :short_name %><br>
+      <%= f.text_field :short_name, class: "form-control" %>
+    </div>
+  <% else %>
+    <%= f.label :short_name %><br/>
+    <div class="form-control">
+     <%= @supergroup.short_name %>
+    </div>
+    <small>For security reasons only administrators can set union short names, since they're used to direct data</small>
+    
+  <% end %>
+  <div class="field">
+    <%= f.label :www %><br/>
+    <%= f.text_field :www, class: "form-control" %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

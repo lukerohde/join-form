@@ -1,0 +1,109 @@
+<%= form_for(@join_form, :html => { class: "form"}) do |f| %>
+  <% if @join_form.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@join_form.errors.count, "error") %> prohibited this join_form from being saved:</h2>
+
+      <ul>
+      <% @join_form.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <div class="form-group">
+    <% if owner? %>
+      <%= f.label :union_id %> <%=link_to "new union", new_polymorphic_path(Union), class: "small", :target => "_blank"%><br>
+      <%= f.select :union_id, 
+        selected_option(@join_form.union),  
+        {
+            include_blank: false,
+        },
+        data: { 
+          placeholder: "Please select a union.",
+          url: unions_path
+        }, 
+        class: "ac-select2 form-control", 
+        style: "width: 100%;"
+      %>
+    <% else %>
+      <%= f.label :union_id %> 
+      <br/><%= (@join_form.union || current_person.union).name %>
+      <br/><small>you can only create and edit join_forms for your union</small>
+      <%= f.hidden_field :union_id, value: ((@join_form.union || current_person.union).id) %>
+    <% end %>
+
+  </div>
+
+  <div class="form-group">
+    <%= f.label :short_name %><br>
+    <%= f.text_field :short_name, class: "form-control", placeholder: t('helpers.label.join_form.short_name_placeholder') %>
+  </div>  
+
+  <div class="form-group">
+    <%= f.label :description %><br>
+    <%= f.text_area :description, class: "form-control", placeholder: t('helpers.label.join_form.description_placeholder') %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :base_rate_establishment %><br>
+    <small><%=t('helpers.label.join_form.base_rate_establishment_description')%></small><br/>
+    <%= f.text_field :base_rate_establishment, class: "form-control" %>
+  </div>  
+
+  <div class="form-group">
+    <%= f.label :base_rate_weekly %><br>
+    <%= f.text_field :base_rate_weekly, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :base_rate_fortnightly %><br>
+    <%= f.text_field :base_rate_fortnightly, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :base_rate_monthly %><br>
+    <%= f.text_field :base_rate_monthly, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :base_rate_ %><br>
+    <%= f.text_field :base_rate_quarterly, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :base_rate_ %><br>
+    <%= f.text_field :base_rate_quarterly, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :base_rate_half_yearly %><br>
+    <%= f.text_field :base_rate_half_yearly, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :base_rate_yearly %><br>
+    <%= f.text_field :base_rate_yearly, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :css %><br>
+    <%= f.text_area :css, class: "form-control", placeholder: t('helpers.label.join_form.css_placeholder') %>
+  </div>
+
+  <%= f.hidden_field :person_id, value: current_person.id %>
+  
+  <div class="actions">
+    <%= f.submit value: "Save Join Form", class: "btn btn-default"%>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  
+  function join_form_ready() {
+    // TODO one day, toggle between NB and join_form connectors
+  }
+
+  $(document).ready(join_form_ready);
+  $(document).on('page:load', join_form_ready);
+</script>

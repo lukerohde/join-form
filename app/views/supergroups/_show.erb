@@ -1,0 +1,6 @@
+<%=render 'title' %>
+
+<%= link_to 'New JoinForm', new_union_join_form_path(@supergroup), class: "btn btn-default new-button" %>
+
+<%=render partial: 'join_forms/join_forms' if @join_forms %>
+<p id="notice"><%= notice %></p>
