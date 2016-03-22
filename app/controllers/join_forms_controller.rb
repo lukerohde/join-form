@@ -58,7 +58,7 @@ class JoinFormsController < ApplicationController
     union = @join_form.union
     @join_form.destroy
     respond_to do |format|
-      format.html { redirect_to union, notice: 'JoinForm was successfully destroyed.' }
+      format.html { redirect_to union, notice: 'The join form was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
