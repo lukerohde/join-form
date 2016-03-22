@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class JoinFormTest < ActiveSupport::TestCase
+class JoinFormModelTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

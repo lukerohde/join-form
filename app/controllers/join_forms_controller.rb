@@ -28,7 +28,7 @@ class JoinFormsController < ApplicationController
       if @join_form.save
         notify
 
-        format.html { redirect_to @join_form.union, notice: 'JoinForm was successfully created.' }
+        format.html { redirect_to @join_form.union, notice: "Your new join form was successfully created." }
         format.json { render :show, status: :created, location: @join_form }
       else
         format.html { render :new }
@@ -43,7 +43,7 @@ class JoinFormsController < ApplicationController
     @join_form.authorizer = current_person
     respond_to do |format|
       if @join_form.update(join_form_params)
-        format.html { redirect_to @join_form.union, notice: 'JoinForm was successfully updated.' }
+        format.html { redirect_to @join_form.union, notice: 'The join form was successfully updated.' }
         format.json { render :show, status: :ok, location: @join_form }
       else
         format.html { render :edit }

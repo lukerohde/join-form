@@ -38,12 +38,12 @@ group :development, :test do
   gem 'pry-byebug'
 
   # testing
-  gem 'rspec-rails', '~> 2.0'
-  gem 'factory_girl_rails'
-  gem 'guard-cucumber'
-  gem 'guard-rspec'
-  gem 'spring-commands-rspec'
-  gem 'spring-commands-cucumber'
+  #gem 'rspec-rails', '~> 3.5.0.beta2'
+  #gem 'factory_girl_rails'
+  #gem 'guard-cucumber'
+  #gem 'guard-rspec'
+  #gem 'spring-commands-rspec'
+  #gem 'spring-commands-cucumber'
 end
 
 group :test do
@@ -61,6 +61,10 @@ group :development do
   gem 'listen', '~> 3.0.5'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+
+  gem 'guard'
+  gem 'guard-minitest'
+
 end
 
 gem 'carrierwave'

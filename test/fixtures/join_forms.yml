@@ -2,9 +2,26 @@
 
 one:
   short_name: MyString
-  base_rate_weekly: 11.40
-  
+  description: MyText
+  css: MyText
+  base_rate_establishment: 9.99
+  base_rate_weekly: 9.99
+  base_rate_fortnightly: 9.99
+  base_rate_monthly: 9.99
+  base_rate_quarterly: 9.99
+  base_rate_half_yearly: 9.99
+  base_rate_yearly: 9.99
+  union: owner
+
 two:
   short_name: MyString
-  base_rate_weekly: 11.40
-  
+  description: MyText
+  css: MyText
+  base_rate_establishment: 9.99
+  base_rate_weekly: 9.99
+  base_rate_fortnightly: 9.99
+  base_rate_monthly: 9.99
+  base_rate_quarterly: 9.99
+  base_rate_half_yearly: 9.99
+  base_rate_yearly: 9.99
+  union: owner
