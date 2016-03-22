@@ -6,13 +6,13 @@
 
 <h1>What's this for?</h1>
 <p>
-	This website has been put together by the NUW and the freeChange to help Megaphone.org.au partners and their developers receive their supporter data
+	This website has been put together by the NUW to help help their organisers and partner organisations create union join forms.
 </p>
 
 <h1>Interested? What do I do next?</h1>
 <ol>
 	<li>Click <%= link_to t("devise.mailer.invitation_instructions.accept"), accept_invitation_url(@resource, :invitation_token => @token) %> and setup your account/contact details</li>
-	<li>Then <%=link_to "click here", new_join_form_path(locale: I18n.locale) %> to create a new join_form,  </li>
+	<li>Then <%=link_to "click here", new_join_form_url(locale: I18n.locale) %> to create a new join_form,  </li>
 </ol>
 
 <h1>Not interested?</h1>

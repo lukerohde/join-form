@@ -1,4 +1,4 @@
-class Supergroup < ActiveRecord::Base
+class Supergroup < ApplicationRecord
 	# Used for index searching
   include Filterable
   scope :name_like, -> (name) {where("name ilike ?", "%#{name}%")}

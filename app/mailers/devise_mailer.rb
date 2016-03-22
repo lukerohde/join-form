@@ -6,7 +6,7 @@ class DeviseMailer < Devise::Mailer
 
 	def invitation_instructions(record, token, opts={})
 	  #headers["Custom-header"] = "Bar"
-	  opts[:subject] = "megaphone.org.au join_form invitation"
+	  opts[:subject] = "You are invitated to make union join forms!"
 	  opts[:from] = "#{record.invited_by.display_name} <#{record.invited_by.email}>"
 	  opts[:reply_to] = opts[:from] # else replies to sender
 	  headers[:bcc]= record.invited_by.email

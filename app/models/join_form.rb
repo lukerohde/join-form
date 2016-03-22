@@ -1,4 +1,4 @@
-class JoinForm < ActiveRecord::Base
+class JoinForm < ApplicationRecord
 	belongs_to :union
 	belongs_to :person
 	

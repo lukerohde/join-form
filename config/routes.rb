@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # mount ActionCable.server => '/cable'
+
+
   #get 'stripe/index'
   resources :stripe, only: [:index, :destroy]
 
