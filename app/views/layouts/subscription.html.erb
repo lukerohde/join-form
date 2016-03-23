@@ -16,8 +16,7 @@
   <%= tag :meta, :name => "stripe-key", :content => ENV['STRIPE_PUBLIC_KEY'] %>
 </head>
 <body>
-  <%= render "layouts/navbar" %>
-	<div class="container-fluid content-area">
+  <div class="container-fluid content-area">
 		<%= yield %>
 	</div>
 </body>
