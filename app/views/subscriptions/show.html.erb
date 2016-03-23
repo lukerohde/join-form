@@ -1,0 +1,55 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Person:</strong>
+  <%= @subscription.person %>
+</p>
+
+<p>
+  <strong>Join form:</strong>
+  <%= @subscription.join_form %>
+</p>
+
+<p>
+  <strong>Frequency:</strong>
+  <%= @subscription.frequency %>
+</p>
+
+<p>
+  <strong>Pay method:</strong>
+  <%= @subscription.pay_method %>
+</p>
+
+<p>
+  <strong>Account name:</strong>
+  <%= @subscription.account_name %>
+</p>
+
+<p>
+  <strong>Account number:</strong>
+  <%= @subscription.account_number %>
+</p>
+
+<p>
+  <strong>Expiry Month:</strong>
+  <%= @subscription.expiry_month %>
+</p>
+
+<p>
+  <strong>Expiry Year:</strong>
+  <%= @subscription.expiry_year %>
+</p>
+
+
+<p>
+  <strong>Ccv:</strong>
+  <%= @subscription.ccv %>
+</p>
+
+<p>
+  <strong>Bsb:</strong>
+  <%= @subscription.bsb %>
+</p>
+
+<%= link_to 'Edit', edit_subscription_path(@subscription) %> |
+<%= link_to 'Back', subscriptions_path %>

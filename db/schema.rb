@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160322233135) do
+ActiveRecord::Schema.define(version: 20160323110755) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,6 +69,7 @@ ActiveRecord::Schema.define(version: 20160322233135) do
     t.string   "invited_by_type"
     t.integer  "invitations_count",      default: 0
     t.integer  "union_id"
+    t.string   "stripe_token"
   end
 
   add_index "people", ["email"], name: "index_people_on_email", unique: true, using: :btree
@@ -85,11 +86,13 @@ ActiveRecord::Schema.define(version: 20160322233135) do
     t.string   "pay_method"
     t.string   "account_name"
     t.string   "account_number"
-    t.string   "expiry"
     t.string   "ccv"
     t.string   "bsb"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.integer  "expiry_month"
+    t.integer  "expiry_year"
+    t.string   "stripe_token"
   end
 
   add_index "subscriptions", ["join_form_id"], name: "index_subscriptions_on_join_form_id", using: :btree

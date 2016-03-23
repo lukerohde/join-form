@@ -1,0 +1,33 @@
+  <h2>Personal Details</h2>
+  
+  <div class="form-group">
+    <%= f.label :first_name %><br>
+    <%= f.text_field :first_name, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :last_name %><br>
+    <%= f.text_field :last_name, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :email %><br>
+    <%= f.text_field :email, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :mobile %><br>
+    <%= f.text_field :mobile, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :gender %><br>
+    <%= f.select :gender,
+      gender_options(person), 
+      {
+          include_blank: true,
+      },
+      data: { 
+        placeholder: "Gender",
+      }, 
+      class: "form-control", 
+      style: "width: 100%;"
+    %>
+  </div>
+  

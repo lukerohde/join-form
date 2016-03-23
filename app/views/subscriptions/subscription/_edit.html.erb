@@ -1,0 +1,25 @@
+<h2> Subscription Details</h2>
+
+<% if @subscription.join_form.description.present? %>
+  <div class="form-group">
+    <%= f.label :description %><br>
+    <p>
+      <% @subscription.join_form.description %>
+    </p>
+  </div>
+<% end %>
+
+<div class="form-group">
+  <%= f.label :frequency %><br>
+  <%= f.select :frequency,
+    frequency_options(@subscription),
+    {
+        include_blank: true,
+    },
+    data: {
+      placeholder: "Payment Frequency",
+    },
+    class: "form-control",
+    style: "width: 100%;"
+  %>
+</div>
