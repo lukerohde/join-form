@@ -1,6 +1,7 @@
 class JoinForm < ApplicationRecord
 	belongs_to :union
 	belongs_to :person
+	has_many :subscriptions
 	
 	validates :short_name, :person, :union, presence: true
 	validates :base_rate_weekly, numericality: { allow_blank: true }	

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160321110839) do
+ActiveRecord::Schema.define(version: 20160322233135) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -78,6 +78,23 @@ ActiveRecord::Schema.define(version: 20160321110839) do
   add_index "people", ["reset_password_token"], name: "index_people_on_reset_password_token", unique: true, using: :btree
   add_index "people", ["union_id"], name: "index_people_on_union_id", using: :btree
 
+  create_table "subscriptions", force: :cascade do |t|
+    t.integer  "person_id"
+    t.integer  "join_form_id"
+    t.string   "frequency"
+    t.string   "pay_method"
+    t.string   "account_name"
+    t.string   "account_number"
+    t.string   "expiry"
+    t.string   "ccv"
+    t.string   "bsb"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "subscriptions", ["join_form_id"], name: "index_subscriptions_on_join_form_id", using: :btree
+  add_index "subscriptions", ["person_id"], name: "index_subscriptions_on_person_id", using: :btree
+
   create_table "supergroups", force: :cascade do |t|
     t.string   "name"
     t.string   "type"
@@ -95,4 +112,6 @@ ActiveRecord::Schema.define(version: 20160321110839) do
   add_foreign_key "join_forms", "people"
   add_foreign_key "join_forms", "supergroups", column: "union_id"
   add_foreign_key "people", "supergroups", column: "union_id"
+  add_foreign_key "subscriptions", "join_forms"
+  add_foreign_key "subscriptions", "people"
 end

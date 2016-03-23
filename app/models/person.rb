@@ -4,11 +4,12 @@ class Person < ApplicationRecord
   devise :invitable, :database_authenticatable,# :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-
+  before_validation :set_default_password, on: [:create]
 
   mount_uploader :attachment, ProfileUploader
   
   belongs_to :union
+  has_many :subscriptions
 
   #validates :email, presence: true # devise does this already
   validates :union, presence: true
@@ -27,6 +28,10 @@ class Person < ApplicationRecord
 
   def authorizer=(person)
     @authorizer = person
+  end
+
+  def authorizer_id=(person_id)
+    @authorizer = Person.find(person_id)
   end
 
   def is_authorized?(person = nil)
@@ -72,4 +77,10 @@ class Person < ApplicationRecord
     self.authorizer = self
     super(new_password, new_password_confirmation)
   end
+
+  def set_default_password
+    self.password ||= SecureRandom.uuid
+    self.password_confirmation ||= self.password
+  end
+
 end

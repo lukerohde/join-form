@@ -51,6 +51,5 @@ class AdminManagingJoinFormsTest < ActionDispatch::IntegrationTest
   	assert_raises(ActionController::RoutingError) do
   		get join_form_path(join_forms(:one))
   	end
-  end
-
+  endss
 end
