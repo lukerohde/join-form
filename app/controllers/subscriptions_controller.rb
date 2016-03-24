@@ -30,9 +30,10 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     @subscription = Subscription.new(subscription_params)
+    
     respond_to do |format|
-      if @subscription.save_with_payment
-        format.html { redirect_to @subscription, notice: 'Subscription was successfully created.' }
+      if @subscription.save
+        format.html { redirect_to next_step, notice: next_step_notice }
         format.json { render :show, status: :created, location: @subscription }
       else
         format.html { render :new }
@@ -44,9 +45,10 @@ class SubscriptionsController < ApplicationController
   # PATCH/PUT /subscriptions/1
   # PATCH/PUT /subscriptions/1.json
   def update
+    binding.pry
     respond_to do |format|
-      if @subscription.update(subscription_params)
-        format.html { redirect_to @subscription, notice: 'Subscription was successfully updated.' }
+      if save_step
+        format.html { redirect_to next_step, notice: next_step_notice }
         format.json { render :show, status: :ok, location: @subscription }
       else
         format.html { render :edit }
@@ -54,6 +56,32 @@ class SubscriptionsController < ApplicationController
       end
     end
   end
+
+  def save_step
+    if subscription_params['pay_method'] == "Credit Card"
+      @subscription.update_with_payment(subscription_params)
+    else
+      @subscription.update(subscription_params)
+    end 
+  end
+
+  def next_step
+    unless @subscription.pay_method_saved?
+      edit_subscription_path @subscription
+    else
+      subscription_path @subscription
+    end
+  end
+
+  def next_step_notice
+    return 'Thank you for joining' if @subscription.pay_method_saved?
+    return 'Please provide a payment method' if @subscription.subscription_saved?
+    return 'Please choose your membership type' if @subscription.address_saved?
+    return 'Please tell us your address' if @subscription.contact_details_saved?  
+  end
+
+
+  
 
   # DELETE /subscriptions/1
   # DELETE /subscriptions/1.json
@@ -76,7 +104,11 @@ class SubscriptionsController < ApplicationController
       
       if params[:subscription][:person_attributes].present?
         params[:subscription][:person_attributes][:union_id] = @join_form.union.id
-        params[:subscription][:person_attributes][:authorizer_id] = @join_form.person.id
+        if current_person
+          params[:subscription][:person_attributes][:authorizer_id] = current_person.id
+        else
+          params[:subscription][:person_attributes][:authorizer_id] = @join_form.person.id
+        end
       end
 
       result = params.require(:subscription).permit(
@@ -91,6 +123,7 @@ class SubscriptionsController < ApplicationController
           :stripe_token, 
           :ccv, 
           :bsb, 
+          :plan, 
           person_attributes: [
               :first_name,
               :last_name,

@@ -1,4 +1,6 @@
-<p id="notice" class="alert alert-info"><%= notice %></p>
+<% if notice.present? %>
+	<p id="notice" class="alert alert-info"><%= notice %></p>
+<% end %>
 
 <h1>Listing Join Forms</h1>
 

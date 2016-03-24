@@ -9,6 +9,8 @@
   </div>
 <% end %>
 
+<%= f.hidden_field :plan, value: "base" %>
+
 <div class="form-group">
   <%= f.label :frequency %><br>
   <%= f.select :frequency,

@@ -13,20 +13,31 @@
 
   <%= f.fields_for :person do |p| %>
     <%= render 'subscriptions/person/edit', f: p, person: @subscription.person  %> 
-
-    <%= render 'subscriptions/address/edit', f: p, person: @subscription.person  %>
   <% end %>
 
-  <%= render 'subscriptions/subscription/edit', f: f %>
-  
-  <%= render 'subscriptions/pay_method/edit', f: f %>
+  <% if @subscription.contact_details_saved? %>
+    <%= f.fields_for :person do |p| %>
+      <%= render 'subscriptions/address/edit', f: p, person: @subscription.person  %>
+    <% end %>
+  <% end %>
 
+  <% if @subscription.address_saved? %>
+    <%= render 'subscriptions/subscription/edit', f: f %>
+  <% end %>
+
+  <% if @subscription.subscription_saved? %>
+    <%= render 'subscriptions/pay_method/edit', f: f %>
+  <% end %>
 
   <div class="field">
     <%= f.hidden_field :join_form_id %>
   </div>
 
   <div class="actions ">
-    <%= f.submit class: "btn btn-default" %>
+    <% if @subscription.subscription_saved? %>
+      <%= f.submit "Join Now", class: "btn btn-success" %>
+    <% else %>
+      <%= f.submit "Next", class: "btn btn-default" %>
+    <% end %>
   </div>
 <% end %>

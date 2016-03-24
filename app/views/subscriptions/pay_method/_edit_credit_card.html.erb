@@ -17,10 +17,10 @@
   <div class="form-group">
     <%= f.label :expiry %><br/>
     <div class="row">
-      <div class="col-sm-1">
+      <div class="col-sm-2">
         <%= f.select :expiry_month, 1..12, {}, class: "form-control" %>
       </div>
-      <div class="col-sm-1">
+      <div class="col-sm-2">
         <%= f.select :expiry_year, Date.today.year..(Date.today.year+15), {}, class: "form-control" %>
       </div>
     </div>

@@ -3,12 +3,12 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
 subscription_helper_ready = ->
-	Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
-	subscription.setupForm()
-
+  Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
+  subscription.setupForm()
+  
 subscription =
   setupForm: ->
-    $('#new_subscription').submit ->
+    $('#new_subscription, .sedit_subscription').submit ->
       $('input[type=submit]').attr('disabled', true)
       if $('#subscription_account_number').length
         subscription.processCard()
@@ -27,7 +27,7 @@ subscription =
   handleStripeResponse: (status, response) ->
     if status == 200
       $('#subscription_stripe_token').val(response.id)
-      $('#new_subscription')[0].submit()
+      $('#new_subscription, .edit_subscription')[0].submit()
     else
       $('#stripe_error').text(response.error.message)
       $('input[type=submit]').attr('disabled', false)

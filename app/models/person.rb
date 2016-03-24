@@ -30,6 +30,18 @@ class Person < ApplicationRecord
     @authorizer = person
   end
 
+  def contact_detail_valid?
+    email_valid? && first_name.present?
+  end
+
+  def email_valid?
+    email =~ /\A[^@\s]+@[[:alnum:]]+((-+|\.)[[:alnum:]]+)*\z/
+  end
+
+  def address_valid?
+    address1.present? && suburb.present? && state.present? && postcode.present?
+  end 
+
   def authorizer_id=(person_id)
     @authorizer = Person.find(person_id)
   end

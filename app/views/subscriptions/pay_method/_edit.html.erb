@@ -28,4 +28,14 @@
 
   $("#edit_credit_card").hide();
   $("#edit_au_bank_account").hide();
+
+  switch ($("#subscription_pay_method").val()) {
+    case "Credit Card":
+      $("#edit_credit_card").show();
+      break;
+    case "Australian Bank Account":
+      $("#edit_au_bank_account").show();
+      break;
+     
+  }
 </script>
