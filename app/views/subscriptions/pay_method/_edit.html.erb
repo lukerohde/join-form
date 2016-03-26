@@ -19,23 +19,3 @@
 <%= render 'subscriptions/pay_method/edit_credit_card', f: f %>
 
 <%= render 'subscriptions/pay_method/edit_au_bank_account', f: f %>
-
-<script type="text/javascript">
-  function pay_method_change(e){
-    $("#edit_credit_card").toggle((e.value == "Credit Card"));
-    $("#edit_au_bank_account").toggle((e.value == "Australian Bank Account"));
-  }
-
-  $("#edit_credit_card").hide();
-  $("#edit_au_bank_account").hide();
-
-  switch ($("#subscription_pay_method").val()) {
-    case "Credit Card":
-      $("#edit_credit_card").show();
-      break;
-    case "Australian Bank Account":
-      $("#edit_au_bank_account").show();
-      break;
-     
-  }
-</script>

@@ -45,7 +45,7 @@ class Subscription < ApplicationRecord
   def pay_method_must_be_complete
   	case pay_method
   	when "Credit Card"
-  		errors.add(:account_number, "couldn't be validated by our payment gateway.  Please try again.") unless stripe_token.present?
+  		errors.add(:card_number, "couldn't be validated by our payment gateway.  Please try again.") unless stripe_token.present?
   	when "Australian Bank Account"
   		errors.add(:bsb, "must be properly formatted BSB e.g. 123-123") unless bsb_valid?
   		errors.add(:account_number, "must be properly formatted e.g. 123456") unless account_number_valid?

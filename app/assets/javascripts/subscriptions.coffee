@@ -8,9 +8,9 @@ subscription_helper_ready = ->
   
 subscription =
   setupForm: ->
-    $('#new_subscription, .sedit_subscription').submit ->
+    $('#new_subscription, .edit_subscription').submit ->
       $('input[type=submit]').attr('disabled', true)
-      if $('#subscription_account_number').length
+      if $('#subscription_card_number').length
         subscription.processCard()
         false
       else
@@ -18,7 +18,7 @@ subscription =
   
   processCard: ->
     card =
-      number: $('#subscription_account_number').val()
+      number: $('#subscription_card_number').val()
       cvc: $('#subscription_ccv').val()
       expMonth: $('#subscription_expiry_month').val()
       expYear: $('#subscription_expiry_year').val()
@@ -34,3 +34,20 @@ subscription =
 
 $(document).ready(subscription_helper_ready);
 $(document).on('page:load', subscription_helper_ready);
+
+@pay_method_change = (e) ->
+  $("#edit_credit_card").toggle (e.value is "Credit Card")
+  $("#edit_au_bank_account").toggle (e.value is "Australian Bank Account")
+
+pay_method_ready = ->
+  $('#edit_credit_card').hide()
+  $('#edit_au_bank_account').hide()
+  switch $('#subscription_pay_method').val()
+    when 'Credit Card'
+      $('#edit_credit_card').show()
+    when 'Australian Bank Account'
+      $('#edit_au_bank_account').show()
+  return
+     
+$(document).ready(pay_method_ready);
+$(document).on('turbolinks:load', pay_method_ready);

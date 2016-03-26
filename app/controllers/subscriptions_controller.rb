@@ -45,7 +45,6 @@ class SubscriptionsController < ApplicationController
   # PATCH/PUT /subscriptions/1
   # PATCH/PUT /subscriptions/1.json
   def update
-    binding.pry
     respond_to do |format|
       if save_step
         format.html { redirect_to next_step, notice: next_step_notice }
@@ -116,12 +115,13 @@ class SubscriptionsController < ApplicationController
           :join_form_id, 
           :frequency, 
           :pay_method, 
-          :account_name, 
-          :account_number, 
+          :card_number, 
           :expiry_month,
           :expiry_year,
-          :stripe_token, 
           :ccv, 
+          :stripe_token, 
+          :account_name, 
+          :account_number, 
           :bsb, 
           :plan, 
           person_attributes: [
