@@ -10,9 +10,34 @@ rake db:seed
 heroku create megaconnect
 figaro heroku:set -e production
 git push heroku master
-heroku run rake db:create
+# heroku run rake db:create # was complaining when running this, also tried heroku restart before attempting the migration (which worked)
 heroku run rake db:migrate
 heroku run rake db:seed 
+
+== SECURE
+
+# https://devcenter.heroku.com/articles/ssl-
+mkdir keys
+openssl genrsa -des3 -out keys/join.pass.key 2048
+openssl rsa -in keys/join.pass.key -out keys/join.key
+rm keys/join.pass.key
+# used SA Unions details, make sure you don't put www in the hostname i.e. securejobssa.org.au
+openssl req -nodes -new -key keys/join.key -out keys/join.csr
+echo keys >> .gitignore
+cat keys/join.csr
+
+# setup certificate with heroku before configuring dns, because the cname changes
+# purchased ssl from positive ssl when buying domain name
+# name cheap, product list, activate, paste in CSR
+# from name cheap setup mail catch all
+# email verification method for ssl, followed steps after confirming mail catch all was working
+vim keys/join.crt
+# pasted in certificate
+heroku addons:create ssl:endpoint
+heroku certs:add keys/join.crt keys/join.key
+# got cname tochigi-71066.herokussl.com
+
+
 
 == README
 
