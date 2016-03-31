@@ -87,7 +87,6 @@ gem "figaro"
 
 gem "socialization", :git => 'https://github.com/union-software-cooperative/socialization.git'
 
-gem "faye-websocket"
 gem "puma"
 
 gem "exception_notification"
@@ -95,3 +94,5 @@ gem "exception_notification"
 gem 'sucker_punch'
 
 gem 'stripe'
+
+gem 'rails_12factor', group: :production
