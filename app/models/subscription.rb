@@ -64,13 +64,13 @@ class Subscription < ApplicationRecord
   end
 
   
- 	def update_with_payment(params)
+ 	def update_with_payment(params, union)
 	  assign_attributes(params)
 	  	
 	  if valid?
-	  	customer = Stripe::Customer.create(description: person.email, card: stripe_token)
+	  	customer = Stripe::Customer.create({description: person.email, card: stripe_token} , {stripe_account: union.stripe_user_id})
 	    person.stripe_token = customer.id
-	    charge = Stripe::Charge.create(amount: 500, currency: 'AUD', description: join_form.description, customer: person.stripe_token)
+	    charge = Stripe::Charge.create({amount: 500, currency: 'AUD', description: join_form.description, customer: person.stripe_token}, {stripe_account: union.stripe_user_id})
 	    save!
 	  end
 	rescue Stripe::CardError => e

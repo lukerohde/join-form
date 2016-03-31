@@ -58,7 +58,7 @@ class SubscriptionsController < ApplicationController
 
   def save_step
     if subscription_params['pay_method'] == "Credit Card"
-      @subscription.update_with_payment(subscription_params)
+      @subscription.update_with_payment(subscription_params, @union)
     else
       @subscription.update(subscription_params)
     end 
@@ -78,9 +78,6 @@ class SubscriptionsController < ApplicationController
     return 'Please choose your membership type' if @subscription.address_saved?
     return 'Please tell us your address' if @subscription.contact_details_saved?  
   end
-
-
-  
 
   # DELETE /subscriptions/1
   # DELETE /subscriptions/1.json
