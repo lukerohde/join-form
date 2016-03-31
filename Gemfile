@@ -94,5 +94,3 @@ gem "exception_notification"
 gem 'sucker_punch'
 
 gem 'stripe'
-
-gem 'rails_12factor', group: :production
