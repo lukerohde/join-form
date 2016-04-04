@@ -1,4 +1,5 @@
 module SubscriptionsHelper
+  require 'addressable/uri'
 
 	def pay_method_options(subscription)
     options_for_select(
@@ -46,4 +47,16 @@ module SubscriptionsHelper
   def subscription_short_path
     "/#{@union.short_name.downcase}/#{@join_form.short_name.downcase}/#{@subscription.token}"
   end  
+
+  def callback_url(url, extra_params = {})
+    u = Addressable::URI.parse(url)
+    bad_request unless u.scheme
+
+    query_values = u.query_values || {}
+    u.query_values = query_values.merge(extra_params)
+
+    u.to_s
+  rescue
+    bad_request
+  end
 end

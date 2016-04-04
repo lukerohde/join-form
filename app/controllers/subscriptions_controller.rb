@@ -23,6 +23,9 @@ class SubscriptionsController < ApplicationController
     @subscription = Subscription.new
     @subscription.person = Person.new
     @subscription.join_form = @join_form
+    
+    # attempt to parse any callback_url, upfront, so developers can test it works
+    @subscription.callback_url = callback_url(params[:callback_url]) if params[:callback_url]
   end
 
   # GET /subscriptions/1/edit
@@ -73,7 +76,11 @@ class SubscriptionsController < ApplicationController
       subscription_form_path(@subscription)
     else
       #subscription_path @subscription.token
-      subscription_short_path # uses @subscription
+      if @subscription.callback_url
+        callback_url(@subscription.callback_url, success: true)
+      else
+        subscription_short_path # uses @subscription
+      end
     end
   end
 
@@ -128,6 +135,7 @@ class SubscriptionsController < ApplicationController
           :account_number, 
           :bsb, 
           :plan, 
+          :callback_url,
           person_attributes: [
               :first_name,
               :last_name,

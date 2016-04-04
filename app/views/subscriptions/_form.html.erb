@@ -33,6 +33,10 @@
     <%= f.hidden_field :join_form_id %>
   </div>
 
+  <div class="field">
+    <%= f.hidden_field :callback_url %>
+  </div>
+
   <div class="actions ">
     <% if @subscription.subscription_saved? %>
       <%= f.submit "Join Now", class: "btn btn-success" %>

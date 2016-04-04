@@ -15,6 +15,10 @@ class ApplicationController < ActionController::Base
   	render(:file => File.join(Rails.root, 'public/403.html'), :status => 403, :layout => false)
 	end
 
+  def bad_request
+      render(:file => File.join(Rails.root, 'public/400.html'), :status => 400, :layout => false)
+  end
+
   def set_union
     id = params[:union_id] || (params[:controller]=="supergroups" ? params[:id] : nil) 
     id ||= owner_union.id
