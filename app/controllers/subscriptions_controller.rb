@@ -1,8 +1,11 @@
 class SubscriptionsController < ApplicationController
+  before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy]
   before_action :set_join_form
 
   layout 'subscription'
+
+  include SubscriptionsHelper
 
   # GET /subscriptions
   # GET /subscriptions.json
@@ -66,9 +69,11 @@ class SubscriptionsController < ApplicationController
 
   def next_step
     unless @subscription.pay_method_saved?
-      edit_subscription_path @subscription
+      #edit_subscription_path @subscription.token
+      subscription_form_path(@subscription)
     else
-      subscription_path @subscription
+      #subscription_path @subscription.token
+      subscription_short_path # uses @subscription
     end
   end
 
@@ -92,7 +97,9 @@ class SubscriptionsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_subscription
-      @subscription = Subscription.find(params[:id])
+      @subscription = Subscription.find_by_token(params[:id])    
+      @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
+      forbidden if @subscription.nil?
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

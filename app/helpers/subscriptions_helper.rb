@@ -31,4 +31,19 @@ module SubscriptionsHelper
 
   end
 
+  def subscription_form_path(subscription)
+    join_form = subscription.join_form
+    union = join_form.union
+
+    if subscription.id
+      #union_join_form_subscription_path(union.short_name, join_form.short_name, subscription.token)
+      "/#{union.short_name.downcase}/#{join_form.short_name.downcase}/join/#{subscription.token}"
+    else
+      "/#{union.short_name.downcase}/#{join_form.short_name.downcase}/join"
+    end
+  end
+
+  def subscription_short_path
+    "/#{@union.short_name.downcase}/#{@join_form.short_name.downcase}/#{@subscription.token}"
+  end  
 end

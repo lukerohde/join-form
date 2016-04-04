@@ -26,6 +26,10 @@ Rails.application.routes.draw do
   get '/public/:filename', to: 'files#get'
   
   get '/:union_id/:join_form_id/join', to: 'subscriptions#new' 
+  post '/:union_id/:join_form_id/join', to: 'subscriptions#create' 
+  get '/:union_id/:join_form_id/join/:id', to: 'subscriptions#edit'
+  patch '/:union_id/:join_form_id/join/:id', to:  'subscriptions#update'
+  get '/:union_id/:join_form_id/:id', to:  'subscriptions#show'
 
   root "join_forms#index"
   

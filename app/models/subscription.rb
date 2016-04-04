@@ -1,4 +1,5 @@
 class Subscription < ApplicationRecord
+
   belongs_to :person
   belongs_to :join_form
   accepts_nested_attributes_for :person
@@ -7,6 +8,12 @@ class Subscription < ApplicationRecord
   validates :frequency, :plan, presence: true, if: :address_saved?
   validate :address_must_be_complete, if: :contact_details_saved?
   validate :pay_method_must_be_complete, if: :subscription_saved?
+
+  before_validation :set_token, on: [:create]
+  
+  def set_token
+    self.token = SecureRandom.urlsafe_base64(16) # equivalent of 128 bit key
+  end
 
   def address_saved?
   	person.present? && person.address1_was.present? && person.suburb_was.present? && person.state_was.present? && person.postcode_was.present?
