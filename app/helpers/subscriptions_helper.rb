@@ -124,6 +124,7 @@ module SubscriptionsHelper
   end
 
   def get_membership_subscription(params)
+    # Load a subscription out of membership, into this system
     data = call_people_end_point(params)
     result = subscription_api_params(data[:subscription]).merge(join_form_id: @join_form.id)
     

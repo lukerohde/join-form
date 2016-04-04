@@ -14,10 +14,17 @@ class PersonMailer < ApplicationMailer
 		mail(from: from.email, to: to.email, bcc: from.email, subject: subject)
 	end
 
-	def resubscribe_notice(subscription, request)
+	def verify_email_notice(subscription, request)
 		@subscription = subscription
 		@request = request
 		mail(from: from(request), to: subscription.person.email, subject: "Please verify your email to continue joining")
+	end
+
+	def duplicate_notice(subscription, params, request)
+		@subscription = subscription
+		@request = request
+		@params = params
+		mail(from: from(request), to: subscription.join_form.person.email, subject: "We may be duplicating a member")
 	end
 
 private

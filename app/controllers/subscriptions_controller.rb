@@ -170,21 +170,44 @@ class SubscriptionsController < ApplicationController
       # TODO Ideally I'd like to treat an application as a join form, not expose any details, backup old details, update with new details, rather than having this nasty email verification step
       # If we match people on more than email, this method becomes insecure when the person matched doesn't have an email (unless we sms verify)
 
-      @person = Person.find_by_email(params.dig(:subscription,:person_attributes,:email))
-      @subscription = @person.subscriptions.last if @person
+      person = Person.find_by_email(params.dig(:subscription,:person_attributes,:email))
+      subscription = @person.subscriptions.last if @person
       
-      # TODO check membership via API and create a subscription
-      @subscription = get_membership_subscription(subscription_params) unless @subscription
-      if @subscription
-        if current_person && current_person.union.id == @join_form.union.id
-          redirect_to subscription_form_path(@subscription), notice: "Person already in our database!  Because you're logged in, we've redirected you to update their existing subscription."
-        else
-          # send message
-          PersonMailer.resubscribe_notice(@subscription, request).deliver_now
-        
-          # redirect
-          render :resubscribe
-        end
+      # Check membership via API and create a subscription
+      subscription = get_membership_subscription(subscription_params) unless @subscription
+      
+      # If an existing subcription exists, determine secure and appropriate action
+      if subscription && current_person && current_person.union.id == @join_form.union.id
+        # if an admin is logged in they can view and update any matched subscriber
+        redirect_to subscription_form_path(subscription), notice: "Person already in our database!  Because you're logged in, we've redirected you to update their existing subscription."
+      elsif subscription && params_match(params, subscription)
+        # if the user has provided enough contact detail to verify their identity, then they can update their subscription
+        redirect_to subscription_form_path(subscription), notice: "We've found an existing subscription for you to renew."
+      elsif subscription && subscription.email.present?     
+        # send message
+        PersonMailer.verify_email_notice(subscription, request).deliver_now
+      
+        # redirect
+        render :verify_email
+      else
+        # Create a duplicate
+        PersonMailer.duplicate_notice(subscription, subscription_params, request).deliver_now
       end
+    end
+
+    def params_match(params, subscription)
+      # We want to avoid email verification if the user
+      # has provided enough information to verify their 
+      # identity
+
+      score = 0
+      score += 1 if params[:first_name] == subscription[:first_name] 
+      score += 1 if params[:last_name] == subscription[:last_name]
+      score += 1 if params[:mobile] == subscription[:mobile]
+      score += 1 if params[:email] == subscription[:email]
+      #score += 1 if params[:external_id] == subscription[:external_id]
+      #score += 1 if params[:dob] == subscription[:dob]
+      
+      score >= 3 # first name and last name and one piece of contact detail may not be enough, alternatively they can have two pieces of contact detail and a typo in one name
     end
 end
