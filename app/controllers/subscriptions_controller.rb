@@ -2,6 +2,7 @@ class SubscriptionsController < ApplicationController
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy]
   before_action :set_join_form
+  before_action :resubscribe?, only: [:create]
 
   layout 'subscription'
 
@@ -36,9 +37,9 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     @subscription = Subscription.new(subscription_params)
-    
+  
     respond_to do |format|
-      if @subscription.save
+      if save_step
         format.html { redirect_to next_step, notice: next_step_notice }
         format.json { render :show, status: :created, location: @subscription }
       else
@@ -76,8 +77,8 @@ class SubscriptionsController < ApplicationController
       subscription_form_path(@subscription)
     else
       #subscription_path @subscription.token
-      if @subscription.callback_url
-        callback_url(@subscription.callback_url, success: true)
+      if @subscription.callback_url.present?
+        callback_url(@subscription.callback_url, callback_params(@subscription))
       else
         subscription_short_path # uses @subscription
       end
@@ -161,6 +162,29 @@ class SubscriptionsController < ApplicationController
         @join_form = @union.join_forms.find(id)
       else
         @join_form = @union.join_forms.where("short_name ilike ?",id).first
+      end
+    end
+
+    def resubscribe?
+      # Verify by email # TODO consider setting a password and requiring login, or backing up details, and overwriting them (without exposing any)
+      # TODO Ideally I'd like to treat an application as a join form, not expose any details, backup old details, update with new details, rather than having this nasty email verification step
+      # If we match people on more than email, this method becomes insecure when the person matched doesn't have an email (unless we sms verify)
+
+      @person = Person.find_by_email(params.dig(:subscription,:person_attributes,:email))
+      @subscription = @person.subscriptions.last if @person
+      
+      # TODO check membership via API and create a subscription
+      @subscription = get_membership_subscription(subscription_params) unless @subscription
+      if @subscription
+        if current_person && current_person.union.id == @join_form.union.id
+          redirect_to subscription_form_path(@subscription), notice: "Person already in our database!  Because you're logged in, we've redirected you to update their existing subscription."
+        else
+          # send message
+          PersonMailer.resubscribe_notice(@subscription, request).deliver_now
+        
+          # redirect
+          render :resubscribe
+        end
       end
     end
 end

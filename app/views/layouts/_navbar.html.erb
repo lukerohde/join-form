@@ -23,6 +23,8 @@
           <li>
             <%= link_to "people", people_path %>
           </li>
+          <li><%= link_to "sign out", destroy_person_session_path, :method=>'delete' %>
+              </li>
           <li class="dropdown">
             <a class="dropdown-toggle" aria-expanded="false" area-haspopup="true" role="button" data-toggle="dropdown" href="#">
               <%=profile_thumb(current_person)%>

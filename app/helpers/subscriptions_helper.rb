@@ -59,4 +59,88 @@ module SubscriptionsHelper
   rescue
     bad_request
   end
+
+  def person_params(person)
+    person.slice(
+      :first_name, 
+      :last_name, 
+      :date_of_birth,
+      :email,
+      :mobile,
+      :gender,
+      :address1,
+      :address2,
+      :suburb,
+      :state,
+      :postcode
+    )
+  end
+
+  def subscription_callback_params(subscription)
+    subscription.slice(
+      :frequency,
+      :plan,
+      :pay_method
+      )
+  end
+
+  def subscription_api_params(subscription)
+    subscription = subscription.to_hash.symbolize_keys
+    result = subscription.slice(:frequency, :plan, :pay_method)
+    
+    pm = 
+      case result[:pay_method]
+        when "Credit Card"
+          subscription.slice(:card_number, :expiry_month, :expiry_year, :csv)
+        when "Australian Bank Account"
+          subscription.slice(:bsb, :account_number)
+        end
+    
+    result.merge(subscription: pm) if pm
+    result
+  end
+
+  def callback_params(subscription)
+    result = person_params(subscription.person)
+    result.merge(subscription_callback_params(subscription))
+  end
+
+  def call_people_end_point(params, method=:get)
+    uri = Addressable::URI.parse("http://localhost:4567/people")
+    
+    payload = person_params(params[:person_attributes])
+    payload.merge({subscription: subscription_api_params(params)})
+
+    if method==:get
+      uri.query_values = (uri.query_values || {}).merge(payload)
+      response = Net::HTTP::get(uri)
+      data = JSON.parse(response).symbolize_keys
+    else
+      response = Net::HTTP.post_form(uri, payload)
+      data = JSON.parse(response.body).symbolize_keys
+    end
+
+    data  
+  end
+
+  def get_membership_subscription(params)
+    data = call_people_end_point(params)
+    result = subscription_api_params(data[:subscription]).merge(join_form_id: @join_form.id)
+    
+    if data[:email] && (@person = Person.find_by_email(data[:email]))
+      # This is an edge case, where a user of the system, is already a member, but doesn't have a subscription in this system
+      @person.update_attributes(person_params(data).merge(authorizer_id: @join_form.person.id))
+      subscription = Subscription.new(result)
+      subscription.person = @person
+    else
+      result = result.merge(person_attributes: person_params(data).merge(authorizer_id: @join_form.person.id, union_id: @join_form.union.id))
+      subscription = Subscription.new(result)
+    end
+    
+    if subscription.save
+      subscription
+    else
+      nil
+    end
+  end
 end
