@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160404023428) do
+ActiveRecord::Schema.define(version: 20160404234637) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,6 +70,8 @@ ActiveRecord::Schema.define(version: 20160404023428) do
     t.integer  "invitations_count",      default: 0
     t.integer  "union_id"
     t.string   "stripe_token"
+    t.date     "dob"
+    t.string   "external_id"
   end
 
   add_index "people", ["email"], name: "index_people_on_email", unique: true, using: :btree
@@ -114,6 +116,7 @@ ActiveRecord::Schema.define(version: 20160404023428) do
     t.string   "stripe_refresh_token"
     t.string   "stripe_publishable_key"
     t.string   "stripe_user_id"
+    t.string   "phone"
   end
 
   add_foreign_key "join_forms", "people"

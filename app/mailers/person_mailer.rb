@@ -1,6 +1,7 @@
 class PersonMailer < ApplicationMailer
 	add_template_helper(ApplicationHelper)
 	add_template_helper(SubscriptionsHelper)
+	include SubscriptionsHelper
 
 	def join_form_notice(person, join_form, request)
 		@person = person
@@ -14,9 +15,16 @@ class PersonMailer < ApplicationMailer
 		mail(from: from.email, to: to.email, bcc: from.email, subject: subject)
 	end
 
-	def verify_email_notice(subscription, request)
+	def verify_email(subscription, subscription_params, request)
 		@subscription = subscription
 		@request = request
+		uri = Addressable::URI.parse("#{request.protocol}#{request.host}:#{request.port}#{subscription_form_path(@subscription)}")
+		
+		params = subscription_callback_params(subscription_params)
+		params = params.merge(person_params(subscription_params[:person_attributes]))
+		uri.query_values = (uri.query_values || {}).merge(params)
+		@url = uri.to_s
+
 		mail(from: from(request), to: subscription.person.email, subject: "Please verify your email to continue joining")
 	end
 

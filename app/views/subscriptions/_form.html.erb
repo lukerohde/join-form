@@ -29,13 +29,8 @@
     <%= render 'subscriptions/pay_method/edit', f: f %>
   <% end %>
 
-  <div class="field">
-    <%= f.hidden_field :join_form_id %>
-  </div>
-
-  <div class="field">
-    <%= f.hidden_field :callback_url %>
-  </div>
+  <%= f.hidden_field :join_form_id %>
+  <%= f.hidden_field :callback_url %>
 
   <div class="actions ">
     <% if @subscription.subscription_saved? %>

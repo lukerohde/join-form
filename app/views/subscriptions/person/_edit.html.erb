@@ -1,5 +1,14 @@
   <h2>Personal Details</h2>
   
+  <% if current_person # prevent external users fiddling, needed for reviewing before saving%> 
+  <div class="form-group">
+    <%= f.hidden_field :external_id %>
+    <%= f.label :external_id, 'Member ID' %><br>
+    <div class="form-control">
+      <%= person.external_id %>
+    </div>
+    <br>
+  <% end %>
   <div class="form-group">
     <%= f.label :first_name %><br>
     <%= f.text_field :first_name, class: "form-control" %>
@@ -30,4 +39,7 @@
       style: "width: 100%;"
     %>
   </div>
-  
+  <div class="form-group">
+    <%= f.label :dob %>
+    <%= f.date_field :dob, class: "form-control" %>
+  </div>

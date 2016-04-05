@@ -61,10 +61,15 @@ module SubscriptionsHelper
   end
 
   def person_params(person)
-    person.slice(
+    result = person.slice(:external_id, *sensitive_person_params)
+    result = result.reject {|k,v| v.blank? }
+  end
+
+  def sensitive_person_params
+    [
       :first_name, 
       :last_name, 
-      :date_of_birth,
+      :dob,
       :email,
       :mobile,
       :gender,
@@ -73,19 +78,21 @@ module SubscriptionsHelper
       :suburb,
       :state,
       :postcode
-    )
+    ]
   end
 
   def subscription_callback_params(subscription)
-    subscription.slice(
+    result = subscription.slice(
       :frequency,
       :plan,
-      :pay_method
+      :pay_method,
+      :callback_url
       )
+    result = result.reject {|k,v| v.blank? }
   end
 
   def subscription_api_params(subscription)
-    subscription = subscription.to_hash.symbolize_keys
+    subscription = (subscription||{}).to_hash.symbolize_keys
     result = subscription.slice(:frequency, :plan, :pay_method)
     
     pm = 
@@ -123,25 +130,34 @@ module SubscriptionsHelper
     data  
   end
 
-  def get_membership_subscription(params)
+  def get_membership_subscription(search_params)
     # Load a subscription out of membership, into this system
-    data = call_people_end_point(params)
-    result = subscription_api_params(data[:subscription]).merge(join_form_id: @join_form.id)
-    
-    if data[:email] && (@person = Person.find_by_email(data[:email]))
-      # This is an edge case, where a user of the system, is already a member, but doesn't have a subscription in this system
-      @person.update_attributes(person_params(data).merge(authorizer_id: @join_form.person.id))
-      subscription = Subscription.new(result)
-      subscription.person = @person
-    else
-      result = result.merge(person_attributes: person_params(data).merge(authorizer_id: @join_form.person.id, union_id: @join_form.union.id))
-      subscription = Subscription.new(result)
+    subscription = nil
+    membership_data = call_people_end_point(search_params)
+    unless membership_data.blank?
+      params = subscription_api_params(membership_data[:subscription]).merge(join_form_id: @join_form.id)
+      
+      if membership_data[:email] && (person = Person.find_by_email(membership_data[:email]))
+        # This is an edge case, where a user of the system, is already a member, but doesn't have a subscription in this system
+        person.update_attributes(person_params(membership_data).merge(authorizer_id: @join_form.person.id))
+        if person.subscriptions.last
+          subscription = person.subscriptions.last
+        else
+          subscription = Subscription.new(params)
+          subscription.person = person
+        end
+      else
+        person = person_params(membership_data) # membership's first_name and email should take precedence
+        person.merge!(authorizer_id: @join_form.person.id, union_id: @join_form.union.id)
+        params.merge!(person_attributes: person)
+        subscription = Subscription.new(params)
+      end
     end
-    
-    if subscription.save
-      subscription
-    else
-      nil
-    end
+
+    subscription
+  end
+
+  def fix_phone(number)
+    (number||"").gsub(/[^0-9]/, '') # remove non-numeric characters
   end
 end
