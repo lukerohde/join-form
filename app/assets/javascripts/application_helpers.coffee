@@ -58,4 +58,4 @@ app_helper_ready = ->
 			$(this).html(new Date($(this).data('time')).toString());
 
 $(document).ready(app_helper_ready);
-$(document).on('page:load', app_helper_ready);
+$(document).on('turbolinks:load', app_helper_ready);

@@ -23,7 +23,7 @@
     <%= render 'subscriptions/person/edit', f: p, person: @subscription.person  %> 
   <% end %>
 
-  <% if @subscription.contact_details_saved? %>
+  <% if @subscription.contact_details_saved? || @subscription.address_present? %>
     <%= f.fields_for :person do |p| %>
       <%= render 'subscriptions/address/edit', f: p, person: @subscription.person  %>
     <% end %>

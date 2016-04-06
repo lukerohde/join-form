@@ -25,12 +25,12 @@ class SubscriptionsController < ApplicationController
     @subscription.person = Person.new
     @subscription.join_form = @join_form
     
-    # attempt to parse any callback_url, upfront, so developers can test it works
-    @subscription.callback_url = callback_url(params[:callback_url]) if params[:callback_url]
+    prefill_form(@subscription, params)
   end
 
   # GET /subscriptions/1/edit
   def edit
+    prefill_form(@subscription, params)
   end
 
   # POST /subscriptions
@@ -128,39 +128,7 @@ class SubscriptionsController < ApplicationController
         end
       end
 
-      result = params.require(:subscription).permit(
-        [
-          :join_form_id, 
-          :frequency, 
-          :pay_method, 
-          :card_number, 
-          :expiry_month,
-          :expiry_year,
-          :ccv, 
-          :stripe_token, 
-          :account_name, 
-          :account_number, 
-          :bsb, 
-          :plan, 
-          :callback_url,
-          person_attributes: [
-              :external_id,
-              :first_name,
-              :last_name,
-              :gender,
-              :dob, 
-              :email,
-              :mobile,
-              :address1, 
-              :address2,
-              :suburb,
-              :state,
-              :postcode,
-              :union_id,
-              :authorizer_id,
-              :id
-            ]
-        ])
+      result = params.require(:subscription).permit(permitted_params)
     end
 
     def set_join_form

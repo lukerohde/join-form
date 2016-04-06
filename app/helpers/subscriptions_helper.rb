@@ -53,8 +53,9 @@ module SubscriptionsHelper
     u = Addressable::URI.parse(url)
     bad_request unless u.scheme
 
-    query_values = u.query_values || {}
-    u.query_values = query_values.merge(extra_params)
+    q = u.query_values || {}    
+    q.merge!(extra_params)
+    u.query_values = JSON.parse(q.to_json) # convert all values to string e.g. dob
 
     u.to_s
   rescue
@@ -62,8 +63,9 @@ module SubscriptionsHelper
   end
 
   def person_params(person)
-    result = person.slice(:external_id, *sensitive_person_params)
+    result = person.slice(:external_id,*sensitive_person_params)
     result = result.reject {|k,v| v.blank? }
+    result
   end
 
   def sensitive_person_params
@@ -104,8 +106,43 @@ module SubscriptionsHelper
           subscription.slice(:bsb, :account_number)
         end
     
-    result.merge(subscription: pm) if pm
+    result.merge!(subscription: pm) if pm
     result
+  end
+
+  def permitted_params
+     [
+          :join_form_id, 
+          :frequency, 
+          :pay_method, 
+          :card_number, 
+          :expiry_month,
+          :expiry_year,
+          :ccv, 
+          :stripe_token, 
+          :account_name, 
+          :account_number, 
+          :bsb, 
+          :plan, 
+          :callback_url,
+          person_attributes: [
+              :external_id,
+              :first_name,
+              :last_name,
+              :gender,
+              :dob, 
+              :email,
+              :mobile,
+              :address1, 
+              :address2,
+              :suburb,
+              :state,
+              :postcode,
+              :union_id,
+              :authorizer_id,
+              :id
+            ]
+        ]
   end
 
   def callback_params(subscription)
@@ -113,18 +150,31 @@ module SubscriptionsHelper
     result.merge(subscription_callback_params(subscription))
   end
 
+  def prefill_form(subscription, params)
+    result = subscription_callback_params(params)
+    result[:callback_url] = callback_url(result[:callback_url]) if result[:callback_url]
+    
+    result.each do |k,v|
+      @subscription.write_attribute(k,v)
+    end
+
+    person_params(params).each do |k,v|
+      @subscription.person.write_attribute(k,v)
+    end
+  end
+
+
   def call_people_end_point(params, method=:get)
     # TODO Timeout quickly and quietly
     uri = Addressable::URI.parse("http://localhost:4567/people")
-    
     payload = person_params(params[:person_attributes])
-    payload.merge!({subscription: subscription_api_params(params)})
-
+    
     if method==:get
       uri.query_values = (uri.query_values || {}).merge(payload)
       response = Net::HTTP::get(uri)
       data = JSON.parse(response).symbolize_keys
     else
+      payload.merge!({subscription: subscription_api_params(params)})
       #response = Net::HTTP.post_form(uri, payload)
       #data = JSON.parse(response.body).symbolize_keys
       response = response = RestClient.put uri.to_s, payload.to_json, content_type: :json

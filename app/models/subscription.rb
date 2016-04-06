@@ -19,12 +19,20 @@ class Subscription < ApplicationRecord
   	person.present? && person.address1_was.present? && person.suburb_was.present? && person.state_was.present? && person.postcode_was.present?
   end
 
+  def address_present?
+    person.present? && person.address1.present? && person.suburb.present? && person.state.present? && person.postcode.present?
+  end
+
   def contact_details_saved?
   	person.present? && person.email_was.present? && person.first_name_was.present?
   end
 
   def subscription_saved?
   	frequency_was.present? && plan_was.present?
+  end
+
+  def subscription_present?
+    frequency.present? && plan.present?
   end
 
   def pay_method_saved?

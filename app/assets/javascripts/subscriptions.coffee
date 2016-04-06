@@ -5,8 +5,13 @@
 subscription_helper_ready = ->
   Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
   subscription.setupForm()
-  
+  subscription.autoSubmitOnPrefill()
+
 subscription =
+  autoSubmitOnPrefill: ->
+    if (window.location.search.indexOf('auto_submit=true')>-1)
+      $('#new_subscription')[0].submit()
+
   setupForm: ->
     $('#new_subscription, .edit_subscription').submit ->
       $('input[type=submit]').attr('disabled', true)
