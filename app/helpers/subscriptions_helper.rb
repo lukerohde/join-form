@@ -63,6 +63,8 @@ module SubscriptionsHelper
   end
 
   def person_params(person)
+    # this is used for both calling system call back
+    # and membership API
     result = person.slice(:external_id,*sensitive_person_params)
     result = result.reject {|k,v| v.blank? }
     result
@@ -92,22 +94,6 @@ module SubscriptionsHelper
       :callback_url
       )
     result = result.reject {|k,v| v.blank? }
-  end
-
-  def subscription_api_params(subscription)
-    subscription = (subscription||{}).to_hash.symbolize_keys
-    result = subscription.slice(:frequency, :plan, :pay_method)
-    
-    pm = 
-      case result[:pay_method]
-        when "Credit Card"
-          subscription.slice(:card_number, :expiry_month, :expiry_year, :csv)
-        when "Australian Bank Account"
-          subscription.slice(:bsb, :account_number)
-        end
-    
-    result.merge!(subscription: pm) if pm
-    result
   end
 
   def permitted_params
@@ -145,70 +131,119 @@ module SubscriptionsHelper
         ]
   end
 
-  def callback_params(subscription)
+  def flatten_subscription(subscription)
     result = person_params(subscription.person)
     result.merge(subscription_callback_params(subscription))
   end
 
-  def prefill_form(subscription, params)
+  def flatten_subscription_params(params)
+    result = person_params(params[:person_attributes])
+    result.merge(subscription_callback_params(params))
+  end
+
+  def unflatten_subscription_params(params)
     result = subscription_callback_params(params)
     result[:callback_url] = callback_url(result[:callback_url]) if result[:callback_url]
-    
-    result.each do |k,v|
-      @subscription.write_attribute(k,v)
-    end
-
-    person_params(params).each do |k,v|
-      @subscription.person.write_attribute(k,v)
-    end
+    result[:person_attributes] = person_params(params)
+    result
   end
 
-
-  def call_people_end_point(params, method=:get)
-    # TODO Timeout quickly and quietly
-    uri = Addressable::URI.parse("http://localhost:4567/people")
-    payload = person_params(params[:person_attributes])
-    
-    if method==:get
-      uri.query_values = (uri.query_values || {}).merge(payload)
-      response = Net::HTTP::get(uri)
-      data = JSON.parse(response).symbolize_keys
-    else
-      payload.merge!({subscription: subscription_api_params(params)})
-      #response = Net::HTTP.post_form(uri, payload)
-      #data = JSON.parse(response.body).symbolize_keys
-      response = response = RestClient.put uri.to_s, payload.to_json, content_type: :json
-      data = JSON.parse(response.body)
-    end
-
-    data  
+  def prefill_form(subscription, params)
+    params = unflatten_subscription_params(params)
+    patch_subscription(subscription, params)
   end
 
-  def get_membership_subscription(search_params)
-    # Load a subscription out of membership, into this system
-    subscription = nil
-    membership_data = call_people_end_point(search_params)
-    unless membership_data.blank?
-      params = subscription_api_params(membership_data[:subscription]).merge(join_form_id: @join_form.id)
-      
-      if membership_data[:email] && (person = Person.find_by_email(membership_data[:email]))
-        # This is an edge case, where a user of the system, is already a member, but doesn't have a subscription in this system
-        person.update_attributes(person_params(membership_data).merge(authorizer_id: @join_form.person.id))
-        if person.subscriptions.last
-          subscription = person.subscriptions.last
-        else
-          subscription = Subscription.new(params)
-          subscription.person = person
-        end
+  def patch_subscription(subscription, params)
+    params.except(:person_attributes).each do |k,v|
+      subscription.write_attribute(k,v) unless v.blank?
+    end
+
+    params[:person_attributes].each do |k,v|
+      if k.to_sym == :authorizer_id
+        subscription.person.authorizer_id = v unless v.blank?
       else
-        person = person_params(membership_data) # membership's first_name and email should take precedence
-        person.merge!(authorizer_id: @join_form.person.id, union_id: @join_form.union.id)
-        params.merge!(person_attributes: person)
-        subscription = Subscription.new(params)
+        subscription.person.write_attribute(k,v) unless v.blank?
+      end
+    end
+  end
+
+  ##############################################
+  ## membership api stuff 
+  ## TODO refactor into end point, and workout 
+  ## better data transformation scheme & cleaner 
+  ## internal interface
+
+  def end_point_uri
+    Addressable::URI.parse("http://localhost:4567/people")
+  end
+
+  def end_point_transform_subscription_to_person(subscription)
+    result = person_params(subscription.person)
+    result.merge!(subscription: end_point_transform_subscription_to_person_subscription(subscription.attributes))
+  end
+
+  def end_point_transform_subscription_to_person_subscription(subscription)
+    # This is used in both directions!
+    subscription = (subscription||{}).to_hash.symbolize_keys
+    result = subscription.slice(:frequency, :plan, :pay_method)
+    
+    pm = 
+      case result[:pay_method]
+        when "Credit Card"
+          subscription.slice(:card_number, :expiry_month, :expiry_year, :csv)
+        when "Australian Bank Account"
+          subscription.slice(:bsb, :account_number)
+        end
+    
+    result.merge!(pm) if pm
+    result
+  end
+
+  def end_point_person_put(subscription)
+    payload = end_point_transform_subscription_to_person(subscription)
+
+    response = response = RestClient.put end_point_uri.to_s, payload.to_json, content_type: :json
+    JSON.parse(response.body)
+  end
+
+  def end_point_person_get(subscription_params)
+    # TODO Timeout quickly and quietly
+    payload = person_params(subscription_params[:person_attributes])
+    
+    response = RestClient.get end_point_uri.to_s, :params => payload.to_hash
+    JSON.parse(response).symbolize_keys
+  end
+
+  def end_point_transform_person_to_subscription(person)
+    subscription = end_point_transform_subscription_to_person_subscription(person[:subscription]).merge(join_form_id: @join_form.id)
+    person = person_params(person) # membership's first_name and email should take precedence
+    person.merge!(authorizer_id: @join_form.person.id, union_id: @join_form.union.id)
+    subscription.merge!(person_attributes: person)
+    subscription
+  end
+
+  def end_point_subscription_get(subscription_params)
+    # Load a subscription out of membership, into this system
+    result = nil
+    person_data = end_point_person_get(subscription_params)
+    
+    unless person_data.blank?
+      subscription_data = end_point_transform_person_to_subscription(person_data)
+      result = Subscription.new(subscription_data)
+      if person_data[:email] && (person = Person.find_by_email(person_data[:email]))
+        if person.subscriptions.last
+          # person already in system, with subscription
+          result = person.subscriptions.last 
+        else
+          # person already in system, without subscription
+          result.person = person
+        end
+        # update existing subscription and person with end point data
+        patch_subscription(result, subscription_data)
       end
     end
 
-    subscription
+    result
   end
 
   def fix_phone(number)

@@ -72,7 +72,7 @@ class SubscriptionsController < ApplicationController
     end 
 
     # TODO Guarentee delivery
-    call_people_end_point(subscription_params, :put) if result
+    end_point_person_put(@subscription) if result
       
     result
   end
@@ -84,7 +84,7 @@ class SubscriptionsController < ApplicationController
     else
       #subscription_path @subscription.token
       if @subscription.callback_url.present?
-        callback_url(@subscription.callback_url, callback_params(@subscription))
+        callback_url(@subscription.callback_url, flatten_subscription(@subscription))
       else
         subscription_short_path # uses @subscription
       end
@@ -148,7 +148,7 @@ class SubscriptionsController < ApplicationController
       @subscription = @person.subscriptions.last if @person
       
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
-      @subscription = get_membership_subscription(subscription_params) unless @subscription
+      @subscription = end_point_subscription_get(subscription_params) unless @subscription
       if @subscription
         # If an existing subcription exists, determine secure and appropriate action
         if current_person && current_person.union.id == @join_form.union.id
@@ -164,11 +164,11 @@ class SubscriptionsController < ApplicationController
           end 
         elsif nothing_to_expose(subscription_params, @subscription)
           # if the subscription from the database exposes no additional information
-          save_step
+          patch_and_persist_subscription(subscription_params)
           redirect_to subscription_form_path(@subscription), notice: next_step_notice
         elsif params_match(subscription_params, @subscription)
           # if the user has provided enough contact detail to verify their identity, then they can update their subscription
-          save_step
+          patch_and_persist_subscription(subscription_params)
           redirect_to subscription_form_path(@subscription), notice: "We've found an existing subscription for you to update or renew."
         elsif @subscription.person.email.present?     
           if @subscription.new_record? 
@@ -183,6 +183,20 @@ class SubscriptionsController < ApplicationController
           PersonMailer.duplicate_notice(@subscription, subscription_params, request).deliver_now
         end
       end
+    end
+
+    def patch_and_persist_subscription(params)
+      # ActiveRecords update and assign_attributes
+      # can't handle overwriting an existing record
+      # with a new record. IDs and other data gets 
+      # blanked.  This is designed to overwrite
+      # attributes with only those params that are 
+      # present
+      patch_subscription(@subscription, params)
+      result = @subscription.save
+      # TODO Guarantee delivery
+      end_point_person_put(@subscription) if result
+      result
     end
 
     def params_match(params, subscription)

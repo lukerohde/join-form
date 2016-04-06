@@ -20,8 +20,8 @@ class PersonMailer < ApplicationMailer
 		@request = request
 		uri = Addressable::URI.parse("#{request.protocol}#{request.host}:#{request.port}#{subscription_form_path(@subscription)}")
 		
-		params = subscription_callback_params(subscription_params)
-		params = params.merge(person_params(subscription_params[:person_attributes]))
+		# TODO refactor to share helper flattening for callback
+		params = flatten_subscription_params(subscription_params)
 		uri.query_values = (uri.query_values || {}).merge(params)
 		@url = uri.to_s
 
