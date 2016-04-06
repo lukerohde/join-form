@@ -27,8 +27,14 @@ en:
         short_name_placeholder: Please enter an short name for this join form, for the url
         description: Subscription Description
         description_placeholder: Please enter a short description of the subscription, to be shown to the user. 
+        page_title: Page Title
+        page_title_placeholder: Specify a web browser title for the page
+        header: Header
+        header_placeholder: Optional header to appear at the top of your join form in raw HTML
         css: Inline CSS
         css_placeholder:  Customize how your form looks using CSS
+        base_rate_id: Plan ID
+        base_rate_id_placeholder: Please enter an id identify what fee level/plan they member is on
         base_rate_establishment:  Up front payment 
         base_rate_establishment_description: Typically $0 but when joining for a service could be something like $200.00
         base_rate_weekly: Weekly fee 

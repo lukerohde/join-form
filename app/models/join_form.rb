@@ -4,9 +4,39 @@ class JoinForm < ApplicationRecord
 	has_many :subscriptions
 	
 	validates :short_name, :person, :union, presence: true
+	validates :base_rate_id, presence: true
 	validates :base_rate_weekly, numericality: { allow_blank: true }	
 	validate :is_authorized?
+
+	after_initialize :set_defaults
 	
+	def set_defaults
+
+		self.css ||= <<-CSS.gsub(/^\t{3}/,'')
+			/* background colour */
+			body {
+			 background-color: #fee;
+			}
+
+			/* heading colors */
+			h1,h2,h3 {
+			  color: #D33;
+			}
+
+			/* label colours */
+			.form-group > label {
+			  color:#555555;
+			}
+
+			/* control colours */
+			.form-control {
+			  background-color: #fff;
+			  color: #555555;
+			}
+		CSS
+
+	end
+
 	def authorizer=(person)
 		@authorizer = person
 	end

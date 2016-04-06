@@ -94,3 +94,5 @@ gem "exception_notification"
 gem 'sucker_punch'
 
 gem 'stripe'
+
+gem 'rest-client'

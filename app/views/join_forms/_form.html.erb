@@ -40,11 +40,16 @@
     <%= f.text_field :short_name, class: "form-control", placeholder: t('helpers.label.join_form.short_name_placeholder') %>
   </div>  
 
+  <h2>Fee Configuration</h2>
+
   <div class="form-group">
     <%= f.label :description %><br>
     <%= f.text_area :description, class: "form-control", placeholder: t('helpers.label.join_form.description_placeholder') %>
   </div>
-
+  <div class="form-group">
+    <%= f.label :base_rate_id %><br>
+    <%= f.text_field :base_rate_id, class: "form-control", placeholder: t('helpers.label.join_form.base_rate_id_placeholder') %>
+  </div> 
   <div class="form-group">
     <%= f.label :base_rate_establishment %><br>
     <small><%=t('helpers.label.join_form.base_rate_establishment_description')%></small><br/>
@@ -67,12 +72,7 @@
   </div>
 
   <div class="form-group">
-    <%= f.label :base_rate_ %><br>
-    <%= f.text_field :base_rate_quarterly, class: "form-control" %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :base_rate_ %><br>
+    <%= f.label :base_rate_quarterly %><br>
     <%= f.text_field :base_rate_quarterly, class: "form-control" %>
   </div>
 
@@ -84,6 +84,18 @@
   <div class="form-group">
     <%= f.label :base_rate_yearly %><br>
     <%= f.text_field :base_rate_yearly, class: "form-control" %>
+  </div>
+
+  <h2> Appearance </h2>
+
+  <div class="form-group">
+    <%= f.label :page_title %><br>
+    <%= f.text_area :page_title, class: "form-control", placeholder: t('helpers.label.join_form.page_title_placeholder') %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :header %><br>
+    <%= f.text_area :header, class: "form-control", placeholder: t('helpers.label.join_form.header_placeholder') %>
   </div>
 
   <div class="form-group">

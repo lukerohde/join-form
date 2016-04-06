@@ -1,4 +1,17 @@
 module ApplicationHelper
+
+	def set_title(title)
+		content_for(:title, title)
+	end
+
+	def get_title(title)
+		if title.blank?
+			"Join a union!"
+		else
+			title
+		end
+	end
+
 	def profile_thumb(person)		
 		unless person.attachment.blank?
 			image_tag person.attachment.thumb.url, class: "profile_thumb"

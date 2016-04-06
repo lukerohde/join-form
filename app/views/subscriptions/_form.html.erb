@@ -1,3 +1,11 @@
+<% set_title(subscription.join_form.page_title) %>
+
+<style>
+  <%=subscription.join_form.css.html_safe %>
+</style>
+
+<%=subscription.join_form.header.html_safe %>
+
 <%= form_for(subscription, url: subscription_form_path(subscription)) do |f| %>
   <% if subscription.errors.any? %>
     <div id="error_explanation">

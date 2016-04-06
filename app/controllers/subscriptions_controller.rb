@@ -64,11 +64,17 @@ class SubscriptionsController < ApplicationController
   end
 
   def save_step
+    result = false
     if subscription_params['pay_method'] == "Credit Card"
-      @subscription.update_with_payment(subscription_params, @union)
+      result = @subscription.update_with_payment(subscription_params, @union)
     else
-      @subscription.update(subscription_params)
+      result = @subscription.update(subscription_params)
     end 
+
+    # TODO Guarentee delivery
+    call_people_end_point(subscription_params, :put) if result
+      
+    result
   end
 
   def next_step

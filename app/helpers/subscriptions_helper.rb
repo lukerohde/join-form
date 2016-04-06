@@ -1,5 +1,6 @@
 module SubscriptionsHelper
   require 'addressable/uri'
+  require 'rest-client'
 
 	def pay_method_options(subscription)
     options_for_select(
@@ -113,18 +114,21 @@ module SubscriptionsHelper
   end
 
   def call_people_end_point(params, method=:get)
+    # TODO Timeout quickly and quietly
     uri = Addressable::URI.parse("http://localhost:4567/people")
     
     payload = person_params(params[:person_attributes])
-    payload.merge({subscription: subscription_api_params(params)})
+    payload.merge!({subscription: subscription_api_params(params)})
 
     if method==:get
       uri.query_values = (uri.query_values || {}).merge(payload)
       response = Net::HTTP::get(uri)
       data = JSON.parse(response).symbolize_keys
     else
-      response = Net::HTTP.post_form(uri, payload)
-      data = JSON.parse(response.body).symbolize_keys
+      #response = Net::HTTP.post_form(uri, payload)
+      #data = JSON.parse(response.body).symbolize_keys
+      response = response = RestClient.put uri.to_s, payload.to_json, content_type: :json
+      data = JSON.parse(response.body)
     end
 
     data  

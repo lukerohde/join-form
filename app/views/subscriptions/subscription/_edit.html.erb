@@ -4,12 +4,12 @@
   <div class="form-group">
     <%= f.label :description %><br>
     <p>
-      <% @subscription.join_form.description %>
+      <%= @subscription.join_form.description %>
     </p>
   </div>
 <% end %>
 
-<%= f.hidden_field :plan, value: "base" %>
+<%= f.hidden_field :plan, value: @subscription.join_form.base_rate_id %>
 
 <div class="form-group">
   <%= f.label :frequency %><br>
