@@ -21,12 +21,17 @@ ActiveRecord::Base.establish_connection(
 class Application < Sinatra::Base
 
 	Dir["./models/*.rb"].each {|file| p file; load file}
+	Dir["./config/initializers/*.rb"].each {|file| p file; load file}
 
 	get '/people' do
+		logger.warn "I got a requiest"
 		p = Person.search(params)
 		(p||{}).to_json
 	end
 
+	get '/error' do
+		1/0
+	end
 
 	put '/people' do
 
