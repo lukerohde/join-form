@@ -174,7 +174,7 @@ module SubscriptionsHelper
   ## internal interface
 
   def end_point_uri
-    Addressable::URI.parse("http://localhost:4567/people")
+    Addressable::URI.parse("#{ENV['NUW_END_POINT']}/people")
   end
 
   def end_point_transform_subscription_to_person(subscription)
