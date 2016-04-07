@@ -213,7 +213,7 @@ module SubscriptionsHelper
     payload = person_params(subscription_params[:person_attributes])
     #response = RestClient.get end_point_uri.to_s, :params => payload.to_hash
     # TODO verify cert
-    response = RestClient::Request.execute url: end_point_uri.to_s, method: :get, verify_ssl: false
+    response = RestClient::Request.execute url: end_point_uri.to_s, method: :get, payload: payload.to_hash, verify_ssl: false
     JSON.parse(response).symbolize_keys
   end
 
@@ -228,6 +228,7 @@ module SubscriptionsHelper
   def end_point_subscription_get(subscription_params)
     # Load a subscription out of membership, into this system
     result = nil
+      
     person_data = end_point_person_get(subscription_params)
       
     unless person_data.blank?
