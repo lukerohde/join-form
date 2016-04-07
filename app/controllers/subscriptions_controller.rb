@@ -143,10 +143,10 @@ class SubscriptionsController < ApplicationController
 
     def resubscribe?
       # Check if renewing/resubscribing, and determine appropriate and secure next step
-
       person = Person.find_by_email(params.dig(:subscription,:person_attributes,:email))
-      @subscription = @person.subscriptions.last if @person
-      
+      @subscription = person.subscriptions.last if person
+      # TODO Fix bug where someone has an admin account, but no subscription yet (possibly by patching a blank subscription with a membership one)
+
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
       @subscription = end_point_subscription_get(subscription_params) unless @subscription
       if @subscription
@@ -164,6 +164,7 @@ class SubscriptionsController < ApplicationController
           end 
         elsif nothing_to_expose(subscription_params, @subscription)
           # if the subscription from the database exposes no additional information
+          # TODO fix bug where existing member with no address requires address validation
           patch_and_persist_subscription(subscription_params)
           redirect_to subscription_form_path(@subscription), notice: next_step_notice
         elsif params_match(subscription_params, @subscription)

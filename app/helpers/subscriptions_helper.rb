@@ -202,15 +202,18 @@ module SubscriptionsHelper
   def end_point_person_put(subscription)
     payload = end_point_transform_subscription_to_person(subscription)
 
-    response = response = RestClient.put end_point_uri.to_s, payload.to_json, content_type: :json
+    #response = RestClient.put end_point_uri.to_s, payload.to_json, content_type: :json
+    response = RestClient::Request.execute url: end_point_uri.to_s, method: :put, payload: payload.to_json, content_type: :json, verify_ssl: false
+    
     JSON.parse(response.body)
   end
 
   def end_point_person_get(subscription_params)
     # TODO Timeout quickly and quietly
     payload = person_params(subscription_params[:person_attributes])
-    
-    response = RestClient.get end_point_uri.to_s, :params => payload.to_hash
+    #response = RestClient.get end_point_uri.to_s, :params => payload.to_hash
+    # TODO verify cert
+    response = RestClient::Request.execute url: end_point_uri.to_s, method: :get, verify_ssl: false
     JSON.parse(response).symbolize_keys
   end
 
@@ -226,7 +229,7 @@ module SubscriptionsHelper
     # Load a subscription out of membership, into this system
     result = nil
     person_data = end_point_person_get(subscription_params)
-    
+      
     unless person_data.blank?
       subscription_data = end_point_transform_person_to_subscription(person_data)
       result = Subscription.new(subscription_data)
