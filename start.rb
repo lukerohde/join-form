@@ -24,8 +24,9 @@ class Application < Sinatra::Base
 	Dir["./config/initializers/*.rb"].each {|file| p file; load file}
 
 	get '/people' do
-		logger.warn "I got a requiest"
+		logger.info "Received: #{params.to_json}"
 		p = Person.search(params)
+		logger.info "Sent: #{(p||{}).to_json}"
 		(p||{}).to_json
 	end
 
@@ -36,8 +37,11 @@ class Application < Sinatra::Base
 	put '/people' do
 
 		payload = JSON.parse(request.body.read)
+		logger.info "Received: #{payload.to_json}"
+
 		payload.symbolize_keys!
 		payload[:subscription].symbolize_keys! if payload[:subscription]
+		
 
 		p = Person.search(payload)
 		if p
@@ -50,6 +54,7 @@ class Application < Sinatra::Base
 		end
 
 		if p.save!
+			logger.info "Sent: #{p.to_json}"
 			p.to_json
 		else
 			status 500
