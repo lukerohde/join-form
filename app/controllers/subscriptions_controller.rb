@@ -149,7 +149,6 @@ class SubscriptionsController < ApplicationController
 
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
       @subscription = end_point_subscription_get(subscription_params) unless @subscription
-      binding.pry
       if @subscription
         # If an existing subcription exists, determine secure and appropriate action
         if current_person && current_person.union.id == @join_form.union.id
