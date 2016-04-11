@@ -5,6 +5,8 @@ require 'pry-byebug'
 require 'ignorable'
 require 'bundler'
 require 'dotenv'
+require 'openssl'
+
 Bundler.require
 
 Dotenv.load
@@ -24,9 +26,8 @@ class Application < Sinatra::Base
 	Dir["./config/initializers/*.rb"].each {|file| p file; load file}
 
 	get '/people' do
-		logger.info "Received: #{params.to_json}"
+		check_signature(params)
 		p = Person.search(params)
-		logger.info "Sent: #{(p||{}).to_json}"
 		(p||{}).to_json
 	end
 
@@ -38,6 +39,7 @@ class Application < Sinatra::Base
 
 		payload = JSON.parse(request.body.read)
 		logger.info "Received: #{payload.to_json}"
+		check_signature(payload)
 
 		payload.symbolize_keys!
 		payload[:subscription].symbolize_keys! if payload[:subscription]
@@ -105,6 +107,16 @@ class Application < Sinatra::Base
 			MailReturned: 0, 
 		}
 	end
+
+	def check_signature(payload)
+		hmac_received = payload[:hmac].to_s
+		payload = payload.reject { |k,v| k == "hmac" }.sort
+		hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['nuw_end_point_secret'], ENV['nuw_end_point_url'] + request.path_info + payload.to_s)}")
+    logger.info "HMAC: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
+    unless hmac == hmac_received
+    	halt 401, "Not Authorized\n"
+    end
+	end 
 
 	run! if app_file == $0
 end 
