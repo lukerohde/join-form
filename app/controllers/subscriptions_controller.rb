@@ -214,7 +214,7 @@ class SubscriptionsController < ApplicationController
       #score += 1 if params[:external_id] == subscription[:external_id]
       score += 1 if p1[:dob].present? && Date.parse(p1[:dob]) == p2[:dob] rescue nil
        
-      score >= 3 
+      score >= 3
     end
 
     def nothing_to_expose(params, subscription)

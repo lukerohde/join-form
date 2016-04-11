@@ -1,6 +1,7 @@
 module SubscriptionsHelper
   require 'addressable/uri'
   require 'rest-client'
+  require 'openssl'
 
 	def pay_method_options(subscription)
     options_for_select(
@@ -201,8 +202,8 @@ module SubscriptionsHelper
 
   def end_point_person_put(subscription)
     payload = end_point_transform_subscription_to_person(subscription)
-
-    #response = RestClient.put end_point_uri.to_s, payload.to_json, content_type: :json
+    payload = end_point_sign(end_point_uri.to_s, payload)
+    
     response = RestClient::Request.execute url: end_point_uri.to_s, method: :put, payload: payload.to_json, content_type: :json, verify_ssl: false
     
     JSON.parse(response.body)
@@ -211,9 +212,10 @@ module SubscriptionsHelper
   def end_point_person_get(subscription_params)
     # TODO Timeout quickly and quietly
     payload = person_params(subscription_params[:person_attributes])
-    #response = RestClient.get end_point_uri.to_s, :params => payload.to_hash
-    # TODO verify cert
-    response = RestClient::Request.execute url: end_point_uri.to_s, method: :get, payload: payload.to_hash, verify_ssl: false
+    payload = end_point_sign(end_point_uri.to_s, payload)
+    url = end_point_uri
+    url.query_values = (url.query_values || {}).merge(payload)
+    response = RestClient::Request.execute url: url.to_s, method: :get, verify_ssl: false
     JSON.parse(response).symbolize_keys
   end
 
@@ -248,6 +250,12 @@ module SubscriptionsHelper
     end
 
     result
+  end
+
+  def end_point_sign(uri, payload)
+    hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['NUW_END_POINT_SECRET'], uri + payload.sort.to_s)}")
+    payload.merge!(hmac: hmac)
+    payload
   end
 
   def fix_phone(number)
