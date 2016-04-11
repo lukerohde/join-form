@@ -56,7 +56,7 @@ class Application < Sinatra::Base
 		end
 
 		if p.save!
-			logger.info "Sent: #{p.to_json}"
+			#logger.info "Sent: #{p.to_json}"
 			p.to_json
 		else
 			status 500
@@ -109,10 +109,19 @@ class Application < Sinatra::Base
 	end
 
 	def check_signature(payload)
-		hmac_received = payload[:hmac].to_s
-		payload = payload.reject { |k,v| k == "hmac" }.sort
-		hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['nuw_end_point_secret'], ENV['nuw_end_point_url'] + request.path_info + payload.to_s)}")
-    logger.info "HMAC: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
+		
+		# build message for signing
+		data = payload.reject { |k,v| k == "hmac" }
+		data = JSON.parse(data.sort.to_json).to_s
+    data = ENV['nuw_end_point_url'] + request.path_info + data
+    logger.debug "PROCESSED PAYLOAD: " + data
+
+    # sign message
+		hmac_received = payload['hmac'].to_s
+		hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['nuw_end_point_secret'], data)}")
+    logger.debug "HMAC: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
+    
+    # halt if signatures differ
     unless hmac == hmac_received
     	halt 401, "Not Authorized\n"
     end
