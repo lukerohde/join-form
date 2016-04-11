@@ -203,7 +203,6 @@ module SubscriptionsHelper
   def end_point_person_put(subscription)
     payload = end_point_transform_subscription_to_person(subscription)
     payload = end_point_sign(end_point_uri.to_s, payload)
-    
     response = RestClient::Request.execute url: end_point_uri.to_s, method: :put, payload: payload.to_json, content_type: :json, verify_ssl: false
     
     JSON.parse(response.body)
@@ -252,8 +251,11 @@ module SubscriptionsHelper
     result
   end
 
-  def end_point_sign(uri, payload)
-    hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['NUW_END_POINT_SECRET'], uri + payload.sort.to_s)}")
+  def end_point_sign(url, payload)
+    # convert to json and back to fix date formats
+    # sort to make sure param order is consistent (only json payloads have nested params and these dont need to be sorted)
+    data = url + JSON.parse(payload.sort.to_json).to_s
+    hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['NUW_END_POINT_SECRET'], data)}")
     payload.merge!(hmac: hmac)
     payload
   end
