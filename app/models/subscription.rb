@@ -9,6 +9,16 @@ class Subscription < ApplicationRecord
   validate :address_must_be_complete, if: :contact_details_saved?
   validate :pay_method_must_be_complete, if: :subscription_saved?
 
+  encrypt_with_public_key :card_number, :ccv, :account_number, :bsb, 
+    :symmetric => :never,
+    :base64 => true,
+    :key_pair => :get_key_pair,
+    :deferred_encryption => true
+
+  def get_key_pair
+    self.join_form.union.key_pair
+  end
+
   before_validation :set_token, on: [:create]
   
   def set_token

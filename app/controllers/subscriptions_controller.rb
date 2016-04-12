@@ -113,7 +113,15 @@ class SubscriptionsController < ApplicationController
     def set_subscription
       @subscription = Subscription.find_by_token(params[:id])    
       @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
-      forbidden if @subscription.nil?
+      if @subscription.nil?
+        forbidden
+      else
+        # blank these so they cannot be returned
+        @subscription.card_number = ""
+        @subscription.ccv = ""
+        @subscription.account_number = ""
+        @subscription.bsb = ""
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

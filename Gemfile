@@ -98,3 +98,5 @@ gem 'stripe'
 gem 'rest-client'
 
 gem 'addressable'
+
+gem 'strongbox'
