@@ -191,7 +191,7 @@ module SubscriptionsHelper
     pm = 
       case result[:pay_method]
         when "Credit Card"
-          subscription.slice(:card_number, :expiry_month, :expiry_year, :csv)
+          subscription.slice(:card_number, :expiry_month, :expiry_year, :ccv)
         when "Australian Bank Account"
           subscription.slice(:bsb, :account_number)
         end

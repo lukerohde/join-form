@@ -52,6 +52,7 @@ class SubscriptionsController < ApplicationController
   # PATCH/PUT /subscriptions/1
   # PATCH/PUT /subscriptions/1.json
   def update
+    binding.pry
     respond_to do |format|
       if save_step
         format.html { redirect_to next_step, notice: next_step_notice }
