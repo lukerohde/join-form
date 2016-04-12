@@ -9,7 +9,6 @@ class Application
 
 		def self.search(api_data)
 			result = self.find_by_MemberID(api_data[:external_id]) if api_data[:external_id].to_s != ""
-			
 			# find by email (except deceased) - husbands and wives share email, but there are more typos and alt spellings, better off just picking the most recent
 			if result.nil? && api_data[:email].to_s != ""
 				result = self.where(["Status <> '6' and MemberEmailAddress = ? OR MemberSecondaryEmailAddress = ?", api_data[:email], api_data[:email]]) 

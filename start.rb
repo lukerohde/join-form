@@ -6,6 +6,7 @@ require 'ignorable'
 require 'bundler'
 require 'dotenv'
 require 'openssl'
+require 'date'
 
 Bundler.require
 
@@ -55,12 +56,28 @@ class Application < Sinatra::Base
 			p.MemberID = member_id
 		end
 
-		if p.save!
-			#logger.info "Sent: #{p.to_json}"
+		result = p.save!
+		if result && payload.dig(:subscription, :pay_method) 
+			result = put_pay_method(p, payload)
+		end		
+
+		if result
 			p.to_json
 		else
 			status 500
 		end
+	end
+
+	def put_pay_method(person, payload)
+		pm = PayMethod.find_by_MemberID(person.MemberID)
+			
+		if pm
+			pm.assign_attributes(tblBank_attributes(payload))
+		else
+			pm = PayMethod.new(tblBank_attributes(payload))
+			pm.MemberID = person.MemberID
+		end
+		pm.save!
 	end
 
 	def member_id 
@@ -87,6 +104,7 @@ class Application < Sinatra::Base
 		if api_data[:subscription]
 			result[:MemberPayFrequency] = (api_data[:subscription][:frequency]||"W")[0]
 			result[:MemberFeeGroupID] = api_data[:subscription][:plan]
+			result[:MemberPaymentType] = api_data[:subscription][:pay_method] == "Credit Card" ? "C" : "D"
 			#TODO Fix fee group	
 		end
 
@@ -100,12 +118,46 @@ class Application < Sinatra::Base
 			EmpType: "C",
 			BranchID: "NA",
 			CompanyID: "", # TODO unalloc
-			Status: "14", # A1p TODO Conditional Potential
+			Status: "14", # A1p TODO Conditional Potential, Paying
 			MemberAwardID: "", 
 			MemberFeeGroupID: "GROUPNVA", 
 			LastName: "Unknown", 
 			MailReturned: 0, 
 		}
+	end
+
+	def tblBank_attributes(api_data)
+		result = {
+			DateOfEntry: Date.today.iso8601,
+			AccountName: "#{api_data[:first_name]} #{api_data[:last_name]}",
+			tblAccountUniqueID: 2, #Nat
+			AlternatePayCompanyID: 'NA00449' #Direct Debit National
+		}
+
+		subscription = api_data[:subscription] || {}
+
+		case subscription[:pay_method]
+			when "Credit Card"
+				result = result.merge({
+					AccountType: decrypt(subscription[:card_number])[0] == '4' ? 'V' : 'M',
+					AccountNo: decrypt(subscription[:card_number]),
+					Expiry: "#{subscription[:expiry_month]}/#{(subscription[:expiry_year].to_s)[2..4]}"
+				})
+			when "Australian Bank Account"
+				result = result.merge({
+					AccountType: 'S',
+					bsb: decrypt(subscription[:bsb]),
+					AccountNo: decrypt(subscription[:account_number]),
+					FeeOverride: subscription[:establishment_fee] || 0
+				})
+			end
+		result
+	end
+
+	def decrypt(value)
+		value = Base64.decode64(value)
+		@key ||= OpenSSL::PKey::RSA.new(File.read(File.join('config','private.key')))
+		@key.private_decrypt(value, OpenSSL::PKey::RSA::PKCS1_PADDING)
 	end
 
 	def check_signature(payload)

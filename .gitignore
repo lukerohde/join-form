@@ -1,3 +1,4 @@
 .env
 log/*
 pids/*
+config/private.key
