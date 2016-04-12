@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     resources :join_forms, except: [:show] do 
       resources :subscriptions
     end
+    resource :key, only: [:show, :new, :edit, :update], controller: 'unions/key'
   end
   
   resources :people, except: [:new] do # people can only be invited
