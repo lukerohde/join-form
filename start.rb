@@ -56,32 +56,61 @@ class Application < Sinatra::Base
 			p.MemberID = member_id
 		end
 
-		result = p.save!
-		if result && payload.dig(:subscription, :pay_method) 
-			result = put_pay_method(p, payload)
-		end		
+		if payload.dig(:subscription, :pay_method) 
+			set_pay_method(p, payload)
+		end
 
-		if result
+		if payload.dig(:subscription, :payments)
+			save_payments(p, payload.dig(:subscription, :payments))
+		end
+
+		if p.save!
 			p.to_json
-		else
-			status 500
 		end
 	end
 
-	def put_pay_method(person, payload)
-		pm = PayMethod.find_by_MemberID(person.MemberID)
-			
-		if pm
-			pm.assign_attributes(tblBank_attributes(payload))
-		else
-			pm = PayMethod.new(tblBank_attributes(payload))
-			pm.MemberID = person.MemberID
+	def save_payments(person, payments)
+		payments.each do |payment|
+			p = person.payments.build(tblTransaction_attributes(person, payment))
+			person.PrevFinDate = person.FinDate
+			person.FinDate = p.TransactionNewFinDate
 		end
-		pm.save!
+	end
+
+	def tblTransaction_attributes(person, payment)
+		payment.symbolize_keys!
+
+		findate = person.FinDate || Date.today
+		newfindate = get_new_findate(findate, payment[:amount], person.MemberPayFrequency, person.MemberFeeGroupID, person.DateOfBirth)
+		result = {
+			transactionRefNumber: "nuw_api_#{payment[:id]}",
+			TransactionType: person.MemberPaymentType,
+			TransactionAmount: payment[:amount],
+			TransactionDate: payment[:date], 
+			TransactionFinDate: findate, 
+			TransactionNewFinDate: newfindate,
+			TransactionMadeBy: 'nuw_api',
+			TransactionPrevFinDate: person.PrevFinDate,
+			TransactionNote: 'Stripe Payment'
+		}
+		result
+	end
+
+	def set_pay_method(person, payload)
+		if person.pay_method.present?
+			person.pay_method.assign_attributes(tblBank_attributes(payload))
+		else
+			person.build_pay_method(tblBank_attributes(payload))
+		end
 	end
 
 	def member_id 
 		ActiveRecord::Base.connection.select_value("GetNewMemberID 'NA'")
+	end
+
+	def get_new_findate(findate, amount, freq, feegroup, dob)
+		dob ||= Date.parse('1950-01-01')
+		ActiveRecord::Base.connection.exec_query("select dbo.GetNewFinDate('#{findate.to_date.iso8601}', '#{amount}', '#{freq}', '#{feegroup}', '#{dob.to_date.iso8601}')").rows[0][0]
 	end
 
 	def tblMember_attributes(api_data)
@@ -97,7 +126,8 @@ class Application < Sinatra::Base
 				MemberResAddress2: api_data[:address2],
 				MemberResSuburb: api_data[:suburb],
 				MemberResState: api_data[:state],
-				MemberResPostcode: api_data[:postcode]
+				MemberResPostcode: api_data[:postcode],
+				paymentNote: 'online join received #{Date.today}'
 			}
 
 
@@ -138,26 +168,34 @@ class Application < Sinatra::Base
 
 		case subscription[:pay_method]
 			when "Credit Card"
-				result = result.merge({
-					AccountType: decrypt(subscription[:card_number])[0] == '4' ? 'V' : 'M',
-					AccountNo: decrypt(subscription[:card_number]),
-					Expiry: "#{subscription[:expiry_month]}/#{(subscription[:expiry_year].to_s)[2..4]}"
-				})
+				if cn = decrypt(subscription[:card_number])
+					result = result.merge({
+						AccountType: cn[0] == '4' ? 'V' : 'M',
+						AccountNo: cn,
+						Expiry: "#{subscription[:expiry_month]}/#{(subscription[:expiry_year].to_s)[2..4]}"
+					})
+				end
 			when "Australian Bank Account"
-				result = result.merge({
-					AccountType: 'S',
-					bsb: decrypt(subscription[:bsb]),
-					AccountNo: decrypt(subscription[:account_number]),
-					FeeOverride: subscription[:establishment_fee] || 0
-				})
+				if an = decrypt(subscription[:account_number])
+					result = result.merge({
+						AccountType: 'S',
+						bsb: decrypt(subscription[:bsb]),
+						AccountNo: an,
+						FeeOverride: subscription[:establishment_fee] || 0
+					})
+				end
 			end
+
+		result = result.reject {|k,v| v.nil?}
 		result
 	end
 
 	def decrypt(value)
-		value = Base64.decode64(value)
-		@key ||= OpenSSL::PKey::RSA.new(File.read(File.join('config','private.key')))
-		@key.private_decrypt(value, OpenSSL::PKey::RSA::PKCS1_PADDING)
+		value = Base64.decode64(value) rescue nil
+		if value
+			@key ||= OpenSSL::PKey::RSA.new(File.read(File.join('config','private.key')))
+			@key.private_decrypt(value, OpenSSL::PKey::RSA::PKCS1_PADDING)
+		end
 	end
 
 	def check_signature(payload)

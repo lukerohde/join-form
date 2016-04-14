@@ -5,7 +5,8 @@ class Application
 
 		ignore_columns :tblMemberUniqueID
 
-		has_many :payments, foreign_key: "MemberID"
+		has_many :payments, foreign_key: "MemberID", autosave: true
+		has_one :pay_method, foreign_key: "MemberID", autosave: true
 
 		def self.search(api_data)
 			result = self.find_by_MemberID(api_data[:external_id]) if api_data[:external_id].to_s != ""
@@ -31,10 +32,12 @@ class Application
 				external_id: self.MemberID
 			}
 
-			transactions = self.payments.collect do |p|
+			transactions = self.payments.where(['TransactionDate > ?', (Date.today - 365).iso8601]).collect do |p| # todo change to at least one whole financial year
 				{
+					id: p.transactionRefNumber,
 					date: p.TransactionDate,
-					amount: p.TransactionAmount
+					amount: p.TransactionAmount,
+					external_id: p.tblTransactionUniqueID
 				}
 			end
 			
@@ -56,9 +59,10 @@ class Application
 					postcode: self.MemberResPostcode,
 					subscription: {
 						frequency: self.MemberPayFrequency,
-						plan: self.MemberFeeGroupID
+						plan: self.MemberFeeGroupID,
+						pay_method: case when self.MemberPaymentType == 'C' then 'Credit Card' else 'Direct Debit' end, 
+						payments: transactions,
 					}, 
-					payments: transactions
 				})
 			end
 
