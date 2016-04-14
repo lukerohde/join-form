@@ -122,6 +122,10 @@ class SubscriptionsController < ApplicationController
         @subscription.account_number = ""
         @subscription.bsb = ""
         @subscription.stripe_token = ""
+        if @subscription.person
+          @subscription.person.email = "" if temporary_email?(@subscription.person.email)
+          @subscription.person.first_name = "" if temporary_first_name?(@subscription.person.first_name)
+        end 
       end
     end
 
@@ -151,26 +155,14 @@ class SubscriptionsController < ApplicationController
     end
 
     def resubscribe?
-      # Check if renewing/resubscribing, and determine appropriate and secure next step
-      person = Person.find_by_email(params.dig(:subscription,:person_attributes,:email))
-      @subscription = person.subscriptions.last if person
-      # TODO Fix bug where someone has an admin account, but no subscription yet (possibly by patching a blank subscription with a membership one)
-
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
-      @subscription = end_point_subscription_get(subscription_params) unless @subscription
+      @subscription = nuw_end_point_load(subscription_params) unless @subscription
       if @subscription
         # If an existing subcription exists, determine secure and appropriate action
         if current_person && current_person.union.id == @join_form.union.id
-          # This is really nasty - I want the logged in user to be able to avoid the verification steps, but have to review the original record first.
-          # if an admin is logged in they can view and update any matched subscriber
-          @subscription.assign_attributes(subscription_params) if subscription_params[:person_attributes][:external_id] # We've already matched them
-          
-          if @subscription.new_record? && !@subscription.save
-            flash[:notice] = "We've matched a person already in our database! Because you're logged in, we've discarded your input and loaded this subscription for you to review and update instead."
-            render :new 
-          else
-            redirect_to subscription_form_path(@subscription), notice: "We've matched a person already in our database!  Because you're logged in, redirected you to review and update this subscription instead."
-          end 
+          # This is really nasty - TODO I want the logged in user to be able to avoid the verification steps, but have to review the original record first.
+          patch_and_persist_subscription(subscription_params)
+          redirect_to subscription_form_path(@subscription), notice: "We've matched a person already in our database!  Because you're logged in, redirected you to review and update this subscription instead."
         elsif nothing_to_expose(subscription_params, @subscription)
           # if the subscription from the database exposes no additional information
           # TODO fix bug where existing member with no address requires address validation
@@ -181,10 +173,6 @@ class SubscriptionsController < ApplicationController
           patch_and_persist_subscription(subscription_params)
           redirect_to subscription_form_path(@subscription), notice: "We've found an existing subscription for you to update or renew."
         elsif @subscription.person.email.present?     
-          if @subscription.new_record? 
-            @subscription.person.first_name = "unknown" if @subscription.person.first_name.blank?
-            @subscription.save # TODO How do I handle this failure
-          end
           # send email verfication message
           PersonMailer.verify_email(@subscription, subscription_params, request).deliver_now
           render :verify_email

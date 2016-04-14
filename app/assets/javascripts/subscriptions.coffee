@@ -15,9 +15,12 @@ subscription =
   setupForm: ->
     $('#new_subscription, .edit_subscription').submit ->
       $('input[type=submit]').attr('disabled', true)
-      if $('#subscription_card_number').length
-        subscription.processCard()
-        false
+      if $('#subscription_pay_method').val() == "Credit Card" # TODO figure out how to localize
+        if $('#subscription_card_number').length
+            subscription.processCard()
+            false
+          else
+            true
       else
         true
   

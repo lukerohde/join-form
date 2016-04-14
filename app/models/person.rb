@@ -10,6 +10,7 @@ class Person < ApplicationRecord
   
   belongs_to :union
   has_many :subscriptions
+  has_many :payments
 
   #validates :email, presence: true # devise does this already
   validates :union, presence: true

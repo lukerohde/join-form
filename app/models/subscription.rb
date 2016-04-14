@@ -1,8 +1,10 @@
 class Subscription < ApplicationRecord
 
   belongs_to :person
+  belongs_to :subscription
   belongs_to :join_form
   accepts_nested_attributes_for :person
+  has_many :payments, autosave: true
   
   validates :person, :join_form, presence: true
   validates :frequency, :plan, presence: true, if: :address_saved?
@@ -26,7 +28,7 @@ class Subscription < ApplicationRecord
   end
 
   def address_saved?
-  	person.present? && person.address1_was.present? && person.suburb_was.present? && person.state_was.present? && person.postcode_was.present?
+  	person.present? && person.address1_was.present? && person.suburb_was.present? && person.state_was.present? && person.postcode_was.present? && !@skip_validation
   end
 
   def address_present?
@@ -34,11 +36,11 @@ class Subscription < ApplicationRecord
   end
 
   def contact_details_saved?
-  	person.present? && person.email_was.present? && person.first_name_was.present?
+  	person.present? && person.email_was.present? && person.first_name_was.present? && !@skip_validation
   end
 
   def subscription_saved?
-  	frequency_was.present? && plan_was.present?
+  	frequency_was.present? && plan_was.present? && !@skip_validation
   end
 
   def subscription_present?
@@ -46,15 +48,15 @@ class Subscription < ApplicationRecord
   end
 
   def pay_method_saved?
-  	stripe_token_was.present? or (bsb_was.present? && account_number_was.present?)
+  	stripe_token_was.present? or (bsb_was.present? && account_number_was.present?) && !@skip_validation
   end
 
   def bsb_valid?
-  	bsb =~ /^\d{3}-?\d{3}$/ # e.g. 123-123 or 123123
+  	bsb.decrypt =~ /^\d{3}-?\d{3}$/ # e.g. 123-123 or 123123
   end
 
   def account_number_valid?
-  	account_number =~ /^\d+$/
+  	account_number.decrypt =~ /^\d+$/
   end
 
   def address_must_be_complete
@@ -72,7 +74,7 @@ class Subscription < ApplicationRecord
   	when "Credit Card"
   		errors.add(:card_number, "couldn't be validated by our payment gateway.  Please try again.") unless stripe_token.present?
   	when "Australian Bank Account"
-  		errors.add(:bsb, "must be properly formatted BSB e.g. 123-123") unless bsb_valid?
+      errors.add(:bsb, "must be properly formatted BSB e.g. 123-123") unless bsb_valid?
   		errors.add(:account_number, "must be properly formatted e.g. 123456") unless account_number_valid?
   	else
   		errors.add(:pay_method, "must be specified")
@@ -107,4 +109,37 @@ class Subscription < ApplicationRecord
 	  errors.add :base, "There was a problem with your credit card."
 	  false
 	end
+
+
+  def update_from_end_point(payload)
+    @skip_validation = true
+      
+    subscription_payload = payload.except(:person_attributes, :payments_attributes)
+    person_payload = payload[:person_attributes]
+    payments_payload = payload[:payments_attributes]
+
+    subscription_payload.each do |k,v|
+      self.write_attribute(k,v) unless v.blank?
+    end
+
+    person_payload.each do |k,v|
+      if k == :authorizer_id
+        self.person.authorizer_id = v unless v.blank? # can't use write_attribute since its not a database attribute
+      else
+        self.person.write_attribute(k,v) unless v.blank?
+      end
+    end
+
+    # either add or update payment, assumes eager loading, n^2 nastiness, to avoid multiple database hits
+    payments_payload.each do |payment_payload|
+      p = payments.find { |p| p.external_id == payment_payload[:external_id]}
+      if p.blank?
+        self.payments.build(payment_payload)
+      else
+        p.assign_attributes(payment_payload)
+      end
+    end
+
+    save!
+  end
 end

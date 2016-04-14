@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160412012339) do
+ActiveRecord::Schema.define(version: 20160414031145) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,19 @@ ActiveRecord::Schema.define(version: 20160412012339) do
 
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
   add_index "join_forms", ["union_id"], name: "index_join_forms_on_union_id", using: :btree
+
+  create_table "payments", force: :cascade do |t|
+    t.date     "date"
+    t.decimal  "amount",          precision: 8, scale: 2
+    t.string   "external_id"
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.integer  "person_id"
+    t.integer  "subscription_id"
+  end
+
+  add_index "payments", ["person_id"], name: "index_payments_on_person_id", using: :btree
+  add_index "payments", ["subscription_id"], name: "index_payments_on_subscription_id", using: :btree
 
   create_table "people", force: :cascade do |t|
     t.string   "first_name"
@@ -125,6 +138,8 @@ ActiveRecord::Schema.define(version: 20160412012339) do
 
   add_foreign_key "join_forms", "people"
   add_foreign_key "join_forms", "supergroups", column: "union_id"
+  add_foreign_key "payments", "people"
+  add_foreign_key "payments", "subscriptions"
   add_foreign_key "people", "supergroups", column: "union_id"
   add_foreign_key "subscriptions", "join_forms"
   add_foreign_key "subscriptions", "people"

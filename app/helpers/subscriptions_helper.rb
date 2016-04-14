@@ -251,6 +251,7 @@ module SubscriptionsHelper
     result
   end
 
+
   def end_point_sign(url, payload)
     # convert to json and back to fix date formats
     # sort to make sure param order is consistent (only json payloads have nested params and these dont need to be sorted)
@@ -263,4 +264,103 @@ module SubscriptionsHelper
   def fix_phone(number)
     (number||"").gsub(/[^0-9]/, '') # remove non-numeric characters
   end
+
+  
+  ###############################################
+  # V2 API Stuff
+  def nuw_end_point_load(subscription_params)
+    subscription = nil
+    scope = Person #.eager_load(:subscriptions => :payments)
+    
+    payload = nuw_end_point_person_get(subscription_params)
+    unless payload.blank? 
+      person = scope.find_by_external_id(payload.dig(:person_parameters, :external_id)) if payload.dig(:person_parameters, :external_id)
+      person ||= scope.find_by_email(subscription_params.dig(:person_attributes, :email)) if subscription_params.dig(:person_attributes, :email)
+      person ||= scope.find_by_email(payload[:email]) if payload[:email]
+      person ||= Person.new()
+
+      subscription = person.subscriptions.last unless person.new_record?
+      subscription ||= Subscription.new(person: person)
+
+      subscription.update_from_end_point(payload)
+    else
+      person ||= scope.find_by_email(subscription_params.dig(:person_attributes, :email))
+      subscription = person.subscription.last
+      subscription ||= Subscription.new(person: person)
+    end
+
+    subscription
+  end
+
+
+  def nuw_end_point_person_get(subscription_params)
+    # TODO Timeout quickly and quietly
+    payload = person_params(subscription_params[:person_attributes])
+    payload = end_point_sign(end_point_uri.to_s, payload)
+    
+    url = end_point_uri
+    url.query_values = (url.query_values || {}).merge(payload)
+    
+    response = RestClient::Request.execute url: url.to_s, method: :get, verify_ssl: false
+    nuw_end_point_transform_from(JSON.parse(response).deep_symbolize_keys)
+  end
+
+ 
+  def nuw_end_point_transform_from(payload)
+    result = nil
+    unless payload.blank? 
+      result = nuw_end_point_transform_from_subscription(payload[:subscription])
+      result[:person_attributes] = nuw_end_point_transform_from_person(payload)
+      result[:payments_attributes] = nuw_end_point_transform_from_payments(payload.dig(:subscription, :payments))
+    end
+    result
+  end
+
+  def nuw_end_point_transform_from_subscription(subscription_hash)
+    # This is used in both directions!
+    result = subscription_hash.slice(:frequency, :plan, :pay_method)
+    result[:join_form_id] = @join_form.id
+
+    pm = 
+      case result[:pay_method]
+        when "Credit Card"
+          subscription_hash.slice(:card_number, :expiry_month, :expiry_year, :ccv)
+        when "Australian Bank Account"
+          subscription_hash.slice(:bsb, :account_number)
+        end
+    
+    result.merge!(pm) if pm
+    result
+  end
+
+  def nuw_end_point_transform_from_person(person_hash)
+    result = person_params(person_hash)
+    result[:authorizer_id] = @join_form.person.id
+    result[:union_id] = @join_form.union.id
+    result[:email] = temporary_email if result[:email].blank?
+    result[:first_name] = temporary_first_name if result[:first_name].blank?
+    result 
+  end
+
+  def nuw_end_point_transform_from_payments(payments_hash)
+    payments_hash || []
+  end
+
+  def temporary_email
+    '#{SecureRandom.hex(8)}@unknown.com' # TODO pray for no clashes
+  end
+
+  def temporary_email?(email)
+    (email =~ /.{16}@unknown.com/) == 0
+  end
+
+  def temporary_first_name
+    'unknown'
+  end
+
+  def temporary_first_name?(first_name)
+    first_name == 'unknown'
+  end  
+
+
 end
