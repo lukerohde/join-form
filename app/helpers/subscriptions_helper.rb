@@ -168,106 +168,14 @@ module SubscriptionsHelper
     end
   end
 
-  ##############################################
-  ## membership api stuff 
-  ## TODO refactor into end point, and workout 
-  ## better data transformation scheme & cleaner 
-  ## internal interface
 
-  def end_point_uri
+  ###############################################
+  # TODO Refactor API Stuff
+
+  def nuw_end_point_uri
     Addressable::URI.parse("#{ENV['NUW_END_POINT']}/people")
   end
 
-  def end_point_transform_subscription_to_person(subscription)
-    result = person_params(subscription.person)
-    result.merge!(subscription: end_point_transform_subscription_to_person_subscription(subscription.attributes))
-  end
-
-  def end_point_transform_subscription_to_person_subscription(subscription)
-    # This is used in both directions!
-    subscription = (subscription||{}).to_hash.symbolize_keys
-    result = subscription.slice(:frequency, :plan, :pay_method)
-    
-    pm = 
-      case result[:pay_method]
-        when "Credit Card"
-          subscription.slice(:card_number, :expiry_month, :expiry_year, :ccv)
-        when "Australian Bank Account"
-          subscription.slice(:bsb, :account_number)
-        end
-    
-    result.merge!(pm) if pm
-    result
-  end
-
-  def end_point_person_put(subscription)
-    payload = end_point_transform_subscription_to_person(subscription)
-    payload = end_point_sign(end_point_uri.to_s, payload)
-    response = RestClient::Request.execute url: end_point_uri.to_s, method: :put, payload: payload.to_json, content_type: :json, verify_ssl: false
-    
-    JSON.parse(response.body)
-  end
-
-  def end_point_person_get(subscription_params)
-    # TODO Timeout quickly and quietly
-    payload = person_params(subscription_params[:person_attributes])
-    payload = end_point_sign(end_point_uri.to_s, payload)
-    url = end_point_uri
-    url.query_values = (url.query_values || {}).merge(payload)
-    response = RestClient::Request.execute url: url.to_s, method: :get, verify_ssl: false
-    JSON.parse(response).symbolize_keys
-  end
-
-  def end_point_transform_person_to_subscription(person)
-    subscription = end_point_transform_subscription_to_person_subscription(person[:subscription]).merge(join_form_id: @join_form.id)
-    person = person_params(person) # membership's first_name and email should take precedence
-    person.merge!(authorizer_id: @join_form.person.id, union_id: @join_form.union.id)
-    subscription.merge!(person_attributes: person)
-    subscription
-  end
-
-  def end_point_subscription_get(subscription_params)
-    # Load a subscription out of membership, into this system
-    result = nil
-      
-    person_data = end_point_person_get(subscription_params)
-      
-    unless person_data.blank?
-      subscription_data = end_point_transform_person_to_subscription(person_data)
-      result = Subscription.new(subscription_data)
-      if person_data[:email] && (person = Person.find_by_email(person_data[:email]))
-        if person.subscriptions.last
-          # person already in system, with subscription
-          result = person.subscriptions.last 
-        else
-          # person already in system, without subscription
-          result.person = person
-        end
-        # update existing subscription and person with end point data
-        patch_subscription(result, subscription_data)
-      end
-    end
-
-    result
-  end
-
-
-  def end_point_sign(url, payload)
-    # convert to json and back to fix date formats
-    # sort to make sure param order is consistent (only json payloads have nested params and these dont need to be sorted)
-    data = url + JSON.parse(payload.sort.to_json).to_s
-    hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['NUW_END_POINT_SECRET'], data)}")
-    payload.merge!(hmac: hmac)
-    payload
-  end
-
-  def fix_phone(number)
-    (number||"").gsub(/[^0-9]/, '') # remove non-numeric characters
-  end
-
-  
-  ###############################################
-  # V2 API Stuff
   def nuw_end_point_load(subscription_params)
     subscription = nil
     scope = Person #.eager_load(:subscriptions => :payments)
@@ -295,16 +203,55 @@ module SubscriptionsHelper
 
   def nuw_end_point_person_get(subscription_params)
     # TODO Timeout quickly and quietly
-    payload = person_params(subscription_params[:person_attributes])
-    payload = end_point_sign(end_point_uri.to_s, payload)
+    url = nuw_end_point_uri
     
-    url = end_point_uri
+    payload = person_params(subscription_params[:person_attributes])
+    payload = nuw_end_point_sign(url.to_s, payload)
+    
     url.query_values = (url.query_values || {}).merge(payload)
     
     response = RestClient::Request.execute url: url.to_s, method: :get, verify_ssl: false
     nuw_end_point_transform_from(JSON.parse(response).deep_symbolize_keys)
   end
+  
+  def nuw_end_point_person_put(subscription)
+    url = nuw_end_point_uri
+    
+    payload = nuw_end_point_transform_to(subscription)
+    payload = nuw_end_point_sign(url.to_s, payload)
+    response = RestClient::Request.execute url: url.to_s, method: :put, payload: payload.to_json, content_type: :json, verify_ssl: false
+    
+    result = JSON.parse(response.body).deep_symbolize_keys
+    nuw_api_process_put(subscription, result)
+    result
+  end
 
+  def nuw_api_process_put(subscription, payload)
+    subscription.person.external_id = payload[:external_id]
+    subscription.person.authorizer_id = @join_form.person.id
+
+    payments = payload.dig(:subscription, :payments)
+
+    subscription.payments.each do |p1|
+      if p1.external_id.nil?
+        p2 = payments.find {|p3| p3[:id] == "nuw_api_#{p1.id}"} # this feels horrible, maybe I should do this on natural key like timestamp and amount
+        p1.external_id = p2[:external_id] 
+      end
+    end
+      
+    subscription.save!
+  end
+
+  def nuw_end_point_sign(url, payload)
+    # convert to json and back to fix date formats
+    # sort to make sure param order is consistent (only json payloads have nested params and these dont need to be sorted)
+    data = url + JSON.parse(payload.sort.to_json).to_s
+    hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['NUW_END_POINT_SECRET'], data)}")
+    payload.merge!(hmac: hmac)
+    payload
+  end
+
+  ## Transform from NUW end point format
  
   def nuw_end_point_transform_from(payload)
     result = nil
@@ -342,8 +289,45 @@ module SubscriptionsHelper
     result 
   end
 
+
   def nuw_end_point_transform_from_payments(payments_hash)
     payments_hash || []
+  end
+
+  ## Tranform to end point format ##
+  def nuw_end_point_transform_to(subscription)
+    result = nuw_end_point_transform_to_person(subscription.person)
+    payments = nuw_end_point_transform_to_payments(subscription.payments.where("external_id is null"))
+    subscription = nuw_end_point_transform_to_subscription(subscription.attributes)
+    subscription[:payments] = payments
+    result[:subscription] = subscription
+    result
+  end
+
+  def nuw_end_point_transform_to_person(person)
+    person_params(person)
+  end
+
+  def nuw_end_point_transform_to_payments(payments)
+    payments.collect { |p| p.attributes.to_hash }
+  end
+
+  def nuw_end_point_transform_to_subscription(subscription)
+    # This is used in both directions!
+    subscription = (subscription||{}).to_hash.symbolize_keys
+    result = subscription.slice(:frequency, :plan, :pay_method)
+    
+    pm = 
+      case result[:pay_method]
+        when "Credit Card"
+          subscription.slice(:card_number, :expiry_month, :expiry_year, :ccv)
+        when "Australian Bank Account"
+          subscription.slice(:bsb, :account_number)
+        end
+    
+    result.merge!(pm) if pm
+
+    result
   end
 
   def temporary_email
@@ -362,5 +346,8 @@ module SubscriptionsHelper
     first_name == 'unknown'
   end  
 
+  def fix_phone(number)
+    (number||"").gsub(/[^0-9]/, '') # remove non-numeric characters
+  end
 
 end

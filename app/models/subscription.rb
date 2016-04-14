@@ -93,20 +93,21 @@ class Subscription < ApplicationRecord
   
  	def update_with_payment(params, union)
 	  assign_attributes(params)
-	  	
+	  amount = 5.00
 	  if valid?
 	  	customer = Stripe::Customer.create({description: person.email, card: stripe_token} , {stripe_account: union.stripe_user_id})
 	    person.stripe_token = customer.id
-	    charge = Stripe::Charge.create({amount: 500, currency: 'AUD', description: join_form.description, customer: person.stripe_token}, {stripe_account: union.stripe_user_id})
-	    save!
+	    charge = Stripe::Charge.create({amount: (amount * 100).round(0), currency: 'AUD', description: join_form.description, customer: person.stripe_token}, {stripe_account: union.stripe_user_id})
+	    self.payments << Payment.new(date: Date.today, amount: amount.round(2), person_id: self.person.id)
+      save!
 	  end
 	rescue Stripe::CardError => e
 		logger.error "Stripe error while creating customer: #{e.message}"
-		errors.add :base, "Your card was declined."
+		errors.add :base, "#{e.message}"
 	  false
 	rescue Stripe::InvalidRequestError => e
 	  logger.error "Stripe error while creating customer: #{e.message}"
-	  errors.add :base, "There was a problem with your credit card."
+	  errors.add :base, "There was a problem with your credit card: #{e.message}."
 	  false
 	end
 
@@ -132,14 +133,18 @@ class Subscription < ApplicationRecord
 
     # either add or update payment, assumes eager loading, n^2 nastiness, to avoid multiple database hits
     payments_payload.each do |payment_payload|
-      p = payments.find { |p| p.external_id == payment_payload[:external_id]}
-      if p.blank?
+      payment_payload.except!(:id).merge!(person_id: self.person.id)
+      found = false
+      self.payments.each do |p|
+        if p.external_id == payment_payload[:external_id].to_s
+          found = true
+          p.assign_attributes(payment_payload) # TODO make sure this works
+        end
+      end
+      unless found 
         self.payments.build(payment_payload)
-      else
-        p.assign_attributes(payment_payload)
       end
     end
-
     save!
   end
 end

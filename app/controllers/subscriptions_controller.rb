@@ -72,7 +72,7 @@ class SubscriptionsController < ApplicationController
     end 
 
     # TODO Guarentee delivery
-    end_point_person_put(@subscription) if result
+    nuw_end_point_person_put(@subscription) if result
       
     result
   end
@@ -193,7 +193,7 @@ class SubscriptionsController < ApplicationController
       patch_subscription(@subscription, params)
       result = @subscription.save
       # TODO Guarantee delivery
-      end_point_person_put(@subscription) if result
+      nuw_end_point_person_put(@subscription) if result
       result
     end
 
