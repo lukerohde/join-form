@@ -57,5 +57,4 @@ app_helper_ready = ->
 		$("span[data-time]").each -> 
 			$(this).html(new Date($(this).data('time')).toString());
 
-$(document).ready(app_helper_ready);
 $(document).on('turbolinks:load', app_helper_ready);

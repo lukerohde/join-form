@@ -37,9 +37,6 @@ subscription =
       $('#stripe_error').text(response.error.message)
       $('input[type=submit]').attr('disabled', false)
 
-$(document).ready(subscription_helper_ready);
-$(document).on('page:load', subscription_helper_ready);
-
 @pay_method_change = (e) ->
   $("#edit_credit_card").toggle (e.value is "Credit Card")
   $("#edit_au_bank_account").toggle (e.value is "Australian Bank Account")
@@ -54,5 +51,6 @@ pay_method_ready = ->
       $('#edit_au_bank_account').show()
   return
      
-$(document).ready(pay_method_ready);
 $(document).on('turbolinks:load', pay_method_ready);
+$(document).on('turbolinks:load', subscription_helper_ready);
+
