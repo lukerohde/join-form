@@ -249,7 +249,7 @@ module SubscriptionsHelper
     subscription.payments.each do |p1|
       if p1.external_id.nil?
         p2 = payments.find {|p3| p3[:id] == "nuw_api_#{p1.id}"} # this feels horrible, maybe I should do this on natural key like timestamp and amount
-        p1.external_id = p2[:external_id] 
+        p1.external_id = p2[:external_id] if p2.present? # if it can't id a payment, then it'll keep posting it
       end
     end
     
