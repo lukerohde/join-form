@@ -206,7 +206,7 @@ module SubscriptionsHelper
     else
       person = Person.find_by_email(subscription_params.dig(:person_attributes, :email))
       if person
-        subscription = person.subscription.last
+        subscription = person.subscriptions.last
         subscription ||= Subscription.new(person: person)
       end
     end
@@ -347,7 +347,7 @@ module SubscriptionsHelper
     
       result.merge!(pm) if pm
     end
-    
+
     result
   end
 
