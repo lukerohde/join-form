@@ -127,7 +127,7 @@ class Application < Sinatra::Base
 				MemberResSuburb: api_data[:suburb],
 				MemberResState: api_data[:state],
 				MemberResPostcode: api_data[:postcode],
-				paymentNote: 'online join received #{Date.today}'
+				paymentNote: "online join received #{Date.today.strftime('%d-%b-%Y')}"
 			}
 
 
@@ -150,7 +150,7 @@ class Application < Sinatra::Base
 			CompanyID: "", # TODO unalloc
 			Status: "14", # A1p TODO Conditional Potential, Paying
 			MemberAwardID: "", 
-			MemberFeeGroupID: "GROUPNVA", 
+			MemberFeeGroupID: "GroupNoFee", 
 			LastName: "Unknown", 
 			MailReturned: 0, 
 		}

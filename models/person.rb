@@ -59,8 +59,8 @@ class Application
 					postcode: self.MemberResPostcode,
 					subscription: {
 						frequency: self.MemberPayFrequency,
-						plan: self.MemberFeeGroupID,
-						pay_method: case when self.MemberPaymentType == 'C' then 'Credit Card' else 'Direct Debit' end, 
+						plan: self.MemberFeeGroupID == "GroupNoFee" ? "" : self.MemberFeeGroupID,
+						pay_method: case when self.MemberPaymentType == 'C' then 'Credit Card' else 'Australian Bank Account' end, 
 						payments: transactions,
 					}, 
 				})
