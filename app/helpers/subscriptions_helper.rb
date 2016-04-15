@@ -336,15 +336,17 @@ module SubscriptionsHelper
     result = hash.slice(:frequency, :plan)
     result[:establishment_fee] = subscription.total
 
-    pm = 
-      case subscription.pay_method_saved?
-        when "Credit Card"
-          hash.slice(:pay_method, :card_number, :expiry_month, :expiry_year, :ccv)
-        when "Australian Bank Account"
-          hash.slice(:pay_method, :bsb, :account_number)
-        end
+    if subscription.pay_method_saved?
+      pm = 
+        case subscription.pay_method
+          when "Credit Card"
+            hash.slice(:pay_method, :card_number, :expiry_month, :expiry_year, :ccv)
+          when "Australian Bank Account"
+            hash.slice(:pay_method, :bsb, :account_number)
+          end
     
-    result.merge!(pm) if pm
+      result.merge!(pm) if pm
+    end
     
     result
   end
