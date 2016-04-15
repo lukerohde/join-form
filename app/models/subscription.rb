@@ -7,7 +7,7 @@ class Subscription < ApplicationRecord
   has_many :payments, autosave: true
   
   validates :person, :join_form, presence: true
-  validates :frequency, :plan, presence: true, if: :address_saved?
+  validate :subscription_must_be_complete, if: :address_saved?
   validate :address_must_be_complete, if: :contact_details_saved?
   validate :pay_method_must_be_complete, if: :subscription_saved?
 
@@ -28,7 +28,7 @@ class Subscription < ApplicationRecord
   end
 
   def address_saved?
-  	person.present? && person.address1_was.present? && person.suburb_was.present? && person.state_was.present? && person.postcode_was.present? && !@skip_validation
+  	person.present? && person.address1_was.present? && person.suburb_was.present? && person.state_was.present? && person.postcode_was.present? 
   end
 
   def address_present?
@@ -36,11 +36,11 @@ class Subscription < ApplicationRecord
   end
 
   def contact_details_saved?
-  	person.present? && person.email_was.present? && person.first_name_was.present? && !@skip_validation
+  	(person.present? && person.email_was.present? && person.first_name_was.present?) 
   end
 
   def subscription_saved?
-  	frequency_was.present? && plan_was.present? && !@skip_validation
+  	(frequency_was.present? && plan_was.present?)
   end
 
   def subscription_present?
@@ -48,18 +48,28 @@ class Subscription < ApplicationRecord
   end
 
   def pay_method_saved?
-  	stripe_token_was.present? or (bsb_was.present? && account_number_was.present?) && !@skip_validation
+  	(stripe_token_was.present? or (bsb_was.present? && account_number_was.present?)) || @skip_validation
   end
 
   def bsb_valid?
-  	bsb.decrypt =~ /^\d{3}-?\d{3}$/ # e.g. 123-123 or 123123
+    # e.g. 123-123 or 123123
+  	bsb.decrypt =~ /^\d{3}-?\d{3}$/ || bsb.decrypt == "*encrypted*"
   end
 
   def account_number_valid?
-  	account_number.decrypt =~ /^\d+$/
+  	account_number.decrypt =~ /^\d+$/ || account_number.decrypt == "*encrypted*"
+  end
+
+  def subscription_must_be_complete
+    return if @skip_validation
+
+    errors.add(:plan, "can't be blank") if plan.blank?
+    errors.add(:frequency, "can't be blank") if frequency.blank?
   end
 
   def address_must_be_complete
+    return if @skip_validation
+
   	if person
   		person.errors.add(:address1, "You must provide an address1") unless person.address1.present?
     	person.errors.add(:suburb, "You must provide an suburb") unless person.suburb.present?
@@ -70,7 +80,9 @@ class Subscription < ApplicationRecord
   end
 
   def pay_method_must_be_complete
-  	case pay_method
+  	return if @skip_validation
+
+    case pay_method
   	when "Credit Card"
   		errors.add(:card_number, "couldn't be validated by our payment gateway.  Please try again.") unless stripe_token.present?
   	when "Australian Bank Account"
@@ -81,6 +93,11 @@ class Subscription < ApplicationRecord
   	end
   end
 
+  def save_without_validation!
+    @skip_validation = true
+    save!
+    @skip_validation = false
+  end
 
   def step?
   	return :thanks if pay_method_saved?
@@ -90,15 +107,32 @@ class Subscription < ApplicationRecord
   	:contact_detail
   end
 
+  def discount 
+    dues = self.payments.sum(:amount)
+    dues > establishment_fee ? establishment_fee : dues
+  end
+
+  def establishment_fee
+    self.join_form.base_rate_establishment
+  end
+
+  def total
+    establishment_fee - discount
+  end
   
  	def update_with_payment(params, union)
 	  assign_attributes(params)
-	  amount = 5.00
+	  
 	  if valid?
 	  	customer = Stripe::Customer.create({description: person.email, card: stripe_token} , {stripe_account: union.stripe_user_id})
 	    person.stripe_token = customer.id
-	    charge = Stripe::Charge.create({amount: (amount * 100).round(0), currency: 'AUD', description: join_form.description, customer: person.stripe_token}, {stripe_account: union.stripe_user_id})
-	    self.payments << Payment.new(date: Date.today, amount: amount.round(2), person_id: self.person.id)
+      
+      stripe_amount = (self.total * 100).round(0).to_i
+      if stripe_amount > 0
+        charge = Stripe::Charge.create({amount: stripe_amount, currency: 'AUD', description: join_form.description, customer: person.stripe_token}, {stripe_account: union.stripe_user_id})
+	    end
+
+      self.payments << Payment.new(date: Date.today, amount: self.total.round(2), person_id: self.person.id)
       save!
 	  end
 	rescue Stripe::CardError => e
@@ -146,5 +180,6 @@ class Subscription < ApplicationRecord
       end
     end
     save!
+    @skip_validation = false
   end
 end

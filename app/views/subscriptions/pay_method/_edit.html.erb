@@ -1,5 +1,22 @@
 <h2>Payment Details</h2>
 
+<p>
+<div class="row">
+  <div class="col-sm-6">Application Fee:</div> 
+  <div class="col-sm-6"><%=number_to_currency(@subscription.establishment_fee, locale: @locale) %> </div>
+</div>
+<% if @subscription.discount > 0 %>
+  <div class="row">
+    <div class="col-sm-6">Member Discount:</div> 
+    <div class="col-sm-6"><%=number_to_currency(@subscription.discount, locale: @locale) %> </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6"><strong>Up Front Total:</strong></div> 
+    <div class="col-sm-6"><strong><u><%=number_to_currency(@subscription.total, locale: @locale) %></u></strong> </div>
+  </div>
+<% end %>
+</p>
+
 <div class="form-group">
   <%= f.label :pay_method %><br>
   <%= f.select :pay_method,
@@ -19,3 +36,7 @@
 <%= render 'subscriptions/pay_method/edit_credit_card', f: f %>
 
 <%= render 'subscriptions/pay_method/edit_au_bank_account', f: f %>
+
+  <div id="stripe_error">
+    <noscript>JavaScript is not enabled and is required for this form. First enable it in your web browser settings.</noscript>
+  </div>

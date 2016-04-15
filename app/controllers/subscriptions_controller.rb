@@ -116,6 +116,9 @@ class SubscriptionsController < ApplicationController
       if @subscription.nil?
         forbidden
       else
+        # update record from api if its been linked (TODO what if it hasn't? should background messaging link it)
+        @subscription = nuw_end_point_reload(@subscription)
+      
         # blank these so they cannot be returned
         @subscription.card_number = ""
         @subscription.ccv = ""
@@ -145,7 +148,7 @@ class SubscriptionsController < ApplicationController
     end
 
     def set_join_form
-      id = params[:join_form_id] || params.dig(:subscription, :join_form_id) 
+      id = params[:join_form_id] || params.dig(:subscription, :join_form_id) || @subscription.join_form.id
       
       if (Integer(id) rescue nil)
         @join_form = @union.join_forms.find(id)
@@ -156,7 +159,7 @@ class SubscriptionsController < ApplicationController
 
     def resubscribe?
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
-      @subscription = nuw_end_point_load(subscription_params) unless @subscription
+      @subscription = nuw_end_point_load(subscription_params, @join_form)
       if @subscription
         # If an existing subcription exists, determine secure and appropriate action
         if current_person && current_person.union.id == @join_form.union.id

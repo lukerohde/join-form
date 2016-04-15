@@ -176,25 +176,39 @@ module SubscriptionsHelper
     Addressable::URI.parse("#{ENV['NUW_END_POINT']}/people")
   end
 
-  def nuw_end_point_load(subscription_params)
+  def nuw_end_point_reload(subscription)
+    if subscription.person.present? && subscription.person.external_id.present?
+      payload = nuw_end_point_person_get(person_attributes: {external_id: subscription.person.external_id})
+      subscription.person.authorizer_id = subscription.join_form.person.id
+      subscription.update_from_end_point(payload)
+    end
+    subscription
+  end
+
+  def nuw_end_point_load(subscription_params, join_form)
     subscription = nil
-    scope = Person #.eager_load(:subscriptions => :payments)
     
     payload = nuw_end_point_person_get(subscription_params)
     unless payload.blank? 
-      person = scope.find_by_external_id(payload.dig(:person_parameters, :external_id)) if payload.dig(:person_parameters, :external_id)
-      person ||= scope.find_by_email(subscription_params.dig(:person_attributes, :email)) if subscription_params.dig(:person_attributes, :email)
-      person ||= scope.find_by_email(payload[:email]) if payload[:email]
+      person = Person.find_by_external_id(payload.dig(:person_parameters, :external_id)) if payload.dig(:person_parameters, :external_id)
+      person ||= Person.find_by_email(subscription_params.dig(:person_attributes, :email)) if subscription_params.dig(:person_attributes, :email)
+      person ||= Person.find_by_email(payload[:email]) if payload[:email]
       person ||= Person.new()
 
       subscription = person.subscriptions.last unless person.new_record?
       subscription ||= Subscription.new(person: person)
 
+      subscription.join_form_id = join_form.id
+      person.authorizer_id = join_form.person.id
+      person.union_id = join_form.union.id
+    
       subscription.update_from_end_point(payload)
     else
-      person ||= scope.find_by_email(subscription_params.dig(:person_attributes, :email))
-      subscription = person.subscription.last
-      subscription ||= Subscription.new(person: person)
+      person = Person.find_by_email(subscription_params.dig(:person_attributes, :email))
+      if person
+        subscription = person.subscription.last
+        subscription ||= Subscription.new(person: person)
+      end
     end
 
     subscription
@@ -222,11 +236,11 @@ module SubscriptionsHelper
     response = RestClient::Request.execute url: url.to_s, method: :put, payload: payload.to_json, content_type: :json, verify_ssl: false
     
     result = JSON.parse(response.body).deep_symbolize_keys
-    nuw_api_process_put(subscription, result)
+    nuw_api_process_put_response(subscription, result)
     result
   end
 
-  def nuw_api_process_put(subscription, payload)
+  def nuw_api_process_put_response(subscription, payload)
     subscription.person.external_id = payload[:external_id]
     subscription.person.authorizer_id = @join_form.person.id
 
@@ -238,8 +252,14 @@ module SubscriptionsHelper
         p1.external_id = p2[:external_id] 
       end
     end
-      
-    subscription.save!
+    
+    # TODO after card details have been posted, they are no longer required
+    #subscription.card_number = nil
+    #subscription.ccv = nil
+    #subscription.bsb = nil
+    #subscription.account_number = nil
+
+    subscription.save_without_validation!
   end
 
   def nuw_end_point_sign(url, payload)
@@ -266,7 +286,6 @@ module SubscriptionsHelper
   def nuw_end_point_transform_from_subscription(subscription_hash)
     # This is used in both directions!
     result = subscription_hash.slice(:frequency, :plan, :pay_method)
-    result[:join_form_id] = @join_form.id
 
     pm = 
       case result[:pay_method]
@@ -282,8 +301,6 @@ module SubscriptionsHelper
 
   def nuw_end_point_transform_from_person(person_hash)
     result = person_params(person_hash)
-    result[:authorizer_id] = @join_form.person.id
-    result[:union_id] = @join_form.union.id
     result[:email] = temporary_email if result[:email].blank?
     result[:first_name] = temporary_first_name if result[:first_name].blank?
     result 
@@ -298,7 +315,7 @@ module SubscriptionsHelper
   def nuw_end_point_transform_to(subscription)
     result = nuw_end_point_transform_to_person(subscription.person)
     payments = nuw_end_point_transform_to_payments(subscription.payments.where("external_id is null"))
-    subscription = nuw_end_point_transform_to_subscription(subscription.attributes)
+    subscription = nuw_end_point_transform_to_subscription(subscription)
     subscription[:payments] = payments
     result[:subscription] = subscription
     result
@@ -309,24 +326,26 @@ module SubscriptionsHelper
   end
 
   def nuw_end_point_transform_to_payments(payments)
-    payments.collect { |p| p.attributes.to_hash }
+    payments
+      .select{|p| p.amount > 0 && p.external_id.nil?}
+      .collect { |p| p.attributes.to_hash }
   end
 
   def nuw_end_point_transform_to_subscription(subscription)
-    # This is used in both directions!
-    subscription = (subscription||{}).to_hash.symbolize_keys
-    result = subscription.slice(:frequency, :plan, :pay_method)
-    
+    hash = subscription.attributes.symbolize_keys
+    result = hash.slice(:frequency, :plan)
+    result[:establishment_fee] = subscription.total
+
     pm = 
-      case result[:pay_method]
+      case subscription.pay_method_saved?
         when "Credit Card"
-          subscription.slice(:card_number, :expiry_month, :expiry_year, :ccv)
+          hash.slice(:pay_method, :card_number, :expiry_month, :expiry_year, :ccv)
         when "Australian Bank Account"
-          subscription.slice(:bsb, :account_number)
+          hash.slice(:pay_method, :bsb, :account_number)
         end
     
     result.merge!(pm) if pm
-
+    
     result
   end
 

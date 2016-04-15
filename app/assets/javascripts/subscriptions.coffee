@@ -15,6 +15,8 @@ subscription =
   setupForm: ->
     $('#new_subscription, .edit_subscription').submit ->
       $('input[type=submit]').attr('disabled', true)
+      subscription.button_text = $('input[type=submit]').prop('value')
+      $('input[type=submit]').prop('value', 'Processing...')
       if $('#subscription_pay_method').val() == "Credit Card" # TODO figure out how to localize
         if $('#subscription_card_number').length
             subscription.processCard()
@@ -39,6 +41,8 @@ subscription =
     else
       $('#stripe_error').text(response.error.message)
       $('input[type=submit]').attr('disabled', false)
+      $('input[type=submit]').prop('value', subscription.button_text)
+      
 
 @pay_method_change = (e) ->
   $("#edit_credit_card").toggle (e.value is "Credit Card")
