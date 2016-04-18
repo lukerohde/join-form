@@ -129,6 +129,7 @@ class SubscriptionsController < ApplicationController
         if @subscription.person
           @subscription.person.email = "" if temporary_email?(@subscription.person.email)
           @subscription.person.first_name = "" if temporary_first_name?(@subscription.person.first_name)
+          @subscription.person.last_name = "" if temporary_last_name?(@subscription.person.last_name)
         end 
       end
     end

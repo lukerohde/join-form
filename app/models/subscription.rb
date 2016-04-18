@@ -36,7 +36,7 @@ class Subscription < ApplicationRecord
   end
 
   def contact_details_saved?
-  	(person.present? && person.email_was.present? && person.first_name_was.present?) 
+  	(person.present? && person.email_was.present? && person.first_name_was.present? && person.first_name.downcase != "unknown") 
   end
 
   def subscription_saved?
@@ -99,12 +99,12 @@ class Subscription < ApplicationRecord
     @skip_validation = false
   end
 
-  def step?
+  def step
   	return :thanks if pay_method_saved?
   	return :pay_method if subscription_saved?
   	return :subscription if address_saved?
-  	return :address if contact_detail_saved?
-  	:contact_detail
+  	return :address if contact_details_saved?
+  	:contact_details
   end
 
   def discount 

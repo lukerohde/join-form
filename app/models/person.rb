@@ -15,9 +15,14 @@ class Person < ApplicationRecord
   #validates :email, presence: true # devise does this already
   validates :union, presence: true
   validate :is_authorized?
+  validate :contact_detail_must_be_complete
 
   include Filterable
   scope :name_like, -> (name) {where("first_name ilike ? or last_name ilike ? or email ilike ?", "%#{name}%", "%#{name}%", "%#{name}%")}
+
+  def contact_detail_must_be_complete
+    errors.add(:first_name, I18n.translate('people.errors.not_blank')) if self.first_name.blank? || self.first_name.downcase == "unknown"
+  end
 
   def name
   	"#{first_name} #{last_name}"
@@ -32,7 +37,7 @@ class Person < ApplicationRecord
   end
 
   def contact_detail_valid?
-    email_valid? && first_name.present?
+    email_valid? && first_name.present? && first_name != "unknown"
   end
 
   def email_valid?

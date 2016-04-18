@@ -8,11 +8,23 @@ subscription_helper_ready = ->
   subscription.autoSubmitOnPrefill()
   if ($('[type="date"]').prop('type') != 'date' )
     $('[type="date"]').datepicker()
+  subscription.goToStep()
   
 subscription =
   autoSubmitOnPrefill: ->
     if (window.location.search.indexOf('auto_submit=true')>-1)
       $('#new_subscription')[0].submit()
+
+  goToStep: ->
+    step = $("#step").data('step')
+    top = $('#' + step).offset().top
+    top = top - ($('#notice').outerHeight() || 0)
+    if (top < 0) 
+      top = 0
+
+    $('html, body').animate { 
+      scrollTop: top
+    }, 1000
 
   setupForm: ->
     $('#new_subscription, .edit_subscription').submit ->

@@ -49,19 +49,6 @@ en:
     other: neither
   helpers:
     label:
-      person:
-        external_id: "Member ID"
-        first_name: "First Name"
-        last_name: "Last Name"
-        email: "Email"
-        mobile: "Mobile Phone"
-        gender: "Gender"
-        dob: "Date of Birth"
-        address1: "Address Line 1"
-        address2: "Address Line 2"
-        suburb: "Suburb"
-        state: "State"
-        postcode: "Post Code"
       subscription:
         description: "Description"
   activerecord:
@@ -75,6 +62,22 @@ en:
         card_number: "Credit Card Number"
         expiry: "Expiry"
         ccv: "CCV (the 3 digits on the back of the card)"
+      person:
+        external_id: "Member ID"
+        first_name: "First Name"
+        last_name: "Last Name"
+        email: "Email"
+        mobile: "Mobile Phone"
+        gender: "Gender"
+        dob: "Date of Birth"
+        address1: "Address Line 1"
+        address2: "Address Line 2"
+        suburb: "Suburb"
+        state: "State"
+        postcode: "Post Code"
+  people:
+    errors:
+      not_blank: "can't be blank"
   subscriptions:
     form:
       error_summary: 

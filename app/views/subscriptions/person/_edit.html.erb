@@ -1,5 +1,7 @@
   <h2><%=t(".heading")%></h2>
-  
+
+  <%= render 'errors' if @subscription.step == :contact_details %>
+
   <% if current_person # prevent external users fiddling, needed for reviewing before saving%> 
     <div class="form-group">
       <%= f.hidden_field :external_id %>
@@ -33,7 +35,7 @@
           include_blank: true,
       },
       data: { 
-        placeholder: t("helpers.label.person.gender"),
+        placeholder: t("activerecord.attributes.person.gender"),
       }, 
       class: "form-control", 
       style: "width: 100%;"

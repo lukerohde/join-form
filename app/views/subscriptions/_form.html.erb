@@ -1,5 +1,5 @@
 <% set_title(subscription.join_form.page_title) %>
-
+<div id="step" data-step="<%=@subscription.step%>"/>
 <style>
   <%=subscription.join_form.css.html_safe %>
 </style>
@@ -7,18 +7,7 @@
 <%=subscription.join_form.header.html_safe %>
 
 <%= form_for(subscription, url: subscription_form_path(subscription)) do |f| %>
-  <% if subscription.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= t('.error_summary', count: subscription.errors.count )%></h2>
-
-      <ul>
-      <% subscription.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
+  
   <%= f.fields_for :person do |p| %>
     <%= render 'subscriptions/person/edit', f: p, person: @subscription.person  %> 
   <% end %>

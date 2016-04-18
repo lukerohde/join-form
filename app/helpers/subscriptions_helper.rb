@@ -347,7 +347,6 @@ module SubscriptionsHelper
     
       result.merge!(pm) if pm
     end
-    binding.pry
 
     result
   end
@@ -364,8 +363,12 @@ module SubscriptionsHelper
     'unknown'
   end
 
+  def temporary_last_name?(last_name)
+    last_name.downcase == 'unknown'
+  end
+
   def temporary_first_name?(first_name)
-    first_name == 'unknown'
+    first_name.downcase == 'unknown'
   end  
 
   def fix_phone(number)

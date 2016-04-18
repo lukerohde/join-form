@@ -1,4 +1,7 @@
-  <h2><%=t(".heading")%></h2>
+  <h2 id="address"><%=t(".heading")%></h2>
+
+  <%= render 'errors' if @subscription.step == :address %>
+
   <div class="form-group">
     <%= f.label :address1 %><br>
     <%= f.text_field :address1, class: "form-control" %>

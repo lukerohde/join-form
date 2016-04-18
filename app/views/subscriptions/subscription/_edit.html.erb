@@ -1,4 +1,6 @@
-<h2><%=t(".heading")%></h2>
+<h2 id="subscription"><%=t(".heading")%></h2>
+
+<%= render 'errors' if @subscription.step == :subscription %>
 
 <% if @subscription.join_form.description.present? %>
   <div class="form-group">
