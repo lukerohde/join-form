@@ -18,4 +18,5 @@
 //= require bootstrap-switch.min
 //= require jquery.playSound
 //= require application_helpers
+//= require jquery-ui
 //= require_tree .

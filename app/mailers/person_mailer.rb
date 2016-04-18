@@ -25,7 +25,7 @@ class PersonMailer < ApplicationMailer
 		uri.query_values = (uri.query_values || {}).merge(params)
 		@url = uri.to_s
 
-		mail(from: from(request), to: subscription.person.email, subject: "Please verify your email to continue joining")
+		mail(from: from(request), to: subscription.person.email, subject: t('subscriptions.verify_email.subject'))
 	end
 
 	def duplicate_notice(subscription, params, request)

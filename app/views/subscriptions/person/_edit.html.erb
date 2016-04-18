@@ -1,14 +1,18 @@
-  <h2>Personal Details</h2>
+  <h2><%=t(".heading")%></h2>
   
   <% if current_person # prevent external users fiddling, needed for reviewing before saving%> 
-  <div class="form-group">
-    <%= f.hidden_field :external_id %>
-    <%= f.label :external_id, 'Member ID' %><br>
-    <div class="form-control">
-      <%= person.external_id %>
-    </div>
-    <br>
+    <div class="form-group">
+      <%= f.hidden_field :external_id %>
+      <%= f.label :external_id %><br>
+      <div class="form-control">
+        <%= person.external_id %>
+      </div>
+      <br>
   <% end %>
+  <div class="form-group">
+    <%= f.label :email %><br>
+    <%= f.text_field :email, class: "form-control" %>
+  </div>
   <div class="form-group">
     <%= f.label :first_name %><br>
     <%= f.text_field :first_name, class: "form-control" %>
@@ -16,10 +20,6 @@
   <div class="form-group">
     <%= f.label :last_name %><br>
     <%= f.text_field :last_name, class: "form-control" %>
-  </div>
-  <div class="form-group">
-    <%= f.label :email %><br>
-    <%= f.text_field :email, class: "form-control" %>
   </div>
   <div class="form-group">
     <%= f.label :mobile %><br>
@@ -33,7 +33,7 @@
           include_blank: true,
       },
       data: { 
-        placeholder: "Gender",
+        placeholder: t("helpers.label.person.gender"),
       }, 
       class: "form-control", 
       style: "width: 100%;"

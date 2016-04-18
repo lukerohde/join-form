@@ -9,7 +9,7 @@
 <%= form_for(subscription, url: subscription_form_path(subscription)) do |f| %>
   <% if subscription.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(subscription.errors.count, "error") %> prohibited this subscription from being saved:</h2>
+      <h2><%= t('.error_summary', count: subscription.errors.count )%></h2>
 
       <ul>
       <% subscription.errors.full_messages.each do |message| %>
@@ -42,9 +42,9 @@
 
   <div class="actions ">
     <% if @subscription.subscription_saved? %>
-      <%= f.submit "Join Now", class: "btn btn-success" %>
+      <%= f.submit t(".submit_join"), class: "btn btn-success" %>
     <% else %>
-      <%= f.submit "Next", class: "btn btn-default" %>
+      <%= f.submit t(".submit_next"), class: "btn btn-default" %>
     <% end %>
   </div>
 <% end %>

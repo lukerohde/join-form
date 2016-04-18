@@ -6,8 +6,8 @@ module SubscriptionsHelper
 	def pay_method_options(subscription)
     options_for_select(
       [
-        'Credit Card',
-        'Australian Bank Account',
+        [t('subscriptions.pay_method.edit.credit_card'), 'CC'],
+        [t('subscriptions.pay_method.edit.au_bank_account'), 'AB']
       ], 
       subscription.pay_method
     )
@@ -17,15 +17,15 @@ module SubscriptionsHelper
     result = []
     f = subscription.join_form
 
-    result << "Weekly - #{f.base_rate_weekly}" if f.base_rate_weekly
-    result << "Fortnightly - #{f.base_rate_fortnightly}" if f.base_rate_fortnightly
-    result << "Monthly - #{f.base_rate_monthly}" if f.base_rate_monthly
-    result << "Quarterly - #{f.base_rate_quarterly}" if f.base_rate_quarterly
-    result << "Half Yearly - #{f.base_rate_half_yearly}" if f.base_rate_half_yearly
-    result << "Yearly - #{f.base_rate_yearly}" if f.base_rate_yearly
+    result << ["#{t('subscriptions.subscription.edit.weekly')} - #{number_to_currency(f.base_rate_weekly, locale: @locale)}", "W"] if f.base_rate_weekly
+    result << ["#{t('subscriptions.subscription.edit.fortnightly')} - #{number_to_currency(f.base_rate_fortnightly, locale: @locale)}", "F"] if f.base_rate_fortnightly
+    result << ["#{t('subscriptions.subscription.edit.monthly')} - #{number_to_currency(f.base_rate_monthly, locale: @locale)}", "M"] if f.base_rate_monthly
+    result << ["#{t('subscriptions.subscription.edit.quarterly')} - #{number_to_currency(f.base_rate_quarterly, locale: @locale)}", "Q"] if f.base_rate_quarterly
+    result << ["#{t('subscriptions.subscription.edit.half_yearly')} - #{number_to_currency(f.base_rate_half_yearly, locale: @locale)}", "H"] if f.base_rate_half_yearly
+    result << ["#{t('subscriptions.subscription.edit.yearly')} - #{number_to_currency(f.base_rate_yearly, locale: @locale)}", "Y"] if f.base_rate_yearly
     
-    current_selection = subscription.frequency || "Fortnightly"
-    current_selection = result.find { |i| i.downcase.starts_with?(current_selection.downcase) }
+    current_selection = subscription.frequency || "F"
+    current_selection = result.find { |i| i[1] == current_selection.upcase }
 
     options_for_select(
       result, 
@@ -289,9 +289,9 @@ module SubscriptionsHelper
 
     pm = 
       case result[:pay_method]
-        when "Credit Card"
+        when "CC"
           subscription_hash.slice(:card_number, :expiry_month, :expiry_year, :ccv)
-        when "Australian Bank Account"
+        when "AB"
           subscription_hash.slice(:bsb, :account_number)
         end
     
@@ -339,14 +339,15 @@ module SubscriptionsHelper
     if subscription.pay_method_saved?
       pm = 
         case subscription.pay_method
-          when "Credit Card"
+          when "CC"
             hash.slice(:pay_method, :card_number, :expiry_month, :expiry_year, :ccv)
-          when "Australian Bank Account"
+          when "AB"
             hash.slice(:pay_method, :bsb, :account_number)
           end
     
       result.merge!(pm) if pm
     end
+    binding.pry
 
     result
   end

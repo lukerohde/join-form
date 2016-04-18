@@ -63,19 +63,19 @@ class Subscription < ApplicationRecord
   def subscription_must_be_complete
     return if @skip_validation
 
-    errors.add(:plan, "can't be blank") if plan.blank?
-    errors.add(:frequency, "can't be blank") if frequency.blank?
+    errors.add(:plan,I18n.translate("subscriptions.errors.not_blank")) if plan.blank?
+    errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank?
   end
 
   def address_must_be_complete
     return if @skip_validation
 
   	if person
-  		person.errors.add(:address1, "You must provide an address1") unless person.address1.present?
-    	person.errors.add(:suburb, "You must provide an suburb") unless person.suburb.present?
-    	person.errors.add(:state, "You must provide an state") unless person.state.present?
-    	person.errors.add(:postcode, "You must provide an postcode") unless person.postcode.present?
-  		errors.add(:base, "You must complete your address") unless person.address_valid?
+  		person.errors.add(:address1,I18n.translate("subscriptions.errors.not_blank")) unless person.address1.present?
+    	person.errors.add(:suburb,I18n.translate("subscriptions.errors.not_blank")) unless person.suburb.present?
+    	person.errors.add(:state,I18n.translate("subscriptions.errors.not_blank")) unless person.state.present?
+    	person.errors.add(:postcode,I18n.translate("subscriptions.errors.not_blank")) unless person.postcode.present?
+  		errors.add(:base,I18n.translate("subscriptions.errors.complete_address")) unless person.address_valid?
   	end
   end
 
@@ -83,13 +83,13 @@ class Subscription < ApplicationRecord
   	return if @skip_validation
 
     case pay_method
-  	when "Credit Card"
-  		errors.add(:card_number, "couldn't be validated by our payment gateway.  Please try again.") unless stripe_token.present?
-  	when "Australian Bank Account"
-      errors.add(:bsb, "must be properly formatted BSB e.g. 123-123") unless bsb_valid?
-  		errors.add(:account_number, "must be properly formatted e.g. 123456") unless account_number_valid?
+  	when "CC"
+  		errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
+  	when "AB"
+      errors.add(:bsb,I18n.translate("subscriptions.errors.bsb") ) unless bsb_valid?
+  		errors.add(:account_number,I18n.translate("subscriptions.errors.account_number") ) unless account_number_valid?
   	else
-  		errors.add(:pay_method, "must be specified")
+  		errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
   	end
   end
 
@@ -137,11 +137,11 @@ class Subscription < ApplicationRecord
 	  end
 	rescue Stripe::CardError => e
 		logger.error "Stripe error while creating customer: #{e.message}"
-		errors.add :base, "#{e.message}"
+		errors.add :base, "#{I18n.translate('subscriptions.errors.payment_gateway_card_error')}: #{e.message}"
 	  false
 	rescue Stripe::InvalidRequestError => e
 	  logger.error "Stripe error while creating customer: #{e.message}"
-	  errors.add :base, "There was a problem with your credit card: #{e.message}."
+	  errors.add :base, "#{I18n.translate('subscriptions.errors.payment_gateway_error')}: #{e.message}."
 	  false
 	end
 

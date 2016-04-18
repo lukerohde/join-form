@@ -65,7 +65,7 @@ class SubscriptionsController < ApplicationController
 
   def save_step
     result = false
-    if subscription_params['pay_method'] == "Credit Card"
+    if subscription_params['pay_method'] == "CC"
       result = @subscription.update_with_payment(subscription_params, @union)
     else
       result = @subscription.update(subscription_params)
@@ -92,10 +92,11 @@ class SubscriptionsController < ApplicationController
   end
 
   def next_step_notice
-    return 'Thank you for joining' if @subscription.pay_method_saved?
-    return 'Please provide a payment method' if @subscription.subscription_saved?
-    return 'Please choose your membership type' if @subscription.address_saved?
-    return 'Please tell us your address' if @subscription.contact_details_saved?  
+    return t('subscriptions.steps.done') if @subscription.pay_method_saved?
+    return t('subscriptions.steps.payment') if @subscription.subscription_saved?
+    return t('subscriptions.steps.plan') if @subscription.address_saved?
+    return t('subscriptions.steps.address') if @subscription.contact_details_saved?  
+    return t('subscriptions.steps.welcome')
   end
 
   # DELETE /subscriptions/1
@@ -174,7 +175,7 @@ class SubscriptionsController < ApplicationController
         elsif params_match(subscription_params, @subscription)
           # if the user has provided enough contact detail to verify their identity, then they can update their subscription
           patch_and_persist_subscription(subscription_params)
-          redirect_to subscription_form_path(@subscription), notice: "We've found an existing subscription for you to update or renew."
+          redirect_to subscription_form_path(@subscription), notice: t("subscriptions.steps.renewal")
         elsif @subscription.person.email.present?     
           # send email verfication message
           PersonMailer.verify_email(@subscription, subscription_params, request).deliver_now

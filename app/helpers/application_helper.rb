@@ -33,11 +33,11 @@ module ApplicationHelper
 
 	def gender_options(person)
     options_for_select(
-      ([
-        t('gender.male'), 
-        t('gender.female'),
-        t('gender.other')
-        ]).uniq, 
+      [
+        [t('gender.male'), 'M'], 
+        [t('gender.female'), 'F'],
+        [t('gender.other'), 'N']
+		  ], 
       person.gender
     )
   end

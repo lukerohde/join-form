@@ -6,7 +6,9 @@ subscription_helper_ready = ->
   Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
   subscription.setupForm()
   subscription.autoSubmitOnPrefill()
-
+  if ($('[type="date"]').prop('type') != 'date' )
+    $('[type="date"]').datepicker()
+  
 subscription =
   autoSubmitOnPrefill: ->
     if (window.location.search.indexOf('auto_submit=true')>-1)
@@ -17,7 +19,7 @@ subscription =
       $('input[type=submit]').attr('disabled', true)
       subscription.button_text = $('input[type=submit]').prop('value')
       $('input[type=submit]').prop('value', 'Processing...')
-      if $('#subscription_pay_method').val() == "Credit Card" # TODO figure out how to localize
+      if $('#subscription_pay_method').val() == "CC" # TODO figure out how to localize
         if $('#subscription_card_number').length
             subscription.processCard()
             false
@@ -45,16 +47,16 @@ subscription =
       
 
 @pay_method_change = (e) ->
-  $("#edit_credit_card").toggle (e.value is "Credit Card")
-  $("#edit_au_bank_account").toggle (e.value is "Australian Bank Account")
+  $("#edit_credit_card").toggle (e.value is "CC")
+  $("#edit_au_bank_account").toggle (e.value is "AB")
 
 pay_method_ready = ->
   $('#edit_credit_card').hide()
   $('#edit_au_bank_account').hide()
   switch $('#subscription_pay_method').val()
-    when 'Credit Card'
+    when 'CC'
       $('#edit_credit_card').show()
-    when 'Australian Bank Account'
+    when 'AB'
       $('#edit_au_bank_account').show()
   return
      

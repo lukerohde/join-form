@@ -1,4 +1,4 @@
-<h2> Subscription Details</h2>
+<h2><%=t(".heading")%></h2>
 
 <% if @subscription.join_form.description.present? %>
   <div class="form-group">
@@ -19,7 +19,7 @@
         include_blank: true,
     },
     data: {
-      placeholder: "Payment Frequency",
+      placeholder: t('activerecord.attributes.subscription.frequency'),
     },
     class: "form-control",
     style: "width: 100%;"

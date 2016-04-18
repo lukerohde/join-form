@@ -47,3 +47,84 @@ en:
     male: male
     female: female
     other: neither
+  helpers:
+    label:
+      person:
+        external_id: "Member ID"
+        first_name: "First Name"
+        last_name: "Last Name"
+        email: "Email"
+        mobile: "Mobile Phone"
+        gender: "Gender"
+        dob: "Date of Birth"
+        address1: "Address Line 1"
+        address2: "Address Line 2"
+        suburb: "Suburb"
+        state: "State"
+        postcode: "Post Code"
+      subscription:
+        description: "Description"
+  activerecord:
+    attributes:
+      subscription:
+        frequency: "Payment Frequency"
+        pay_method: "Payment Method"
+        account_name: "Name Of Account Holder / Name On Card"
+        bsb: "BSB"
+        account_number: "Account Number"
+        card_number: "Credit Card Number"
+        expiry: "Expiry"
+        ccv: "CCV (the 3 digits on the back of the card)"
+  subscriptions:
+    form:
+      error_summary: 
+        one:  "1 error prevented your membership application from being saved."
+        other: "%{count} errors prevented your membership application from being saved."
+      submit_join: "Join Now"
+      submit_renew: "Renew Now"
+      submit_next: "Next"
+    verify_email:
+      instruction: "Please check your email and follow the verification link to continue."
+      explanation: "We have sent the verification email to the email address already in our system, which may be different to the email you just provided."
+      subject: "Please verify your email to continue joining"
+      follow_link: "Please follow this link to continue..."
+      email_explanation: "You are receiving this notice because somebody may have been trying to update your union membership online."
+    person:
+      edit:
+        heading: "Contact Details"
+    address:
+      edit:
+        heading: "Address Details"
+    subscription:
+      edit: 
+        heading: "Membership Plan Details"
+        weekly: "Weekly"
+        fortnightly: "Fortnightly"
+        monthly: "Monthly"
+        quarterly: "Quarterly"
+        half_yearly: "Half Yearly"
+        yearly: "Yearly"
+    pay_method:
+      edit:
+        heading: "Payment Details"
+        credit_card: "Credit Card"
+        au_bank_account: "Australian Bank Account"
+        application_fee: "Application Fee:"
+        member_discount: "Member Discount:"
+        total: "Up front total:"
+    steps:
+      done: "Thank you for joining"
+      payment: "Please provide a payment method"
+      plan: "Please choose your membership plan"
+      address: "Please tell us your address in Australia"
+      welcome: "Please provide your contact details"
+      renewal: "You are updating your membership with us"
+    errors:
+      not_blank: "can't be blank"
+      complete_address: "You must complete your address"
+      credit_card: "couldn't be validated by our payment gateway.  Please try again."
+      bsb: "must be properly formatted BSB e.g. 123-123"
+      account_number: "must be properly formatted e.g. 123456"
+      pay_method: "must be specified"
+      payment_gateway_error: "Our payment provider had an error while creating your customer record"
+      payment_gateway_card_error: "Our payment provider had a problem with your credit card"
