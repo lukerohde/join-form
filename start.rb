@@ -121,7 +121,7 @@ class Application < Sinatra::Base
 				LastName: api_data[:last_name],
 				MemberEmailAddress: api_data[:email],
 				MobilePhone: api_data[:mobile],
-				Gender: (api_data[:gender]||"")[0],
+				Gender: (api_data[:gender]||"U"),
 				MemberResAddress1: api_data[:address1],
 				MemberResAddress2: api_data[:address2],
 				MemberResSuburb: api_data[:suburb],
@@ -167,7 +167,7 @@ class Application < Sinatra::Base
 		subscription = api_data[:subscription] || {}
 
 		case subscription[:pay_method]
-			when "Credit Card"
+			when "CC"
 				if cn = decrypt(subscription[:card_number])
 					result = result.merge({
 						AccountType: cn[0] == '4' ? 'V' : 'M',
@@ -175,7 +175,7 @@ class Application < Sinatra::Base
 						Expiry: "#{subscription[:expiry_month]}/#{(subscription[:expiry_year].to_s)[2..4]}"
 					})
 				end
-			when "Australian Bank Account"
+			when "AB"
 				if an = decrypt(subscription[:account_number])
 					result = result.merge({
 						AccountType: 'S',

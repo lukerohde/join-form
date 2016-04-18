@@ -60,7 +60,7 @@ class Application
 					subscription: {
 						frequency: self.MemberPayFrequency,
 						plan: self.MemberFeeGroupID == "GroupNoFee" ? "" : self.MemberFeeGroupID,
-						pay_method: case when self.MemberPaymentType == 'C' then 'Credit Card' else 'Australian Bank Account' end, 
+						pay_method: case when self.MemberPaymentType == 'C' then 'CC' else 'AB' end, 
 						payments: transactions,
 					}, 
 				})
