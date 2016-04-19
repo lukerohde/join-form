@@ -33,13 +33,18 @@ subscription =
 
       $('html, body').animate({ 
           scrollTop: top 
-      }, 600)
+      }, 1000)
 
+  swapSubmitLabel: ->
+    temp = $('#subscription_submit').prop('value')
+    $('#subscription_submit').prop('value', $('#subscription_submit').data('label'))
+    $('#subscription_submit').data('label', temp)
+    
   setupForm: ->
     $('#new_subscription, .edit_subscription').submit ->
-      $('input[type=submit]').attr('disabled', true)
-      subscription.button_text = $('input[type=submit]').prop('value')
-      $('input[type=submit]').prop('value', 'Processing...')
+      
+      subscription.swapSubmitLabel()
+      $('#subscription_submit').attr('disabled', true)
       localStorage.setItem('scrollYPos', window.scrollY);
       if $('#subscription_pay_method').val() == "CC" 
         if $('#subscription_card_number').length
@@ -64,9 +69,8 @@ subscription =
       $('#new_subscription, .edit_subscription')[0].submit()
     else
       $('#stripe_error').text(response.error.message)
-      $('input[type=submit]').attr('disabled', false)
-      $('input[type=submit]').prop('value', subscription.button_text)
-      
+      $('#subscription_submit').attr('disabled', false)
+      subscription.swapSubmitLabel()
 
 @pay_method_change = (e) ->
   $("#edit_credit_card").toggle (e.value is "CC")
@@ -82,6 +86,10 @@ pay_method_ready = ->
       $('#edit_au_bank_account').show()
   return
      
+firefox_form_reset = ->
+  $('#subscription_submit').attr('disabled', false)
+  subscription.swapSubmitLabel()
+
 $(document).on('turbolinks:load', pay_method_ready);
 $(document).on('turbolinks:load', subscription_helper_ready);
-
+$(window).unload firefox_form_reset

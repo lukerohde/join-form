@@ -31,9 +31,9 @@
 
   <div class="actions ">
     <% if @subscription.subscription_saved? %>
-      <%= f.submit t(".submit_join"), class: "btn btn-success" %>
+      <%= f.submit t(".submit_join"), class: "btn btn-success", id: "subscription_submit", data: { label: t(".submit_processing")} %>
     <% else %>
-      <%= f.submit t(".submit_next"), class: "btn btn-default" %>
+      <%= f.submit t(".submit_next"), class: "btn btn-default", id: "subscription_submit", data: { label: t(".submit_processing")}  %>
     <% end %>
   </div>
 <% end %>

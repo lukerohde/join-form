@@ -86,6 +86,7 @@ en:
       submit_join: "Join Now"
       submit_renew: "Renew Now"
       submit_next: "Next"
+      submit_processing: "Processing..."
     verify_email:
       instruction: "Please check your email and follow the verification link to continue."
       explanation: "We have sent the verification email to the email address already in our system, which may be different to the email you just provided."
