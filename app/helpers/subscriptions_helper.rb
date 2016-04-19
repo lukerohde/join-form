@@ -3,6 +3,10 @@ module SubscriptionsHelper
   require 'rest-client'
   require 'openssl'
 
+  def start_hidden(step)
+    @subscription.step == step ? "start_hidden" : ""
+  end
+
 	def pay_method_options(subscription)
     options_for_select(
       [

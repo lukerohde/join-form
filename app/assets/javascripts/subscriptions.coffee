@@ -17,21 +17,31 @@ subscription =
 
   goToStep: ->
     step = $("#step").data('step')
-    top = $('#' + step).offset().top
-    top = top - ($('#notice').outerHeight() || 0)
-    if (top < 0) 
-      top = 0
+    if step != "contact_details" && localStorage.getItem('scrollYPos')? 
+      
+      # Go to last scroll position
+      window.scrollTo(0, localStorage.getItem('scrollYPos'))
+      
+      # show the next step
+      $("#" + step).show()       
+      
+      # scroll down, allowing room for the notice
+      top = $('#' + step).offset().top
+      if $('#notice')? 
+        top = top - $('#notice').outerHeight()
+        top = 0 if top < 0 
 
-    $('html, body').animate { 
-      scrollTop: top
-    }, 1000
+      $('html, body').animate({ 
+          scrollTop: top 
+      }, 600)
 
   setupForm: ->
     $('#new_subscription, .edit_subscription').submit ->
       $('input[type=submit]').attr('disabled', true)
       subscription.button_text = $('input[type=submit]').prop('value')
       $('input[type=submit]').prop('value', 'Processing...')
-      if $('#subscription_pay_method').val() == "CC" # TODO figure out how to localize
+      localStorage.setItem('scrollYPos', window.scrollY);
+      if $('#subscription_pay_method').val() == "CC" 
         if $('#subscription_card_number').length
             subscription.processCard()
             false
