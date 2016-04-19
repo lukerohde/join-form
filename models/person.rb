@@ -27,6 +27,10 @@ class Application
 			result
 		end
 
+		def friendly_status
+				ActiveRecord::Base.connection.exec_query("select returnvalue2 from tblLookup where returnvalue1 = '#{self.Status}' and maincriteria = 'tblMember.status'").rows[0][0]
+		end
+
 		def to_json
 			result = {
 				external_id: self.MemberID
@@ -58,6 +62,7 @@ class Application
 					state: self.MemberResState,
 					postcode: self.MemberResPostcode,
 					subscription: {
+						status: self.friendly_status,
 						frequency: self.MemberPayFrequency,
 						plan: self.MemberFeeGroupID == "GroupNoFee" ? "" : self.MemberFeeGroupID,
 						pay_method: case when self.MemberPaymentType == 'C' then 'CC' else 'AB' end, 
