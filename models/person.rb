@@ -50,7 +50,7 @@ class Application
 					last_name: self.LastName,
 					email: self.MemberEmailAddress,
 					mobile: self.MobilePhone,
-					gender: case (self.Gender||'u').downcase when 'm' then 'male' when 'f' then 'female' when 'u' then 'unknown' else 'neither' end,
+					gender: self.Gender,
 					dob: self.DateOfBirth,
 					address1: self.MemberResAddress1,
 					address2: self.MemberResAddress2,
