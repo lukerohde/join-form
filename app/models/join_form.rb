@@ -33,6 +33,56 @@ class JoinForm < ApplicationRecord
 			  background-color: #fff;
 			  color: #555555;
 			}
+
+
+			/* membership card styling */
+			#membership-card-union-name {
+			  width: 70%; 
+			  float:left; 
+			  text-align: left;
+			  font-weight: bold;
+			  font-style: italic;
+			  font-size: 1.4em;
+			  color: white;
+			}
+
+			#membership-card-union-logo {
+			  width: 20%; 
+			  float:right;
+			}
+
+			#membership-card-union-logo > img {
+			  width: 100%
+			}
+
+			#membership-card-person-name {
+			  float:left;
+			  font-weight: bold;
+			}
+
+			#membership-card-person-id {
+			   float:right;
+			   font-weight: bold;
+			}
+
+			#membership-card-status {
+			  float: left;
+			  font-size: 1rem;
+			}
+
+
+			#membership-card-top-panel {
+			  background-color: red;
+			  height: 90px;
+			}
+
+			#membership-card-bottom-panel {
+			  background-color: white;
+			  height: 102px;
+			  padding-right:15px; 
+			  padding-left:15px;
+			  padding-top:15px;
+			}
 		CSS
 
 	end

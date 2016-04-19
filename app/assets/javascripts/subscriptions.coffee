@@ -87,9 +87,14 @@ pay_method_ready = ->
   return
      
 firefox_form_reset = ->
-  $('#subscription_submit').attr('disabled', false)
-  subscription.swapSubmitLabel()
+  if $('meta[name="js-context"]').attr('controller') == "subscriptions"
+    $('#subscription_submit').attr('disabled', false)
+    subscription.swapSubmitLabel()
 
-$(document).on('turbolinks:load', pay_method_ready);
-$(document).on('turbolinks:load', subscription_helper_ready);
+subscription_ready = ->
+  if $('meta[name="js-context"]').attr('controller') == "subscriptions"
+    subscription_helper_ready()
+    pay_method_ready()
+
+$(document).on('turbolinks:load', subscription_ready);
 $(window).unload firefox_form_reset

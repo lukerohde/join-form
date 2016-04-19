@@ -289,7 +289,7 @@ module SubscriptionsHelper
 
   def nuw_end_point_transform_from_subscription(subscription_hash)
     # This is used in both directions!
-    result = subscription_hash.slice(:frequency, :plan, :pay_method)
+    result = subscription_hash.slice(:frequency, :plan, :pay_method, :status)
 
     pm = 
       case result[:pay_method]

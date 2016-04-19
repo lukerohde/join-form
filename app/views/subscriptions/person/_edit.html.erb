@@ -2,7 +2,8 @@
 
   <%= render 'errors' if @subscription.step == :contact_details %>
 
-  <% if current_person # prevent external users fiddling, needed for reviewing before saving%> 
+       
+  <% if current_person # prevent external users fiddling, needed for reviewing before saving %>  
     <div class="form-group">
       <%= f.hidden_field :external_id %>
       <%= f.label :external_id %><br>
@@ -10,7 +11,9 @@
         <%= person.external_id %>
       </div>
       <br>
+    </div>
   <% end %>
+
   <div class="form-group">
     <%= f.label :email %><br>
     <%= f.email_field :email, class: "form-control" %>

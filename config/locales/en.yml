@@ -43,14 +43,12 @@ en:
         base_rate_quarterly: Quarterly fee
         base_rate_half_yearly:  Half yearly fee
         base_rate_yearly:  Yearly fee
+      subscription:
+        description: "Description"
   gender:
     male: male
     female: female
     other: neither
-  helpers:
-    label:
-      subscription:
-        description: "Description"
   activerecord:
     attributes:
       subscription:

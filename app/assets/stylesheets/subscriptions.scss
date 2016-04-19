@@ -17,3 +17,20 @@
 .start_hidden {
 	display: none;
 }
+
+.membership-card {
+	border-radius: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 300px;
+	height: 194px;
+	border: 1px solid black;
+}
+
+#membership-card-top-panel {
+	border-radius: 9px 9px 0 0;
+}
+
+#membership-card-bottom-panel {
+	border-radius: 0 0 9px 9px;
+}
