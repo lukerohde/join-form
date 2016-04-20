@@ -29,7 +29,9 @@ class Application < Sinatra::Base
 	get '/people' do
 		check_signature(params)
 		p = Person.search(params)
-		(p||{}).to_json
+		response = (p||{}).to_json
+		logger.info "GET Response: #{response}"
+		response
 	end
 
 	get '/error' do
@@ -39,7 +41,7 @@ class Application < Sinatra::Base
 	put '/people' do
 
 		payload = JSON.parse(request.body.read)
-		logger.info "Received: #{payload.to_json}"
+		logger.info "PUT Received: #{payload.to_json}"
 		check_signature(payload)
 
 		payload.symbolize_keys!
@@ -49,7 +51,7 @@ class Application < Sinatra::Base
 		p = Person.search(payload)
 		if p
 			# update
-			p.assign_attributes(tblMember_attributes(payload))
+			p.assign_attributes(tblMember_attributes(payload, p))
 		else
 			# insert
 			p = Person.new(tblMember_defaults.merge(tblMember_attributes(payload)))
@@ -64,9 +66,12 @@ class Application < Sinatra::Base
 			save_payments(p, payload.dig(:subscription, :payments))
 		end
 
+		response = {}
 		if p.save!
-			p.to_json
+			response = p.to_json 
 		end
+		logger.info "PUT Response: #{response}"
+		response
 	end
 
 	def save_payments(person, payments)
@@ -113,8 +118,9 @@ class Application < Sinatra::Base
 		ActiveRecord::Base.connection.exec_query("select dbo.GetNewFinDate('#{findate.to_date.iso8601}', '#{amount}', '#{freq}', '#{feegroup}', '#{dob.to_date.iso8601}')").rows[0][0]
 	end
 
-	def tblMember_attributes(api_data)
+	def tblMember_attributes(api_data, person = nil)
 
+		
 		result = {
 				MemberID: api_data[:external_id], 
 				FirstName: api_data[:first_name], 
@@ -132,10 +138,23 @@ class Application < Sinatra::Base
 
 
 		if api_data[:subscription]
+			
+			current_status = person.Status if person
+			status = "17" unless current_status # potential member
+			status = "14" if (current_status.nil? || current_status == "17") && api_data[:subscription][:pay_method]
+			#status = "14" if (current_status == "1") && api_data[:subscription][:pay_method] # TODO I don't want to update a person's status when we ahven't tested their card, but I do want to provide feedback that we are expecting payment, Maybe fake a status by looking at the retrypaymentdate
+			status = "1" if api_data[:subscription][:payments] && api_data[:subscription][:payments].length > 0
+			result[:Status] = status if status
+			
 			result[:MemberPayFrequency] = (api_data[:subscription][:frequency]||"W")[0]
 			result[:MemberFeeGroupID] = api_data[:subscription][:plan]
 			result[:MemberPaymentType] = api_data[:subscription][:pay_method] == "Credit Card" ? "C" : "D"
-			#TODO Fix fee group	
+			
+			if ((person && !["1", "14"].include?(person.Status)) || person.nil?) && api_data[:subscription][:pay_method]
+				# if the person is new or the person isn't status 1 or 14, then set the findate and nextpaymentdate
+				result[:nextpaymentdate] = Date.today # TODO We should be updating this or findate if the person already has one set and isn't resetting it.  
+				result[:FinDate] = Date.today - 1
+			end
 		end
 
 		result.delete_if { |k,v| v.nil? }
@@ -148,11 +167,10 @@ class Application < Sinatra::Base
 			EmpType: "C",
 			BranchID: "NA",
 			CompanyID: "", # TODO unalloc
-			Status: "14", # A1p TODO Conditional Potential, Paying
 			MemberAwardID: "", 
 			MemberFeeGroupID: "GroupNoFee", 
 			LastName: "Unknown", 
-			MailReturned: 0, 
+			MailReturned: 0
 		}
 	end
 
@@ -172,7 +190,9 @@ class Application < Sinatra::Base
 					result = result.merge({
 						AccountType: cn[0] == '4' ? 'V' : 'M',
 						AccountNo: cn,
-						Expiry: "#{subscription[:expiry_month]}/#{(subscription[:expiry_year].to_s)[2..4]}"
+						Expiry: "#{subscription[:expiry_month]}/#{(subscription[:expiry_year].to_s)[2..4]}",
+						RetryPaymentDate: Date.today, 
+						RetryPaymentUser: 'nuw-api'
 					})
 				end
 			when "AB"
@@ -181,7 +201,9 @@ class Application < Sinatra::Base
 						AccountType: 'S',
 						bsb: decrypt(subscription[:bsb]),
 						AccountNo: an,
-						FeeOverride: subscription[:establishment_fee] || 0
+						FeeOverride: subscription[:establishment_fee] || 0,
+						RetryPaymentDate: Date.today, 
+						RetryPaymentUser: 'nuw-api'
 					})
 				end
 			end
@@ -204,15 +226,17 @@ class Application < Sinatra::Base
 		data = payload.reject { |k,v| k == "hmac" }
 		data = JSON.parse(data.sort.to_json).to_s
     data = ENV['nuw_end_point_url'] + request.path_info + data
-    logger.debug "PROCESSED PAYLOAD: " + data
 
     # sign message
 		hmac_received = payload['hmac'].to_s
 		hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['nuw_end_point_secret'], data)}")
-    logger.debug "HMAC: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
     
     # halt if signatures differ
     unless hmac == hmac_received
+ 	    logger.debug "HMAC MISMATCH!"
+ 	    logger.debug "HMAC_CALCULATED: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
+			logger.debug "PROCESSED PAYLOAD: " + data
+      
     	halt 401, "Not Authorized\n"
     end
 	end 

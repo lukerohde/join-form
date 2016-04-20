@@ -28,7 +28,11 @@ class Application
 		end
 
 		def friendly_status
-				ActiveRecord::Base.connection.exec_query("select returnvalue2 from tblLookup where returnvalue1 = '#{self.Status}' and maincriteria = 'tblMember.status'").rows[0][0]
+				result = ActiveRecord::Base.connection.exec_query("select returnvalue2 from tblLookup where returnvalue1 = '#{self.Status}' and maincriteria = 'tblMember.status'").rows[0][0]
+				unless ["awaiting 1st payment", "paying"].include?(result.downcase) 
+						result = 'Pending' if pay_method.RetryPaymentDate
+				end
+				result
 		end
 
 		def to_json
