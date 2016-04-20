@@ -81,7 +81,6 @@ class Subscription < ApplicationRecord
 
   def pay_method_must_be_complete
   	return if @skip_validation
-    binding.pry
     case pay_method
     when "-"
       pay_method = pay_method_was
