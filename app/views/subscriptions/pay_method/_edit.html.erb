@@ -26,7 +26,7 @@
     <%= f.select :pay_method,
       pay_method_options(@subscription),
       {
-          include_blank: true,
+          include_blank: false,
       },
       data: {
         placeholder: t('activerecord.attributes.subscription.pay_method'),

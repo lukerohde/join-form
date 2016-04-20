@@ -8,12 +8,12 @@
 <div class="col-sm-8 col-sm-offset-2">
 
   <h1 id="membership-card-heading" class="text-center">
-    Online Membership Card 
+    <%= t('subscriptions.membership_card.heading') %>
   </h1>
   <br/>
   <br/>
-  <div class="membership-card" style="background-color: white; position:relative; box-shadow: 5px 5px 15px 5px">
-    <div id="membership-card-top-panel" style="padding-top: 15px; padding-left: 15px; padding-right: 15px">
+  <div class="membership-card">
+    <div id="membership-card-top-panel">
       <div id="membership-card-union-name">
         <%=@union.name %>
       </div>
@@ -32,13 +32,13 @@
       <div id="membership-card-status">
         <%= @subscription.status.blank? ? "Pending" : @subscription.status %>
       </div>
-      <%= link_to "Edit", subscription_form_path(@subscription), class: 'btn btn-default pull-right', style: "position: absolute; bottom: 5px; right: 5px" %>
+      <%= link_to t('subscriptions.membership_card.edit'), subscription_form_path(@subscription), class: 'btn btn-default', style: "position: absolute; bottom: 5px; right: 5px" %>
     </div>
     
   </div>
   <br/>
   <p class="text-center">
-    You can bookmark this page
+    <%= t('subscriptions.membership_card.bookmark') %>
   </p>
 
 </div>

@@ -36,6 +36,19 @@ class JoinForm < ApplicationRecord
 
 
 			/* membership card styling */
+			#membership-card {
+				background-color: white; 
+				box-shadow: 5px 5px 15px 5px
+			}
+
+			#membership-card-top-panel {
+			  background-color: red;
+			  height: 90px;
+			  padding-top: 15px; 
+			  padding-left: 15px; 
+			  padding-right: 15px
+			}
+
 			#membership-card-union-name {
 			  width: 70%; 
 			  float:left; 
@@ -55,6 +68,14 @@ class JoinForm < ApplicationRecord
 			  width: 100%
 			}
 
+			#membership-card-bottom-panel {
+			  background-color: white;
+			  height: 102px;
+			  padding-right:15px; 
+			  padding-left:15px;
+			  padding-top:15px;
+			}
+
 			#membership-card-person-name {
 			  float:left;
 			  font-weight: bold;
@@ -68,20 +89,6 @@ class JoinForm < ApplicationRecord
 			#membership-card-status {
 			  float: left;
 			  font-size: 1rem;
-			}
-
-
-			#membership-card-top-panel {
-			  background-color: red;
-			  height: 90px;
-			}
-
-			#membership-card-bottom-panel {
-			  background-color: white;
-			  height: 102px;
-			  padding-right:15px; 
-			  padding-left:15px;
-			  padding-top:15px;
 			}
 		CSS
 

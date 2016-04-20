@@ -30,10 +30,18 @@
   <%= f.hidden_field :callback_url %>
 
   <div class="actions ">
-    <% if @subscription.subscription_saved? %>
-      <%= f.submit t(".submit_join"), class: "btn btn-success", id: "subscription_submit", data: { label: t(".submit_processing")} %>
-    <% else %>
-      <%= f.submit t(".submit_next"), class: "btn btn-default", id: "subscription_submit", data: { label: t(".submit_processing")}  %>
-    <% end %>
+    <% 
+      if @subscription.subscription_saved? 
+        if nuw_end_point_has_good_pay_method(@subscription)
+          submit_label = t(".submit_renew") # TODO this logic is dumb
+        else
+          submit_label = t(".submit_join")
+        end
+      else
+        submit_label = t(".submit_next")
+      end
+    %>
+
+    <%= f.submit submit_label, class: "btn btn-success", id: "subscription_submit", data: { label: t(".submit_processing")} %>
   </div>
 <% end %>

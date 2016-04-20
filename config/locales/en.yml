@@ -91,6 +91,10 @@ en:
       subject: "Please verify your email to continue joining"
       follow_link: "Please follow this link to continue..."
       email_explanation: "You are receiving this notice because somebody may have been trying to update your union membership online."
+    membership_card:
+      heading: Online Membership Card
+      bookmark: You can bookmark this page
+      edit: Edit
     person:
       edit:
         heading: "Contact Details"
@@ -111,11 +115,12 @@ en:
         heading: "Payment Details"
         credit_card: "Credit Card"
         au_bank_account: "Australian Bank Account"
+        use_existing: "Use my existing payment method"
         application_fee: "Application Fee:"
         member_discount: "Member Discount:"
         total: "Up front total:"
     steps:
-      done: "Thank you for joining"
+      done: "Welcome to the union"
       payment: "Please provide a payment method"
       plan: "Please choose your membership plan"
       address: "Please tell us your address in Australia"

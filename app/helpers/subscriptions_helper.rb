@@ -8,12 +8,14 @@ module SubscriptionsHelper
   end
 
 	def pay_method_options(subscription)
+    result = []
+    result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if nuw_end_point_has_good_pay_method(subscription)
+    result << [t('subscriptions.pay_method.edit.credit_card'), 'CC']
+    result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB']
+    
     options_for_select(
-      [
-        [t('subscriptions.pay_method.edit.credit_card'), 'CC'],
-        [t('subscriptions.pay_method.edit.au_bank_account'), 'AB']
-      ], 
-      subscription.pay_method
+      result, 
+      nuw_end_point_has_good_pay_method(subscription) ? "-" : (subscription.pay_method || "CC")
     )
   end
 
@@ -184,6 +186,14 @@ module SubscriptionsHelper
     if subscription.person.present? && subscription.person.external_id.present?
       payload = nuw_end_point_person_get(person_attributes: {external_id: subscription.person.external_id})
       subscription.person.authorizer_id = subscription.join_form.person.id
+      
+      # My API adds mock values so the subscription can be saved. 
+      # Remove them here, because we don't them wanting to be overridden
+      # TODO figure out why this feels so wrong - It shouldn't be the APIs responsbility nor can it be the models, maybe these values should be added not in person get, but in NUW endpoint load
+      payload[:person_attributes] = payload[:person_attributes].except(:email) if temporary_email?(payload[:person_attributes][:email])
+      payload[:person_attributes] = payload[:person_attributes].except(:first_name) if temporary_first_name?(payload[:person_attributes][:first_name])
+      payload[:person_attributes] = payload[:person_attributes].except(:last_name) if temporary_last_name?(payload[:person_attributes][:last_name])
+
       subscription.update_from_end_point(payload)
     end
     subscription
@@ -289,6 +299,7 @@ module SubscriptionsHelper
 
   def nuw_end_point_transform_from_subscription(subscription_hash)
     # This is used in both directions!
+    return {} if subscription_hash.nil?
     result = subscription_hash.slice(:frequency, :plan, :pay_method, :status)
 
     pm = 
@@ -355,8 +366,12 @@ module SubscriptionsHelper
     result
   end
 
+  def nuw_end_point_has_good_pay_method(subscription)
+    nuw_end_point_has_good_pay_method = ["pending", "awaiting 1st payment", "paying"].include?((subscription.status||"").downcase)
+  end
+
   def temporary_email
-    '#{SecureRandom.hex(8)}@unknown.com' # TODO pray for no clashes
+    "#{SecureRandom.hex(8)}@unknown.com" # TODO pray for no clashes
   end
 
   def temporary_email?(email)
@@ -368,11 +383,11 @@ module SubscriptionsHelper
   end
 
   def temporary_last_name?(last_name)
-    last_name.downcase == 'unknown'
+    (last_name||"").downcase == 'unknown'
   end
 
   def temporary_first_name?(first_name)
-    first_name.downcase == 'unknown'
+    (first_name||"").downcase == 'unknown'
   end  
 
   def fix_phone(number)

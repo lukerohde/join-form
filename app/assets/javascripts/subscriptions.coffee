@@ -17,23 +17,24 @@ subscription =
 
   goToStep: ->
     step = $("#step").data('step')
-    if step != "contact_details" && localStorage.getItem('scrollYPos')? 
+    if step? && step != "contact_details" && step != "thanks" && localStorage.getItem('scrollYPos')? 
       
       # Go to last scroll position
       window.scrollTo(0, localStorage.getItem('scrollYPos'))
       
       # show the next step
-      $("#" + step).show()       
-      
-      # scroll down, allowing room for the notice
-      top = $('#' + step).offset().top
-      if $('#notice')? 
-        top = top - $('#notice').outerHeight()
-        top = 0 if top < 0 
+      if $("#" + step)?
+        $("#" + step).show()       
+        
+        # scroll down, allowing room for the notice
+        top = $('#' + step).offset().top
+        if $('#notice')? 
+          top = top - $('#notice').outerHeight()
+          top = 0 if top < 0 
 
-      $('html, body').animate({ 
-          scrollTop: top 
-      }, 1000)
+        $('html, body').animate({ 
+            scrollTop: top 
+        }, 1000)
 
   swapSubmitLabel: ->
     temp = $('#subscription_submit').prop('value')

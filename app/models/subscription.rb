@@ -81,8 +81,10 @@ class Subscription < ApplicationRecord
 
   def pay_method_must_be_complete
   	return if @skip_validation
-
+    binding.pry
     case pay_method
+    when "-"
+      pay_method = pay_method_was
   	when "CC"
   		errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
   	when "AB"
