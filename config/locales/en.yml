@@ -118,7 +118,7 @@ en:
         use_existing: "Use my existing payment method"
         application_fee: "Application Fee:"
         member_discount: "Member Discount:"
-        total: "Up front total:"
+        total: "Dues payable in advance:"
     steps:
       done: "Welcome to the union"
       payment: "Please provide a payment method"

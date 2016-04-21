@@ -31,6 +31,10 @@ module ApplicationHelper
 		"<span class=\"small glyphicon glyphicon-pencil\"/>".html_safe 
 	end
 
+	def cog_button
+		"<span class=\"small glyphicon glyphicon-cog\"/>".html_safe 
+	end
+
 	def gender_options(person)
     options_for_select(
       [

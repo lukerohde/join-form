@@ -18,7 +18,7 @@
         <%=@union.name %>
       </div>
       <div id="membership-card-union-logo">
-        <%=image_tag @union.logo.thumb.url  %>
+        <%=image_tag @union.logo.thumb.url  if @union.logo.thumb.url %>
       </div>
     </div>
     <div id="membership-card-bottom-panel">

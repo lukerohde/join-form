@@ -34,6 +34,10 @@ class JoinForm < ApplicationRecord
 			  color: #555555;
 			}
 
+			/* descriptive detail for emphasis */
+			.detail {
+				color: #D33;
+			}
 
 			/* membership card styling */
 			#membership-card {

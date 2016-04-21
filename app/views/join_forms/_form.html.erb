@@ -95,12 +95,12 @@
 
   <div class="form-group">
     <%= f.label :header %><br>
-    <%= f.text_area :header, class: "form-control", placeholder: t('helpers.label.join_form.header_placeholder') %>
+    <%= f.text_area :header, class: "form-control", placeholder: t('helpers.label.join_form.header_placeholder'), rows: 10 %>
   </div>
 
   <div class="form-group">
     <%= f.label :css %><br>
-    <%= f.text_area :css, class: "form-control", placeholder: t('helpers.label.join_form.css_placeholder') %>
+    <%= f.text_area :css, class: "form-control", placeholder: t('helpers.label.join_form.css_placeholder'), rows: 20 %>
   </div>
 
   <%= f.hidden_field :person_id, value: current_person.id %>

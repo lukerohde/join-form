@@ -7,9 +7,9 @@ class StripeController < ApplicationController
   	
   	unless token["error"]
   		if union.update(stripe_params(token))
-  			redirect_to union, notice: "Your stripe account has been successfully connected"
+  			redirect_to edit_union_path(union), notice: "Your stripe account has been successfully connected"
   		else
-  			redirect_to union, notice: "Something went wrong! Error: #{union.errors}"
+  			redirect_to edit_union_path(union), notice: "Something went wrong! Error: #{union.errors}"
   		end
   	else
   		redirect_to union, notice: "Something went wrong! Response: #{token['error']} Message: #{token['error_description']}"
@@ -20,9 +20,9 @@ class StripeController < ApplicationController
   	union = Union.find(params[:id])
   	if deauthorize_stripe_user_id(union.stripe_user_id)
   		union.update(blank_stripe_params)
-  		redirect_to union, notice: "Your stripe account has been disconnected."
+  		redirect_to edit_union_path(union), notice: "Your stripe account has been disconnected."
   	else 
-  		redirect_to union, notice: "Something went wrong disconnecting your stripe account."
+  		redirect_to edit_union_path(union), notice: "Something went wrong disconnecting your stripe account."
   	end
   end
 

@@ -4,7 +4,9 @@
   <%=subscription.join_form.css.html_safe %>
 </style>
 
-<%=subscription.join_form.header.html_safe %>
+<div class="subscription_header">
+  <%=subscription.join_form.header.html_safe %>
+</div>
 
 <%= form_for(subscription, url: subscription_form_path(subscription)) do |f| %>
   

@@ -5,7 +5,8 @@ class JoinFormsController < ApplicationController
   # GET /join_forms
   # GET /join_forms.json
   def index
-    @join_forms = JoinForm.all
+    #@join_forms = JoinForm.all
+    redirect_to union_path(@union)
   end
 
   # GET /join_forms/new

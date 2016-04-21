@@ -16,6 +16,11 @@ subscription =
       $('#new_subscription')[0].submit()
 
   goToStep: ->
+    noticeHeight = 0
+    if $('#notice')? 
+      noticeHeight = $('#notice').outerHeight()
+      $('.subscription_header').css('margin-top', noticeHeight);
+
     step = $("#step").data('step')
     if step? && step != "contact_details" && step != "thanks" && localStorage.getItem('scrollYPos')? 
       
@@ -28,9 +33,8 @@ subscription =
         
         # scroll down, allowing room for the notice
         top = $('#' + step).offset().top
-        if $('#notice')? 
-          top = top - $('#notice').outerHeight()
-          top = 0 if top < 0 
+        top = top - noticeHeight
+        top = 0 if top < 0 
 
         $('html, body').animate({ 
             scrollTop: top 
