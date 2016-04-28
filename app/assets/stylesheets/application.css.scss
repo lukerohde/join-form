@@ -67,8 +67,8 @@ body {
 
 .navbar-brand > img {
 	display:inline;
-	max-height: 40px; 
-	margin-top: -10px; 
+	max-height: 80px; 
+	margin-top: -25px; 
 	margin-left: 0px
 }
 
@@ -96,14 +96,16 @@ $a-tags-hover: 'a:active, a:hover';
 
   .navbar-brand > img {
   	display:inline;
-		max-height:40px; 
-	 	margin-top: -10px; 
+		max-height:80px; 
+	 	margin-top: -25px; 
 	 	margin-left: 0px;
 	}
 
+  /*
   .navbar-nav > li > img {
   	height: 40px;
   }
+  */
 }
 
 @-moz-document url-prefix() {
