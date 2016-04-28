@@ -3,7 +3,7 @@
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
       <a class="navbar-brand" href="/">
-        <img src="<%=image_path('logo.png')%>">
+        <img src="<%=@union.logo_thumb.url || image_path('logo.png')%>">
       </a>
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
@@ -23,7 +23,7 @@
           <li>
             <%= link_to "people", people_path %>
           </li>
-          <li><%= link_to "sign out", destroy_person_session_path, :method=>'delete' %>
+          <!--<li><%= link_to "sign out", destroy_person_session_path, :method=>'delete' %>-->
               </li>
           <li class="dropdown">
             <a class="dropdown-toggle" aria-expanded="false" area-haspopup="true" role="button" data-toggle="dropdown" href="#">
