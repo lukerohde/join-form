@@ -86,7 +86,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Mailgun
-  config.action_mailer.default_url_options = { host: ENV['mailgun_host'], port: 80 }
+  config.action_mailer.default_url_options = { host: ENV['APPLICATION_ROOT'], port: 80 }
   config.action_mailer.delivery_method = :mailgun
   config.action_mailer.mailgun_settings = {
         api_key: ENV["mailgun_api_key"],
@@ -96,7 +96,7 @@ Rails.application.configure do
   config.middleware.use ExceptionNotification::Rack,
     :email => {
       :email_prefix => "[error] ",
-      :sender_address => %{"notifier" <notifier@megaconnect.herokuapp.com>},
+      :sender_address => %{"notifier" <notifier@joinaunion.org.au>},
       :exception_recipients => %w{lukerohde@gmail.com}
     }
 end

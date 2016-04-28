@@ -57,7 +57,7 @@ Rails.application.configure do
   config.assets.raise_runtime_errors = true
 
   # Mailgun
-  config.action_mailer.default_url_options = { host: ENV['mailgun_host'], port: 3000 }
+  config.action_mailer.default_url_options = { host: ENV['APPLICATION_ROOT'], port: 3000 }
   config.action_mailer.delivery_method = :mailgun
   config.action_mailer.mailgun_settings = {
         api_key: ENV["mailgun_api_key"], 

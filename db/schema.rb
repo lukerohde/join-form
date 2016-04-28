@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160419063521) do
+ActiveRecord::Schema.define(version: 20160421091936) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,6 +34,8 @@ ActiveRecord::Schema.define(version: 20160419063521) do
     t.string   "base_rate_id"
     t.text     "header"
     t.string   "page_title"
+    t.json     "fee_schedule"
+    t.json     "plans"
   end
 
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
@@ -116,6 +118,7 @@ ActiveRecord::Schema.define(version: 20160419063521) do
     t.string   "token"
     t.string   "callback_url"
     t.string   "status"
+    t.json     "plan_data"
   end
 
   add_index "subscriptions", ["join_form_id"], name: "index_subscriptions_on_join_form_id", using: :btree
