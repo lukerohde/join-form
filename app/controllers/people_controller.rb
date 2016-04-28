@@ -7,7 +7,7 @@ class PeopleController < ApplicationController
   def index
     @people = Person.filter(params.slice(:name_like))
     @people = @people.where(["union_id = ?", current_person.union_id]) if request.format.json? && !owner?
-    @people = @people.order([:last_name, :first_name, :id])
+    @people = @people.where("not invited_by_id is null").order([:last_name, :first_name, :id])
 
     respond_to do |format|
       format.html
