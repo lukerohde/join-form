@@ -13,8 +13,8 @@ module ApplicationHelper
 	end
 
 	def union_logo
-		if @union && @union.logo.present?
-			@union.logo.url
+		if @union && @union.logo.thumb.present?
+			@union.logo.thumb.url
 		else
 			image_path('logo.png')
 		end
