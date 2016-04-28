@@ -12,6 +12,14 @@ module ApplicationHelper
 		end
 	end
 
+	def union_logo
+		if @union && @union.logo.present?
+			@union.logo.url
+		else
+			image_path('logo.png')
+		end
+	end 
+
 	def profile_thumb(person)		
 		unless person.attachment.blank?
 			image_tag person.attachment.thumb.url, class: "profile_thumb"
