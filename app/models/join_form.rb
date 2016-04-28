@@ -8,6 +8,8 @@ class JoinForm < ApplicationRecord
 	validates :base_rate_weekly, numericality: { allow_blank: true }	
 	validate :is_authorized?
 
+	#translates :header, :description
+
 	after_initialize :set_defaults
 	
 	def set_defaults
@@ -19,7 +21,7 @@ class JoinForm < ApplicationRecord
 			}
 
 			/* heading colors */
-			h1,h2,h3 {
+			h1,h2,h
 			  color: #D33;
 			}
 

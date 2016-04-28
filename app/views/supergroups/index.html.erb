@@ -25,7 +25,7 @@
                 <%= logo_thumb(supergroup) %>
               <% end %>
               </td>
-              <td style="vertical-align: middle"><%=link_to supergroup.name, polymorphic_path(supergroup) %></td>
+              <td style="vertical-align: middle"><%=link_to supergroup.name, polymorphic_path(supergroup, locale: locale) %></td>
               <td style="vertical-align: middle"><%=link_to supergroup.www, "http://#{supergroup.www}"%></td>
               <td class="text-right" style="vertical-align: middle;"><%=supergroup.join_forms.count()%></td>
             </tr>

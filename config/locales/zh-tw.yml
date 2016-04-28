@@ -1,12 +1,101 @@
 ---
-zh-TW:
+zh-tw:
   activerecord:
+    attributes:
+      subscription:
+        frequency: "付款頻率"
+        pay_method: "付款方式"
+        account_name: "銀行帳戶持有人/卡片上名稱/"
+        bsb: "BSB"
+        account_number: "帳號名稱"
+        card_number: "信用卡持有人"
+        expiry: "效期"
+        ccv: "信用卡驗證码（英文 Card Verification Value)"
+      person:
+        external_id: "會員號碼"
+        first_name: "名"
+        last_name: "姓氏"
+        email: "電子信箱"
+        mobile: "手機號碼"
+        gender: "性別"
+        dob: "生日"
+        address1: "地址第一欄"
+        address2: "地址第二欄"
+        suburb: "區域"
+        state: "州別"
+        postcode: "郵遞區號"
     errors:
       messages:
         record_invalid: '校驗失敗: %{errors}'
         restrict_dependent_destroy:
           has_one: 由於 %{record} 需要此記錄，所以無法移除記錄
           has_many: 由於 %{record} 需要此記錄，所以無法移除記錄
+  gender:
+    male: "男:男"
+    female: "女:女"
+    other: "其他:以上皆非"
+  people:
+    errors:
+      not_blank: "不能留空白"
+  subscriptions:
+    form:
+      error_summary: 
+        one:  "錯誤１　導致資料無法儲存"
+        other: "錯誤%{count}　導致資料無法儲存"
+      submit_join: "現在加入"
+      submit_renew: "更新"
+      submit_next: "下一步"
+      submit_processing: "處理中"
+    verify_email:
+      instruction: "請先登入電子信箱，系統將自動發送審核信件，請按確認連結"
+      explanation: "系統已經自動發送審核信件到您的信箱中 而該電子信箱地址，可能與你所提供的郵件地址不同"
+      subject: "請先確認你的電子信箱以繼續下一階段"
+      follow_link: "請確認以下的連結以繼續下一階段"
+      email_explanation: "你收到此系統通知，是因為有人正嘗試登入你的帳號更新你的會員紀錄"
+    membership_card:
+      heading: "線上會員哪"
+      bookmark: "你可以直接新增書籤"
+      edit: Edit
+    person:
+      edit:
+        heading: "個人通訊資料"
+    address:
+      edit:
+        heading: "地址"
+    subscription:
+      edit: 
+        heading: "繳費方式"
+        weekly: "週繳"
+        fortnightly: "１４天一次繳費"
+        monthly: "月繳"
+        quarterly: "季繳"
+        half_yearly: "每半年繳"
+        yearly: "年繳"
+    pay_method:
+      edit:
+        heading: "付款細節"
+        credit_card: "信用卡"
+        au_bank_account: "澳洲銀行帳戶"
+        use_existing: "用我之前所登入的繳費方式"
+        application_fee: "申請費用"
+        member_discount: "既有會員折扣"
+        total: "總金額"
+    steps:
+      done: "歡迎造訪工會網頁"
+      payment: "請提供繳費方式"
+      plan: "請選擇加入會員類別"
+      address: "請提供澳洲當地的通訊地址"
+      welcome: "請提供你的聯絡資料"
+      renewal: "你正在更新你的資料"
+    errors:
+      not_blank: "不能留空白"
+      complete_address: "你必須要填妥你的通訊地址"
+      credit_card: "無法認證，請再嘗試一次"
+      bsb: "Bsb碼必須以123-123格式提供"
+      account_number: "帳號必須有六碼，例123456"
+      pay_method: "請確認"
+      payment_gateway_error: "銀行端在登入你的資料時發現錯誤"
+      payment_gateway_card_error: "銀行端在確認你的信用卡時發現錯誤"
   date:
     abbr_day_names:
     - 周日

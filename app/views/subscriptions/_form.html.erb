@@ -1,8 +1,11 @@
+
 <% set_title(subscription.join_form.page_title) %>
 <div id="step" data-step="<%=@subscription.step%>"/>
 <style>
   <%=subscription.join_form.css.html_safe %>
 </style>
+
+<%= render partial: "shared/lang_picker", locals: { display_class: "pull-right" } %>
 
 <div class="subscription_header">
   <%=subscription.join_form.header.html_safe %>

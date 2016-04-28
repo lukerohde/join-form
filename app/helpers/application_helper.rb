@@ -28,6 +28,9 @@ module ApplicationHelper
 		end
 	end
 
+	def other_languages
+		Rails.application.config.languages.except(locale)
+	end
 
 	def profile_logo(person)		
 		unless person.attachment.blank?

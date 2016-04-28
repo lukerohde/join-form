@@ -16,7 +16,7 @@
         <tr class="">
           <td><%= join_form.union.short_name if join_form.union%></td>
           <td>
-            <%= link_to join_form.short_name, edit_union_join_form_path(join_form.union, join_form.id) %>
+            <%= link_to join_form.short_name, edit_union_join_form_path(join_form.union, join_form.id, locale: locale) %>
           </td>
           <td>
             <%= join_form.description %>
