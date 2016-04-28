@@ -56,18 +56,18 @@ body {
 }
 
 .navbar-fixed-top {
-    min-height: 110px;
+    min-height: 50px;
 }
 
 .navbar-nav > li > a {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    line-height: 110px;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    line-height: 20px;
 }
 
 .navbar-brand > img {
 	display:inline;
-	max-height:100px; 
+	max-height: 40px; 
 	margin-top: -10px; 
 	margin-left: 0px
 }
