@@ -40,20 +40,26 @@ module SubscriptionsHelper
 
   end
 
+  def join_form_id(join_form)
+    # HACK TO PREVENT PEOPLE BOOKMARKING MY GLOBALIZE HACK
+    join_form_id = join_form.short_name.downcase
+    join_form_id.gsub("-zh-tw", "")
+  end
+
   def subscription_form_path(subscription)
     join_form = subscription.join_form
     union = join_form.union
 
     if subscription.id
       #union_join_form_subscription_path(union.short_name, join_form.short_name, subscription.token)
-      "/#{locale}/#{union.short_name.downcase}/#{join_form.short_name.downcase}/join/#{subscription.token}"
+      "/#{locale}/#{union.short_name.downcase}/#{join_form_id(join_form)}/join/#{subscription.token}"
     else
-      "/#{locale}/#{union.short_name.downcase}/#{join_form.short_name.downcase}/join"
+      "/#{locale}/#{union.short_name.downcase}/#{join_form_id(join_form)}/join"
     end
   end
 
   def subscription_short_path
-    "/#{locale}/#{@union.short_name.downcase}/#{@join_form.short_name.downcase}/#{@subscription.token}"
+    "/#{locale}/#{@union.short_name.downcase}/#{join_form_id(@join_form)}/#{@subscription.token}"
   end  
 
   def callback_url(url, extra_params = {})

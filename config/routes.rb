@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  scope "(:locale)", locale: /en|zh-tw/ do
+  scope "(:locale)", locale: /en|en-AU|zh-TW/ do
     
     resources :subscriptions
     # mount ActionCable.server => '/cable'

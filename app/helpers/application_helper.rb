@@ -29,7 +29,9 @@ module ApplicationHelper
 	end
 
 	def other_languages
-		Rails.application.config.languages.except(locale)
+		l = locale.to_s
+		l = "en" if l == "en-AU"
+		Rails.application.config.languages.except(l)
 	end
 
 	def profile_logo(person)		

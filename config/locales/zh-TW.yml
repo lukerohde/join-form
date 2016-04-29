@@ -1,5 +1,5 @@
 ---
-zh-tw:
+zh-TW:
   helpers:
     select:
       prompt: 請選擇
@@ -62,9 +62,9 @@ zh-tw:
           has_one: 由於 %{record} 需要此記錄，所以無法移除記錄
           has_many: 由於 %{record} 需要此記錄，所以無法移除記錄
   gender:
-    male: "男:男"
-    female: "女:女"
-    other: "其他:以上皆非"
+    male: "男"
+    female: "女"
+    other: "以上皆非"
   people:
     errors:
       not_blank: "不能留空白"
@@ -84,7 +84,7 @@ zh-tw:
       follow_link: "請確認以下的連結以繼續下一階段"
       email_explanation: "你收到此系統通知，是因為有人正嘗試登入你的帳號更新你的會員紀錄"
     membership_card:
-      heading: "線上會員哪"
+      heading: "線上會員"
       bookmark: "你可以直接新增書籤"
       edit: Edit
     person:
@@ -100,7 +100,7 @@ zh-tw:
         fortnightly: "１４天一次繳費"
         monthly: "月繳"
         quarterly: "季繳"
-        half_yearly: "每半年繳"
+        half_yearly: "半年繳"
         yearly: "年繳"
     pay_method:
       edit:

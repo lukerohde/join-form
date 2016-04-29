@@ -25,9 +25,9 @@ module JoinAUnion
     
     config.languages = {
         "en" => "english", 
-        "zh-tw" => "中文版",
+        "zh-TW" => "中文版",
     }
-    config.i18n.available_locales = config.languages.keys
+    config.i18n.available_locales = config.languages.keys << "en-AU"
     config.i18n.fallbacks = true
 
     config.after_initialize do

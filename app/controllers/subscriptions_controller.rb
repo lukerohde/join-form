@@ -78,6 +78,7 @@ class SubscriptionsController < ApplicationController
   end
 
   def next_step
+    binding.pry
     unless @subscription.pay_method_saved?
       #edit_subscription_path @subscription.token
       subscription_form_path(@subscription)
@@ -155,7 +156,11 @@ class SubscriptionsController < ApplicationController
       if (Integer(id) rescue nil)
         @join_form = @union.join_forms.find(id)
       else
-        @join_form = @union.join_forms.where("short_name ilike ?",id).first
+        # TODO Remove this hack when globalize works with rails 5
+        zh_id = id + '-zh-tw' if locale.to_s.downcase == "zh-tw" && !id.include?("-zh-tw") 
+        @join_form = @union.join_forms.where("short_name ilike ?",zh_id).first
+        # END OF HACK
+        @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?
       end
     end
 
