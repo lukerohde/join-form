@@ -125,7 +125,7 @@ en:
       plan: "Please choose your membership plan"
       address: "Please tell us your address in Australia"
       welcome: "Please provide your contact details"
-      renewal: "You are updating your membership with us"
+      renewal: "Hey, you are already a member! Please update your details with us."
     errors:
       not_blank: "can't be blank"
       complete_address: "You must complete your address"

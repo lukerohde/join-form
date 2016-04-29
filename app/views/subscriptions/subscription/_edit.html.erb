@@ -5,7 +5,7 @@
 
   <% if @subscription.join_form.description.present? %>
     <div class="form-group">
-      <%= f.label :description %><br>
+      <%= f.label :description, t('helpers.label.subscription.description') %><br>
       <p class="detail">
         <%= @subscription.join_form.description %>
       </p>
