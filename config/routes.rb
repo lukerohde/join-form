@@ -36,4 +36,5 @@ Rails.application.routes.draw do
 
     root "join_forms#index"
   end
+
 end
