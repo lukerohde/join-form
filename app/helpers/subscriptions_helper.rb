@@ -46,9 +46,9 @@ module SubscriptionsHelper
 
     if subscription.id
       #union_join_form_subscription_path(union.short_name, join_form.short_name, subscription.token)
-      "/#{union.short_name.downcase}/#{join_form.short_name.downcase}/join/#{subscription.token}"
+      "/#{locale}/#{union.short_name.downcase}/#{join_form.short_name.downcase}/join/#{subscription.token}"
     else
-      "/#{union.short_name.downcase}/#{join_form.short_name.downcase}/join"
+      "/#{locale}/#{union.short_name.downcase}/#{join_form.short_name.downcase}/join"
     end
   end
 
