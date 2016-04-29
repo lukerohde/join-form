@@ -41,7 +41,7 @@ module SubscriptionsHelper
   end
 
   def join_form_id(join_form)
-    # HACK TO PREVENT PEOPLE BOOKMARKING MY GLOBALIZE HACK
+    # HACK TO PREVENT PEOPLE BOOKMARKING MY ALTERNATIVE TO GLOBALIZE HACK
     join_form_id = join_form.short_name.downcase
     join_form_id.gsub("-zh-tw", "")
   end
@@ -274,11 +274,14 @@ module SubscriptionsHelper
     end
     
     # TODO after card details have been posted, they are no longer required
-    #subscription.card_number = nil
-    #subscription.ccv = nil
-    #subscription.bsb = nil
-    #subscription.account_number = nil
-
+    if subscription.pay_method_saved?
+      subscription[:card_number] = nil
+      subscription[:ccv] = nil
+      subscription[:bsb] = nil
+      subscription[:account_number]= nil
+      subscription.pay_method = "-" # dash indicates that the details are already on the system
+    end 
+    
     subscription.save_without_validation!
   end
 

@@ -48,7 +48,8 @@ class Subscription < ApplicationRecord
   end
 
   def pay_method_saved?
-  	(stripe_token_was.present? or (bsb_was.present? && account_number_was.present?)) || @skip_validation
+    # can have an old stripe_token
+  	errors.empty? && (stripe_token_was.present? || (bsb_was.present? && account_number_was.present?) || pay_method == "-") || @skip_validation
   end
 
   def bsb_valid?
@@ -83,7 +84,7 @@ class Subscription < ApplicationRecord
   	return if @skip_validation
     case pay_method
     when "-"
-      pay_method = pay_method_was
+      #pay_method = pay_method_was
   	when "CC"
   		errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
   	when "AB"
@@ -101,7 +102,7 @@ class Subscription < ApplicationRecord
   end
 
   def step
-  	return :thanks if pay_method_saved?
+    return :thanks if pay_method_saved?
   	return :pay_method if subscription_saved?
   	return :subscription if address_saved?
   	return :address if contact_details_saved?
