@@ -1,5 +1,9 @@
 ---
 zh-tw:
+  helpers:
+    label:
+      subscription:
+        description: "基本資料"
   activerecord:
     attributes:
       subscription:

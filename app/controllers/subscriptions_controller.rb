@@ -80,7 +80,7 @@ class SubscriptionsController < ApplicationController
   def next_step
     unless @subscription.pay_method_saved?
       #edit_subscription_path @subscription.token
-      subscription_form_path(@subscription)
+      subscription_form_path(@subscription, locale: locale)
     else
       #subscription_path @subscription.token
       if @subscription.callback_url.present?

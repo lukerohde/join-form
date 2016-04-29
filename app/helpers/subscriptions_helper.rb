@@ -23,12 +23,12 @@ module SubscriptionsHelper
     result = []
     f = subscription.join_form
 
-    result << ["#{t('subscriptions.subscription.edit.weekly')} - #{number_to_currency(f.base_rate_weekly, locale: @locale)}", "W"] if f.base_rate_weekly
-    result << ["#{t('subscriptions.subscription.edit.fortnightly')} - #{number_to_currency(f.base_rate_fortnightly, locale: @locale)}", "F"] if f.base_rate_fortnightly
-    result << ["#{t('subscriptions.subscription.edit.monthly')} - #{number_to_currency(f.base_rate_monthly, locale: @locale)}", "M"] if f.base_rate_monthly
-    result << ["#{t('subscriptions.subscription.edit.quarterly')} - #{number_to_currency(f.base_rate_quarterly, locale: @locale)}", "Q"] if f.base_rate_quarterly
-    result << ["#{t('subscriptions.subscription.edit.half_yearly')} - #{number_to_currency(f.base_rate_half_yearly, locale: @locale)}", "H"] if f.base_rate_half_yearly
-    result << ["#{t('subscriptions.subscription.edit.yearly')} - #{number_to_currency(f.base_rate_yearly, locale: @locale)}", "Y"] if f.base_rate_yearly
+    result << ["#{t('subscriptions.subscription.edit.weekly')} - #{number_to_currency(f.base_rate_weekly, locale: 'en-au')}", "W"] if f.base_rate_weekly
+    result << ["#{t('subscriptions.subscription.edit.fortnightly')} - #{number_to_currency(f.base_rate_fortnightly, locale: 'en-au')}", "F"] if f.base_rate_fortnightly
+    result << ["#{t('subscriptions.subscription.edit.monthly')} - #{number_to_currency(f.base_rate_monthly, locale: 'en-au')}", "M"] if f.base_rate_monthly
+    result << ["#{t('subscriptions.subscription.edit.quarterly')} - #{number_to_currency(f.base_rate_quarterly, locale: 'en-au')}", "Q"] if f.base_rate_quarterly
+    result << ["#{t('subscriptions.subscription.edit.half_yearly')} - #{number_to_currency(f.base_rate_half_yearly, locale: 'en-au')}", "H"] if f.base_rate_half_yearly
+    result << ["#{t('subscriptions.subscription.edit.yearly')} - #{number_to_currency(f.base_rate_yearly, locale: 'en-au')}", "Y"] if f.base_rate_yearly
     
     current_selection = subscription.frequency || "F"
     current_selection = result.find { |i| i[1] == current_selection.upcase }
@@ -53,7 +53,7 @@ module SubscriptionsHelper
   end
 
   def subscription_short_path
-    "/#{@union.short_name.downcase}/#{@join_form.short_name.downcase}/#{@subscription.token}"
+    "/#{locale}/#{@union.short_name.downcase}/#{@join_form.short_name.downcase}/#{@subscription.token}"
   end  
 
   def callback_url(url, extra_params = {})
