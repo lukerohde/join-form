@@ -78,7 +78,6 @@ class SubscriptionsController < ApplicationController
   end
 
   def next_step
-    binding.pry
     unless @subscription.pay_method_saved?
       #edit_subscription_path @subscription.token
       subscription_form_path(@subscription)
@@ -181,7 +180,7 @@ class SubscriptionsController < ApplicationController
         elsif params_match(subscription_params, @subscription)
           # if the user has provided enough contact detail to verify their identity, then they can update their subscription
           patch_and_persist_subscription(subscription_params)
-          redirect_to subscription_form_path(@subscription), notice: t("subscriptions.steps.renewal")
+          redirect_to subscription_form_path(@subscription), notice: t('subscriptions.steps.renewal')
         elsif @subscription.person.email.present?     
           # send email verfication message
           PersonMailer.verify_email(@subscription, subscription_params, request).deliver_now
