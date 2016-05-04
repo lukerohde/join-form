@@ -136,7 +136,6 @@ class SubscriptionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def subscription_params
-      
       if params[:subscription][:person_attributes].present?
         params[:subscription][:person_attributes][:union_id] = @join_form.union.id
         if current_person
@@ -144,8 +143,12 @@ class SubscriptionsController < ApplicationController
         else
           params[:subscription][:person_attributes][:authorizer_id] = @join_form.person.id
         end
-      end
 
+        # Hack date back to a regular format (for my API) TODO something better
+        params[:subscription][:person_attributes][:dob] = "#{params['subscription']['person_attributes']['dob(1i)']}-#{params['subscription']['person_attributes']['dob(2i)']}-#{params['subscription']['person_attributes']['dob(3i)']}"
+        params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
+      end
+      
       result = params.require(:subscription).permit(permitted_params)
     end
 
