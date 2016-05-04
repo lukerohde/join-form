@@ -69,7 +69,7 @@ class Application
 						status: self.friendly_status,
 						frequency: self.MemberPayFrequency,
 						plan: self.MemberFeeGroupID == "GroupNoFee" ? "" : self.MemberFeeGroupID,
-						pay_method: case when self.MemberPaymentType == 'C' then 'CC' else 'AB' end, 
+						pay_method: '-', #case when self.MemberPaymentType == 'C' then 'CC' else 'AB' end, 
 						payments: transactions,
 					}, 
 				})
