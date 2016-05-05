@@ -1,0 +1,32 @@
+// Place all the styles related to the join_forms controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+
+.jumbotron {
+  background-color: transparent !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+.join_form {
+  background-color: #fefefe;
+  border: 1px solid #444;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.new-button {
+	margin: 15px;
+	margin-bottom: 15px !important;
+}
+
+.join_form h1, .join_form h2, .join_form h3 {
+	margin-left: 0px !important;
+}
+

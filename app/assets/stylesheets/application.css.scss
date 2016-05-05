@@ -1,0 +1,126 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require select2
+ *= require select2-bootstrap
+ *= require bootstrap-switch.min
+ *= require jquery-ui
+ *= require jquery-ui.structure
+ *= require jquery-ui.theme
+ *= require_tree .
+ *= require_self
+ */
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+h1, h1, h2 {
+	color: #D33;
+	small {
+	//	color: #D33;
+	}
+}
+
+body {
+  background-color: white;
+  color: #555;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  font-size: 1.6rem;
+  line-height: 1.6;
+  pading-bottom: 2rem;
+}
+
+/*
+.content-area {
+	border-radius: 5px;
+	border: 1px solid #111;
+	background-color: #ffe;
+}
+*/
+.content-area {
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;  
+}
+.navbar {
+  margin-bottom: 0px;
+}
+
+.navbar-fixed-top {
+    min-height: 50px;
+}
+
+.navbar-nav > li > a {
+    padding-top: 15px;
+    padding-bottom: 10px;
+    line-height: 20px;
+}
+
+.navbar-brand > img {
+	display:inline;
+	max-height: 80px; 
+	margin-top: -25px; 
+	margin-left: 0px
+}
+
+a.navbar-brand {
+  font-weight: bold !important;
+}
+
+$a-tags: 'a, a:active, a:hover, a:visited';
+$a-tags-hover: 'a:active, a:hover';
+ 
+#{$a-tags} {
+}
+#{$a-tags-hover} {
+  background-color: transparent;
+}
+
+
+@media (max-width: 767px) {
+  .navbar-nav > li > a {
+    line-height: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .navbar-brand > img {
+  	display:inline;
+		max-height:80px; 
+	 	margin-top: -25px; 
+	 	margin-left: 0px;
+	}
+
+  /*
+  .navbar-nav > li > img {
+  	height: 40px;
+  }
+  */
+}
+
+@-moz-document url-prefix() {
+  fieldset { display: table-cell; }
+}
+
+.form {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.no-left-margin {
+  margin-left: 0px;
+}
+
+.do-not-stack {
+  width: auto;
+  display: inline-block;
+}

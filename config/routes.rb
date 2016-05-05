@@ -1,56 +1,40 @@
 Rails.application.routes.draw do
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
+  scope "(:locale)", locale: /en|en-AU|zh-TW/ do
+    
+    resources :subscriptions
+    # mount ActionCable.server => '/cable'
 
-  # You can have the root of your site routed with "root"
-  # root 'welcome#index'
 
-  # Example of regular route:
-  #   get 'products/:id' => 'catalog#view'
+    #get 'stripe/index'
+    resources :stripe, only: [:index, :destroy]
 
-  # Example of named route that can be invoked with purchase_url(id: product.id)
-  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
+    devise_for :people, :controllers => { :invitations => 'people/invitations' }
+      
+    resources :unions, controller: :supergroups, type: 'Union' do
+      resources :join_forms, except: [:show] do 
+        resources :subscriptions
+      end
+      resource :key, only: [:show, :new, :edit, :update], controller: 'unions/key'
+    end
+    
+    resources :people, except: [:new] do # people can only be invited
+      member do 
+        get 'compose_email'
+        patch 'send_email'
+      end
+    end 
 
-  # Example resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
+    resources :join_forms, except: [:show] 
 
-  # Example resource route with options:
-  #   resources :products do
-  #     member do
-  #       get 'short'
-  #       post 'toggle'
-  #     end
-  #
-  #     collection do
-  #       get 'sold'
-  #     end
-  #   end
+    get '/public/:filename', to: 'files#get'
+    
+    get '/:union_id/:join_form_id/join', to: 'subscriptions#new' 
+    post '/:union_id/:join_form_id/join', to: 'subscriptions#create' 
+    get '/:union_id/:join_form_id/join/:id', to: 'subscriptions#edit'
+    patch '/:union_id/:join_form_id/join/:id', to:  'subscriptions#update'
+    get '/:union_id/:join_form_id/:id', to:  'subscriptions#show'
 
-  # Example resource route with sub-resources:
-  #   resources :products do
-  #     resources :comments, :sales
-  #     resource :seller
-  #   end
+    root "join_forms#index"
+  end
 
-  # Example resource route with more complex sub-resources:
-  #   resources :products do
-  #     resources :comments
-  #     resources :sales do
-  #       get 'recent', on: :collection
-  #     end
-  #   end
-
-  # Example resource route with concerns:
-  #   concern :toggleable do
-  #     post 'toggle'
-  #   end
-  #   resources :posts, concerns: :toggleable
-  #   resources :photos, concerns: :toggleable
-
-  # Example resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
 end

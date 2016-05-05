@@ -1,0 +1,45 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Subscriptions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Person</th>
+      <th>Join form</th>
+      <th>Frequency</th>
+      <th>Pay method</th>
+      <th>Account name</th>
+      <th>Account number</th>
+      <th>Expiry Month</th>
+      <th>Expiry Year</th>
+      <th>Ccv</th>
+      <th>Bsb</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @subscriptions.each do |subscription| %>
+      <tr>
+        <td><%= subscription.person %></td>
+        <td><%= subscription.join_form %></td>
+        <td><%= subscription.frequency %></td>
+        <td><%= subscription.pay_method %></td>
+        <td><%= subscription.account_name %></td>
+        <td><%= subscription.account_number %></td>
+        <td><%= subscription.expiry_month %></td>
+        <td><%= subscription.expiry_year %></td>
+        <td><%= subscription.ccv %></td>
+        <td><%= subscription.bsb %></td>
+        <td><%= link_to 'Show', subscription %></td>
+        <td><%= link_to 'Edit', edit_subscription_path(subscription) %></td>
+        <td><%= link_to 'Destroy', subscription, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Subscription', new_subscription_path %>

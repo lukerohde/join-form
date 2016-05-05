@@ -20,4 +20,118 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  helpers:
+    label:
+      join_form:
+        short_name: Slug
+        short_name_placeholder: Please enter an short name for this join form, for the url
+        description: Subscription Description
+        description_placeholder: Please enter a short description of the subscription, to be shown to the user. 
+        page_title: Page Title
+        page_title_placeholder: Specify a web browser title for the page
+        header: Header
+        header_placeholder: Optional header to appear at the top of your join form in raw HTML
+        css: Inline CSS
+        css_placeholder:  Customize how your form looks using CSS
+        base_rate_id: Plan ID
+        base_rate_id_placeholder: Please enter an id identify what fee level/plan they member is on
+        base_rate_establishment:  Up front payment 
+        base_rate_establishment_description: Typically $0 but when joining for a service could be something like $200.00
+        base_rate_weekly: Weekly fee 
+        base_rate_fortnightly: Fortnightly fee
+        base_rate_monthly: Monthly fee
+        base_rate_quarterly: Quarterly fee
+        base_rate_half_yearly:  Half yearly fee
+        base_rate_yearly:  Yearly fee
+      subscription:
+        description: "Description"
+  gender:
+    male: male
+    female: female
+    other: neither
+  activerecord:
+    attributes:
+      subscription:
+        frequency: "Payment Frequency"
+        pay_method: "Payment Method"
+        account_name: "Name Of Account Holder / Name On Card"
+        bsb: "BSB"
+        account_number: "Account Number"
+        card_number: "Credit Card Number"
+        expiry: "Expiry"
+        ccv: "CCV (the 3 digits on the back of the card)"
+      person:
+        external_id: "Member ID"
+        first_name: "First Name"
+        last_name: "Last Name"
+        email: "Email"
+        mobile: "Mobile Phone"
+        gender: "Gender"
+        dob: "Date of Birth"
+        address1: "Address Line 1"
+        address2: "Address Line 2"
+        suburb: "Suburb"
+        state: "State"
+        postcode: "Post Code"
+  people:
+    errors:
+      not_blank: "can't be blank"
+  subscriptions:
+    form:
+      error_summary: 
+        one:  "1 error prevented your membership application from being saved."
+        other: "%{count} errors prevented your membership application from being saved."
+      submit_join: "Join Now"
+      submit_renew: "Renew Now"
+      submit_next: "Next"
+      submit_processing: "Processing..."
+    verify_email:
+      instruction: "Please check your email and follow the verification link to continue."
+      explanation: "We have sent the verification email to the email address already in our system, which may be different to the email you just provided."
+      subject: "Please verify your email to continue joining"
+      follow_link: "Please follow this link to continue..."
+      email_explanation: "You are receiving this notice because somebody may have been trying to update your union membership online."
+    membership_card:
+      heading: Online Membership Card
+      bookmark: You can bookmark this page
+      edit: Edit
+    person:
+      edit:
+        heading: "Contact Details"
+    address:
+      edit:
+        heading: "Address Details"
+    subscription:
+      edit: 
+        heading: "Membership Plan Details"
+        weekly: "Weekly"
+        fortnightly: "Fortnightly"
+        monthly: "Monthly"
+        quarterly: "Quarterly"
+        half_yearly: "Half Yearly"
+        yearly: "Yearly"
+    pay_method:
+      edit:
+        heading: "Payment Details"
+        credit_card: "Credit Card"
+        au_bank_account: "Australian Bank Account"
+        use_existing: "Use my existing payment method"
+        application_fee: "Application Fee:"
+        member_discount: "Member Discount:"
+        total: "Dues payable in advance:"
+    steps:
+      done: "Welcome to the union"
+      payment: "Please provide a payment method"
+      plan: "Please choose your membership plan"
+      address: "Please tell us your address in Australia"
+      welcome: "Please provide your contact details"
+      renewal: "Hey, you are already a member! Please update your details with us."
+    errors:
+      not_blank: "can't be blank"
+      complete_address: "You must complete your address"
+      credit_card: "couldn't be validated by our payment gateway.  Please try again."
+      bsb: "must be properly formatted BSB e.g. 123-123"
+      account_number: "must be properly formatted e.g. 123456"
+      pay_method: "must be specified"
+      payment_gateway_error: "Our payment provider had an error while creating your customer record"
+      payment_gateway_card_error: "Our payment provider had a problem with your credit card"

@@ -21,6 +21,18 @@ module JoinAUnion
     # config.i18n.default_locale = :de
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
+    # config.active_record.raise_in_transactional_callbacks = true
+    
+    config.languages = {
+        "en" => "english", 
+        "zh-TW" => "中文版",
+    }
+    config.i18n.available_locales = config.languages.keys << "en-AU"
+    config.i18n.fallbacks = true
+
+    config.after_initialize do
+        config.owner_union = Union.find_by_short_name(ENV['OWNER_UNION']) rescue nil
+    end
+    config.active_job.queue_adapter = :sucker_punch
   end
 end

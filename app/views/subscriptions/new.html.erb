@@ -1,0 +1,7 @@
+<% if notice.present? %>
+	<p id="notice" class="alert alert-info text-center"><%= notice %></p>
+<% end %>
+
+<div class="col-sm-8 col-sm-offset-2">
+	<%= render 'form', subscription: @subscription %>
+</div>

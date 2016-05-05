@@ -1,0 +1,37 @@
+<p id="notice"><%= notice %></p>
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-2">
+      <%= link_to "New #{supergroup.titlecase}", new_polymorphic_path(@klass), style: "margin-top: 15px",class: "btn btn-default pull-right" if owner? %>
+    <% unless @supergroups.blank? %>
+      <h2 class="no-left-margin">Listing <%=supergroup.titlecase.pluralize%></h2>
+  
+      <table class="table table-condensed table-striped box-shadow">
+        <thead>
+          <tr>
+            <th>Logo</th>
+            <th><%= supergroup.titlecase %></th>
+            <th>www</th>
+            <th>JoinForms</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @supergroups.each do |supergroup| %>
+            <tr class="">
+              <td style="vertical-align: middle"> 
+                <% if supergroup.logo.url.blank? %>
+                  <strong><%= supergroup.short_name || supergroup.name %></strong>
+              <% else %>
+                <%= logo_thumb(supergroup) %>
+              <% end %>
+              </td>
+              <td style="vertical-align: middle"><%=link_to supergroup.name, polymorphic_path(supergroup, locale: locale) %></td>
+              <td style="vertical-align: middle"><%=link_to supergroup.www, "http://#{supergroup.www}"%></td>
+              <td class="text-right" style="vertical-align: middle;"><%=supergroup.join_forms.count()%></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+// Place all the styles related to the subscriptions controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+#stripe_error {
+	color: red;
+	font-weight: bold;
+}
+
+.fixed-to-top {
+	position:fixed;
+	top: 0;
+	z-index: 1000;
+	width:100%;
+}
+
+.start_hidden {
+	display: none;
+}
+
+.membership-card {
+	border-radius: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 300px;
+	height: 194px;
+	border: 1px solid black;
+	position:relative; 		
+}
+
+#membership-card-top-panel {
+	border-radius: 9px 9px 0 0;
+}
+
+#membership-card-bottom-panel {
+	border-radius: 0 0 9px 9px;
+}

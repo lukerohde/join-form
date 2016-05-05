@@ -1,0 +1,31 @@
+<div id="subscription" class="<%=start_hidden(:subscription) %>">
+  <h2><%=t(".heading")%></h2>
+
+  <%= render 'errors' if @subscription.step == :subscription %>
+
+  <% if @subscription.join_form.description.present? %>
+    <div class="form-group">
+      <%= f.label :description, t('helpers.label.subscription.description') %><br>
+      <p class="detail">
+        <%= @subscription.join_form.description %>
+      </p>
+    </div>
+  <% end %>
+
+  <%= f.hidden_field :plan, value: @subscription.join_form.base_rate_id %>
+
+  <div class="form-group">
+    <%= f.label :frequency %><br>
+    <%= f.select :frequency,
+      frequency_options(@subscription),
+      {
+          include_blank: true,
+      },
+      data: {
+        placeholder: t('activerecord.attributes.subscription.frequency'),
+      },
+      class: "form-control",
+      style: "width: 100%;"
+    %>
+  </div>
+</div>
