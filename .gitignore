@@ -27,3 +27,5 @@
 /features_disabled
 /keys
 test.rb
+public/assets
+.ruby-version

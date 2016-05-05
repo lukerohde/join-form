@@ -101,5 +101,6 @@ subscription_ready = ->
     subscription_helper_ready()
     pay_method_ready()
 
-$(document).on('turbolinks:load', subscription_ready);
-$(window).unload firefox_form_reset
+$(document).ready(subscription_ready);
+#$(document).on('turbolinks:load', subscription_ready);
+#$(window).unload firefox_form_reset

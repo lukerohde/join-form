@@ -234,6 +234,7 @@ module SubscriptionsHelper
     subscription
   end
 
+
   def nuw_end_point_person_get(subscription_params)
     # TODO Timeout quickly and quietly
     url = nuw_end_point_uri

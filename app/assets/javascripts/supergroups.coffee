@@ -14,4 +14,5 @@ $( window ).resize ->
 supergroup_ready = ->
 	resize()
 
-$(document).on('turbolinks:load', supergroup_ready);
+#$(document).on('turbolinks:load', supergroup_ready);
+$(document).ready(supergroup_ready);
