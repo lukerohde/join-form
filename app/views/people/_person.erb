@@ -1,9 +1,0 @@
-<span id="person">
-	<%=profile_logo(person)%>
-	<%="<br/>".html_safe if person.attachment.quote.url %>
-	<% if person.is_authorized?(current_person) %>
-		<%=link_to person.display_name, edit_person_path(person)%>
-	<% else %>
-		<%=person.display_name%>
-	<% end %>
-</span>

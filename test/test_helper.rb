@@ -7,12 +7,4 @@ class ActiveSupport::TestCase
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
-
-  def sign_in(person)
-		# device testhelpers don't work in Rails 5 yet!
-	  post person_session_path \
-	    "person[email]"    => person.email,
-	    "person[password]" => "password"
-	end
-
 end

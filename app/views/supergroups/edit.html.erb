@@ -1,6 +1,0 @@
-<h1>Editing <%=supergroup.titlecase%></h1>
-
-<%= render 'form' %>
-
-<hr/>
-<%= link_to "Permanently Delete This #{@supergroup.class}",polymorphic_path(@supergroup), method: :delete, class: "btn btn-danger ", style: "margin: 15px; color: white", data: {confirm: "Are you really really sure?"} %>
