@@ -8,7 +8,7 @@
 <%= render partial: "shared/lang_picker", locals: { display_class: "pull-right" } %>
 
 <div class="subscription_header">
-  <%=subscription.join_form.header.html_safe %>
+  <%=subscription.join_form.header.html_safe if subscription.join_form.header %>
 </div>
 
 <%= form_for(subscription, url: subscription_form_path(subscription)) do |f| %>

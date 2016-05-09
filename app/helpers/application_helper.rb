@@ -96,4 +96,30 @@ module ApplicationHelper
   def local_time_tag(t)
   	content_tag(:span, I18n.l(t, format: :long), data: { time: t.iso8601 })
   end
+
+  # HELPER FOR MAKING A SHORT ROUTE - is there a better away
+  def join_form_id(join_form)
+    # HACK TO PREVENT PEOPLE BOOKMARKING MY ALTERNATIVE TO GLOBALIZE HACK
+    join_form_id = join_form.short_name.downcase
+    join_form_id.gsub("-zh-tw", "")
+  end
+
+  def subscription_form_path(subscription)
+    join_form = subscription.join_form
+    union = join_form.union
+
+    if subscription.id
+      #union_join_form_subscription_path(union.short_name, join_form.short_name, subscription.token)
+      #"/#{locale}/#{union.short_name.downcase}/#{join_form_id(join_form)}/join/#{subscription.token}"
+    	edit_join_path(locale, union.short_name, join_form.short_name, subscription.token).downcase
+    else
+      #"/#{locale}/#{union.short_name.downcase}/#{join_form_id(join_form)}/join"
+    	new_join_path(locale, union.short_name, join_form.short_name).downcase
+    end
+  end
+
+  def subscription_short_path
+    "/#{locale}/#{@union.short_name.downcase}/#{join_form_id(@join_form)}/#{@subscription.token}"
+  end  
+
 end

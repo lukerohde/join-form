@@ -1,5 +1,5 @@
 class JoinFormsController < ApplicationController
-  before_action :set_join_form, only: [:edit, :update, :destroy]
+  before_action :set_join_form, only: [:edit, :update, :destroy, :show]
   before_action :forbid, only: [:edit, :update]
   
   # GET /join_forms
@@ -7,6 +7,10 @@ class JoinFormsController < ApplicationController
   def index
     #@join_forms = JoinForm.all
     redirect_to union_path(@union)
+  end
+
+  def show
+    redirect_to subscription_form_path(Subscription.new(join_form: @join_form, person: Person.new))
   end
 
   # GET /join_forms/new

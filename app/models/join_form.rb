@@ -1,7 +1,7 @@
 class JoinForm < ApplicationRecord
 	belongs_to :union
 	belongs_to :person
-	has_many :subscriptions
+	has_many :subscriptions, dependent: :delete_all
 	
 	validates :short_name, :person, :union, presence: true
 	validates :base_rate_id, presence: true

@@ -11,7 +11,7 @@ Rails.application.routes.draw do
     devise_for :people, :controllers => { :invitations => 'people/invitations' }
       
     resources :unions, controller: :supergroups, type: 'Union' do
-      resources :join_forms, except: [:show] do 
+      resources :join_forms do 
         resources :subscriptions
       end
       resource :key, only: [:show, :new, :edit, :update], controller: 'unions/key'
@@ -24,15 +24,15 @@ Rails.application.routes.draw do
       end
     end 
 
-    resources :join_forms, except: [:show] 
+    resources :join_forms
 
     get '/public/:filename', to: 'files#get'
     
-    get '/:union_id/:join_form_id/join', to: 'subscriptions#new' 
+    get '/:union_id/:join_form_id/join', to: 'subscriptions#new', as: :new_join
     post '/:union_id/:join_form_id/join', to: 'subscriptions#create' 
-    get '/:union_id/:join_form_id/join/:id', to: 'subscriptions#edit'
+    get '/:union_id/:join_form_id/join/:id', to: 'subscriptions#edit', as: :edit_join
     patch '/:union_id/:join_form_id/join/:id', to:  'subscriptions#update'
-    get '/:union_id/:join_form_id/:id', to:  'subscriptions#show'
+    get '/:union_id/:join_form_id/:id', to:  'subscriptions#show', as: :join
 
     root "join_forms#index"
   end
