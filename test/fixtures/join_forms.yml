@@ -12,6 +12,7 @@ one:
   base_rate_half_yearly: 9.99
   base_rate_yearly: 9.99
   union: owner
+  person: admin
 
 two:
   short_name: MyString
@@ -25,3 +26,4 @@ two:
   base_rate_half_yearly: 9.99
   base_rate_yearly: 9.99
   union: owner
+  person: admin

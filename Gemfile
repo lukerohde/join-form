@@ -56,6 +56,7 @@ group :test do
   gem 'minitest-reporters'
   gem 'minitest-focus'
   gem 'm'
+  gem 'mocha'
 end
 
 group :development do

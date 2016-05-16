@@ -10,12 +10,17 @@ one:
   ccv: MyString
   bsb: MyString
 
-two:
-  person: two
+contact_details_only_subscription:
   join_form: two
-  frequency: MyString
-  pay_method: MyString
-  account_name: MyString
-  account_number: MyString
-  ccv: MyString
-  bsb: MyString
+  person: contact_details_only_person
+  token: contact_details_only_token
+contact_details_with_address_subscription:
+  join_form: two
+  person: contact_details_with_address_person
+  token: contact_details_with_address_token
+contact_details_with_subscription_subscription:
+  join_form: two
+  person: contact_details_with_address_person
+  token: contact_details_with_subscription_token
+  plan: asdf
+  frequency: "W"

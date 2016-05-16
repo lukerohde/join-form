@@ -78,9 +78,6 @@ en:
       not_blank: "can't be blank"
   subscriptions:
     form:
-      error_summary: 
-        one:  "1 error prevented your membership application from being saved."
-        other: "%{count} errors prevented your membership application from being saved."
       submit_join: "Join Now"
       submit_renew: "Renew Now"
       submit_next: "Next"
@@ -135,3 +132,6 @@ en:
       pay_method: "must be specified"
       payment_gateway_error: "Our payment provider had an error while creating your customer record"
       payment_gateway_card_error: "Our payment provider had a problem with your credit card"
+      error_summary: 
+        one:  "1 error prevented your membership application from being saved."
+        other: "%{count} errors prevented your membership application from being saved."

@@ -2,7 +2,7 @@ class SubscriptionsController < ApplicationController
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy]
   before_action :set_join_form
-  before_action :resubscribe?, only: [:create]
+  # TODO Re-enable with tests.  before_action :resubscribe?, only: [:create]
 
   layout 'subscription'
 
@@ -65,14 +65,18 @@ class SubscriptionsController < ApplicationController
 
   def save_step
     result = false
-    if subscription_params['pay_method'] == "CC"
-      result = @subscription.update_with_payment(subscription_params, @union)
-    else
-      result = @subscription.update(subscription_params)
+    if @subscription.new_record?
+      result = @subscription.save
+    else 
+      if subscription_params['pay_method'] == "CC"
+        result = @subscription.update_with_payment(subscription_params, @union)
+      else
+        result = @subscription.update(subscription_params)
+      end 
     end 
 
     # TODO Guarentee delivery
-    nuw_end_point_person_put(@subscription) if result
+    # TODO Re-enable with tests.  nuw_end_point_person_put(@subscription) if result
       
     result
   end
@@ -118,7 +122,7 @@ class SubscriptionsController < ApplicationController
         forbidden
       else
         # update record from api if its been linked (TODO what if it hasn't? should background messaging link it)
-        @subscription = nuw_end_point_reload(@subscription)
+        # TODO Re-enable with tests.  @subscription = nuw_end_point_reload(@subscription)
       
         # blank these so they cannot be returned
         @subscription.card_number = ""
@@ -168,7 +172,6 @@ class SubscriptionsController < ApplicationController
 
     def resubscribe?
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
-      binding.pry
       @subscription = nuw_end_point_load(subscription_params, @join_form)
       if @subscription
         # If an existing subcription exists, determine secure and appropriate action

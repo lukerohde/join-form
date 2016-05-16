@@ -111,10 +111,10 @@ module ApplicationHelper
     if subscription.id
       #union_join_form_subscription_path(union.short_name, join_form.short_name, subscription.token)
       #"/#{locale}/#{union.short_name.downcase}/#{join_form_id(join_form)}/join/#{subscription.token}"
-    	edit_join_path(locale, union.short_name, join_form.short_name, subscription.token).downcase
+    	edit_join_path(locale, union.short_name, join_form.short_name, subscription.token)
     else
       #"/#{locale}/#{union.short_name.downcase}/#{join_form_id(join_form)}/join"
-    	new_join_path(locale, union.short_name, join_form.short_name).downcase
+    	new_join_path(locale, union.short_name, join_form.short_name)
     end
   end
 

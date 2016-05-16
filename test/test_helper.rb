@@ -4,6 +4,8 @@ require 'rails/test_help'
 require 'minitest/rails'
 require 'minitest/rails/capybara'
 require 'minitest/reporters'
+require 'mocha/mini_test'
+require 'ostruct'
 
 reporter_options = { color: true }
 Minitest::Reporters.use! [Minitest::Reporters::ProgressReporter.new(reporter_options)]

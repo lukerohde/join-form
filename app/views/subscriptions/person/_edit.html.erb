@@ -2,7 +2,8 @@
 
   <%= render 'errors' if @subscription.step == :contact_details %>
 
-       
+  <%= f.hidden_field :id, class: "form-control" %>
+  
   <% if current_person # prevent external users fiddling, needed for reviewing before saving %>  
     <div class="form-group">
       <%= f.hidden_field :external_id %>

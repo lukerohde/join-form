@@ -70,9 +70,6 @@ zh-TW:
       not_blank: "不能留空白"
   subscriptions:
     form:
-      error_summary: 
-        one:  "錯誤１　導致資料無法儲存"
-        other: "錯誤%{count}　導致資料無法儲存"
       submit_join: "現在加入"
       submit_renew: "更新"
       submit_next: "下一步"
@@ -127,6 +124,9 @@ zh-TW:
       pay_method: "請確認"
       payment_gateway_error: "銀行端在登入你的資料時發現錯誤"
       payment_gateway_card_error: "銀行端在確認你的信用卡時發現錯誤"
+      error_summary: 
+        one:  "錯誤１　導致資料無法儲存"
+        other: "錯誤%{count}　導致資料無法儲存"
   date:
     abbr_day_names:
     - 周日

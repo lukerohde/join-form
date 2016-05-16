@@ -51,6 +51,6 @@ class AdminManagingJoinFormsTest < ActionDispatch::IntegrationTest
 	  j = join_forms(:one)
     u = j.union
   	get join_form_path(join_forms(:one))
-    assert_redirected_to "http://www.example.com/en/#{u.short_name.downcase}/#{j.short_name.downcase}/join"
+    assert_redirected_to "http://www.example.com/en/#{u.short_name}/#{j.short_name}/join"
   end
 end

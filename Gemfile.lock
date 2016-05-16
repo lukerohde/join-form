@@ -280,6 +280,7 @@ GEM
       actionmailer (>= 3.2.13)
       json (>= 1.7.7)
       rest-client (>= 1.6.7)
+    metaclass (0.0.4)
     method_source (0.8.2)
     mime-types (2.99.1)
     mini_magick (4.5.1)
@@ -306,6 +307,8 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
+    mocha (1.1.0)
+      metaclass (~> 0.0.1)
     multi_json (1.12.0)
     nenv (0.3.0)
     netrc (0.11.0)
@@ -442,6 +445,7 @@ DEPENDENCIES
   minitest-rails
   minitest-rails-capybara
   minitest-reporters
+  mocha
   pg
   pry-byebug
   puma
