@@ -176,32 +176,38 @@ class SubscriptionsController < ApplicationController
     end
 
     def resubscribe?
-      return unless Subscription.new(subscription_params).valid?
-    
+
+      # setup some shortcuts
+      params = subscription_params
+      pparams = params[:person_attributes]
+
+      # don't check resubscribe if the person is invalid, but do allow duplicate email. TODO dry up valiation logic - Subscription.new(params).valid? has a problem with duplicate email 
+      return if pparams[:first_name].blank? || !Person.email_valid?(pparams[:email]) 
+      
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
-      @subscription = nuw_end_point_load(subscription_params, @join_form)
+      @subscription = nuw_end_point_load(params, @join_form)
       if @subscription
         # If an existing subcription exists, determine secure and appropriate action
         if current_person && current_person.union.id == @join_form.union.id
           # This is really nasty - TODO I want the logged in user to be able to avoid the verification steps, but have to review the original record first.
-          patch_and_persist_subscription(subscription_params)
+          patch_and_persist_subscription(params)
           redirect_to subscription_form_path(@subscription), notice: "We've matched a person already in our database!  Because you're logged in, redirected you to review and update this subscription instead."
-        elsif nothing_to_expose(subscription_params, @subscription)
+        elsif nothing_to_expose(params, @subscription)
           # if the subscription from the database exposes no additional information
           # TODO fix bug where existing member with no address requires address validation
-          patch_and_persist_subscription(subscription_params)
+          patch_and_persist_subscription(params)
           redirect_to subscription_form_path(@subscription), notice: next_step_notice
-        elsif params_match(subscription_params, @subscription)
+        elsif params_match(params, @subscription)
           # if the user has provided enough contact detail to verify their identity, then they can update their subscription
-          patch_and_persist_subscription(subscription_params)
+          patch_and_persist_subscription(params)
           redirect_to subscription_form_path(@subscription), notice: t('subscriptions.steps.renewal')
         elsif ( @subscription.person.email.present? && !temporary_email?(@subscription.person.email) )
           # send email verfication message
-          PersonMailer.verify_email(@subscription, subscription_params, request).deliver_now
+          PersonMailer.verify_email(@subscription, params, request).deliver_now
           render :verify_email
         else
           # Can't verify identify so potentially create a duplicate
-          PersonMailer.duplicate_notice(@subscription, subscription_params, request).deliver_now
+          PersonMailer.duplicate_notice(@subscription, params, request).deliver_now
         end
       end
     end

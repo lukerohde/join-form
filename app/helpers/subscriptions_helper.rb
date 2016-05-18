@@ -264,7 +264,6 @@ module SubscriptionsHelper
   def nuw_end_point_sign(url, payload)
     # convert to json and back to fix date formats
     # sort to make sure param order is consistent (only json payloads have nested params and these dont need to be sorted)
-    binding.pry
     secret = ENV['NUW_END_POINT_SECRET']
     raise "NUW_END_POINT_SECRET not configured" unless secret
     data = url + JSON.parse(payload.sort.to_json).to_s

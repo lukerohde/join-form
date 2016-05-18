@@ -40,8 +40,12 @@ class Person < ApplicationRecord
     email_valid? && first_name.present? && first_name != "unknown"
   end
 
+  def self.email_valid?(email)
+      email =~ /\A[^@\s]+@[[:alnum:]]+((-+|\.)[[:alnum:]]+)*\z/
+  end 
+
   def email_valid?
-    email =~ /\A[^@\s]+@[[:alnum:]]+((-+|\.)[[:alnum:]]+)*\z/
+    Person.email_valid?(self.email)
   end
 
   def address_valid?
