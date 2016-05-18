@@ -235,10 +235,11 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "get step 4" do
-    @subscription = subscriptions(:contact_details_with_address_subscription)
+    @subscription = subscriptions(:contact_details_with_subscription_subscription)
     get edit_join_path(:en, @union, @join_form, @subscription.token)
 
-    assert response.body.include?('data-step="subscription"'), "wrong step - should be address"
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay method"
+    assert response.body =~ /I authorize.*100\.00.*9\.99/, "no authorization message"
   end
 
   test "post step 4 - failure" do 
@@ -307,4 +308,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     
     assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
   end
+
+  # TODO I think i have a bug in here, where the subscription join form can vary from the joinform shown
+  # TODO testing around first_payment
 end

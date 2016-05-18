@@ -111,16 +111,32 @@ class Subscription < ApplicationRecord
   end
 
   def discount 
-    dues = self.payments.sum(:amount)
+    dues = (self.payments.sum(:amount)||0)
     dues > establishment_fee ? establishment_fee : dues
   end
 
   def establishment_fee
-    self.join_form.base_rate_establishment
+    self.join_form.base_rate_establishment || 0
   end
 
   def total
-    establishment_fee - discount
+    (establishment_fee - discount)
+  end
+
+  def reoccurring_fee
+    result = self.join_form.fee(self.frequency)
+    result = self.join_form.fee(self.join_form.max_frequency) if result == 0 # This is probably stupid - defaults the user to the minimum amount chargeable if they have a different frequency
+    # TODO add javascript to update the page, if the user changes the frequency when on the payment method step
+    # TODO I think i have a bug in here, where the subscription join form can vary from the joinform shown
+    result
+  end
+
+  def first_payment
+    if self.total < 0.01
+      self.reoccurring_fee
+    else
+      self.total
+    end
   end
   
  	def update_with_payment(params, union)
@@ -130,12 +146,13 @@ class Subscription < ApplicationRecord
 	  	customer = Stripe::Customer.create({description: person.email, card: stripe_token} , {stripe_account: union.stripe_user_id})
 	    person.stripe_token = customer.id
       
-      stripe_amount = (self.total * 100).round(0).to_i
+      stripe_amount = (self.first_payment * 100).round(0).to_i
+       
       if stripe_amount > 0
         charge = Stripe::Charge.create({amount: stripe_amount, currency: 'AUD', description: join_form.description, customer: person.stripe_token}, {stripe_account: union.stripe_user_id})
-	    end
+	      self.payments << Payment.new(date: Date.today, amount: (stripe_amount / 100.0).round(2), person_id: self.person.id)
+      end
 
-      self.payments << Payment.new(date: Date.today, amount: self.total.round(2), person_id: self.person.id)
       save!
 	  end
 	rescue Stripe::CardError => e

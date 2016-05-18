@@ -11,6 +11,41 @@ class JoinForm < ApplicationRecord
 	#translates :header, :description
 
 	after_initialize :set_defaults
+
+
+	def max_frequency
+		case
+			when self.base_rate_weekly > 0
+				"W"
+			when self.base_rate_fortnightly > 0
+				"F"
+			when self.base_rate_monthly > 0
+				"M"
+			when self.base_rate_quarterly > 0
+				"Q"
+			when self.base_rate_half_yearly > 0
+				"H"
+			when self.base_rate_yearly > 0
+				"Y"
+			end	
+	end
+
+	def fee(frequency)
+		case frequency
+      when  "W" 
+        self.base_rate_weekly || 0
+      when  "F" 
+        self.base_rate_fortnightly || 0
+      when  "M" 
+        self.base_rate_monthly || 0
+      when  "Q" 
+        self.base_rate_quarterly || 0
+      when  "H" 
+        self.base_rate_half_yearly || 0
+      when  "Y" 
+        self.base_rate_yearly || 0
+      end
+	end
 	
 	def set_defaults
 

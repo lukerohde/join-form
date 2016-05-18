@@ -55,12 +55,31 @@
 </head>
 
 <body>
+  <style>
+    #header {
+      text-align: center;
+    }
+
+    img#ouch {
+      max-width: 100%;
+      min-width: 200px;
+      border: solid 10px white;
+      box-shadow:  5px 5px 5px #888;
+      margin-bottom: 15px;
+    }
+
+  </style>
+
   <!-- This file lives in public/500.html -->
   <div class="dialog">
-    <div>
-      <h1>We're sorry, but something went wrong.</h1>
+
+
+    <div id="header">
+      <h1>I've broken something!</h1>
+      <!-- Images are stored in my join_hosting dropbox (lrohde) folder -->
+      <img id="ouch" src="https://dl.dropboxusercontent.com/s/lmi3i3jxrbuy1yh/forehead_smack.jpg?dl=0" />
     </div>
-    <p>If you are the application owner check the logs for more information.</p>
+    <p>I've been emailed the details of your error and will hopefully contact you soon.  My email is <strong><i>lrohde at nuw dot org dot au</i></strong> if you want to contact me first.</p>
   </div>
 </body>
 </html>

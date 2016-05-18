@@ -4,7 +4,7 @@ one:
   short_name: MyString
   description: MyText
   css: MyText
-  base_rate_establishment: 9.99
+  base_rate_establishment: 100.00
   base_rate_weekly: 9.99
   base_rate_fortnightly: 9.99
   base_rate_monthly: 9.99
@@ -18,7 +18,7 @@ two:
   short_name: MyString
   description: MyText
   css: MyText
-  base_rate_establishment: 9.99
+  base_rate_establishment: 100.00
   base_rate_weekly: 9.99
   base_rate_fortnightly: 9.99
   base_rate_monthly: 9.99

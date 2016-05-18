@@ -80,7 +80,7 @@ gem 'jquery-fileupload-rails'
 gem 'autoprefixer-rails'
 
 #RAILS5, for heroku??
-#gem 'rails_12factor', group: :production
+gem 'rails_12factor', group: :production
 
 # User Login
 gem 'devise' #, :git => 'https://github.com/plataformatec/devise.git' # '~> 3.5.6'

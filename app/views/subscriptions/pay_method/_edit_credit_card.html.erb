@@ -31,4 +31,8 @@
   <div class="field">
     <%= f.hidden_field :stripe_token %>
   </div>
+
+  <strong> 
+    Amount Payable Now: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
+  </strong>
 </div>

@@ -16,4 +16,9 @@
 	  <%= f.label :account_number %><br/>
 	  <%= f.text_field :account_number, class: "form-control" %>
 	</div>
+
+	<strong> 
+    Initial Payment: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
+    <br/><small> Deductions will usually commence within 3 business days.  </small>
+  </strong>
 </div>
