@@ -1,4 +1,5 @@
 require 'test_helper'
+include ActiveJob::TestHelper
 include ApplicationHelper
 include SubscriptionsHelper
 
@@ -120,6 +121,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: "Lucas", email: "lrohde@nuw.org.au" } }
     assert_response :success
     assert response.body.include?('Please check your email'), "should be verifying"
+    assert ActionMailer::Base.deliveries.last.subject == "Please verify your email to continue joining", "verification mail not sent"
   end
 
   test "post step 1 - success, someone matched, duplicate" do
@@ -129,11 +131,11 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     # TODO Should be a get here but because put is mocked, the member isn't updated with an ID
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'})) 
+    assert ActionMailer::Base.deliveries.last.subject == "We may be duplicating a member", "duplication mail not sent"
+    
     follow_redirect!
     assert response.body.include?('data-step="address"'), "wrong step - should be contact_details"
-    assert ActionMailer::Base.deliveries.first.subject == "We may be duplicating a member", "duplication mail not sent"
-
-  end
+    end
 
   def step2_params
     @with_address = people(:contact_details_with_address_person)   
@@ -142,135 +144,150 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     params
   end
 
-  # test "get step 2" do 
-  #   @subscription = subscriptions(:contact_details_only_subscription)
-  #   get edit_join_path(:en, @union, @join_form, @subscription.token)
-  #   assert_response :success
+  test "get step 2" do 
+    @subscription = subscriptions(:contact_details_only_subscription)
+    get edit_join_path(:en, @union, @join_form, @subscription.token)
+    assert_response :success
     
-  #   assert response.body.include?('data-step="address"'), "wrong step - should be address"
-  # end
+    assert response.body.include?('data-step="address"'), "wrong step - should be address"
+  end
 
-  # test "post step 2 - failure" do 
-  #   @without_address = subscriptions(:contact_details_only_subscription)
-  #   params = step1_params
-  #   params[:subscription][:person_attributes][:id] = @without_address.person.id
-  #   patch edit_join_path(:en, @union, @join_form, @without_address.token), params
-  #   assert_response :success
-  #   assert response.body.include?('data-step="address"'), "wrong step - should be address"
-  #   #TODO figure out how to get the address validations to show for person
-  #   assert response.body.include?( I18n.translate('subscriptions.errors.complete_address') ), "no address1 error"
-  # end
+  test "post step 2 - failure" do 
+    @without_address = subscriptions(:contact_details_only_subscription)
+    params = step1_params
+    params[:subscription][:person_attributes][:id] = @without_address.person.id
+    patch edit_join_path(:en, @union, @join_form, @without_address.token), params
+    assert_response :success
+    assert response.body.include?('data-step="address"'), "wrong step - should be address"
+    #TODO figure out how to get the address validations to show for person
+    assert response.body.include?( I18n.translate('subscriptions.errors.complete_address') ), "no address1 error"
+  end
 
-  # test "post step 2 - success" do 
-  #   @without_address = subscriptions(:contact_details_only_subscription)
-  #   params = step2_params
-  #   params[:subscription][:person_attributes][:id] = @without_address.person.id
-  #   patch edit_join_path(:en, @union, @join_form, @without_address.token), params
-  #   assert_response :redirect
-  #   follow_redirect!
-  #   assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
-  # end
+  test "post step 2 - success" do 
+    @without_address = subscriptions(:contact_details_only_subscription)
+    params = step2_params
+    api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    params[:subscription][:person_attributes][:id] = @without_address.person.id
+    patch edit_join_path(:en, @union, @join_form, @without_address.token), params
+    assert_response :redirect
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+    follow_redirect!
+    assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
+  end
 
-  # def step3_params
-  #   @with_subscription = subscriptions(:contact_details_with_subscription_subscription)   
-  #   params = step2_params
-  #   params[:subscription].merge!(@with_subscription.slice('plan', 'frequency'))
-  #   params
-  # end
+  def step3_params
+    @with_subscription = subscriptions(:contact_details_with_subscription_subscription)   
+    params = step2_params
+    params[:subscription].merge!(@with_subscription.slice('plan', 'frequency'))
+    params
+  end
 
-  # test "get step 3" do
-  #   @subscription = subscriptions(:contact_details_with_address_subscription)
-  #   get edit_join_path(:en, @union, @join_form, @subscription.token)
+  test "get step 3" do
+    @subscription = subscriptions(:contact_details_with_address_subscription)
+    get edit_join_path(:en, @union, @join_form, @subscription.token)
 
-  #   assert response.body.include?('data-step="subscription"'), "wrong step - should be address"
-  # end
+    assert response.body.include?('data-step="subscription"'), "wrong step - should be address"
+  end
 
-  # test "post step 3 - failure" do 
-  #   with_address = subscriptions(:contact_details_with_address_subscription)
-  #   params = step2_params
+  test "post step 3 - failure" do 
+    with_address = subscriptions(:contact_details_with_address_subscription)
+    params = step2_params
     
-  #   params[:subscription][:person_attributes][:id] = with_address.person.id
-  #   patch edit_join_path(:en, @union, @join_form, with_address.token), params
-  #   assert_response :success
-  #   assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
-  #   #TODO figure out how to get the address validations to show for person
-  #   assert response.body.include?( 'Payment Frequency can&#39;t be blank') , "no frequency error"
-  #   assert response.body.include?( 'Plan can&#39;t be blank') , "no plan error"
-  # end
+    params[:subscription][:person_attributes][:id] = with_address.person.id
+    patch edit_join_path(:en, @union, @join_form, with_address.token), params
+    assert_response :success
+    assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
+    #TODO figure out how to get the address validations to show for person
+    assert response.body.include?( 'Payment Frequency can&#39;t be blank') , "no frequency error"
+    assert response.body.include?( 'Plan can&#39;t be blank') , "no plan error"
+  end
 
 
-  # test "post step 3 - success" do 
-  #   with_address = subscriptions(:contact_details_with_address_subscription)
-  #   params = step3_params
-  #   params[:subscription][:person_attributes][:id] = with_address.person.id
-  #   patch edit_join_path(:en, @union, @join_form, with_address.token), params
-  #   assert_response :redirect
-  #   follow_redirect!
-  #   assert response.body.include?('data-step="pay_method"'), "wrong step - should be subscription"
-  # end
+  test "post step 3 - success" do 
+    with_address = subscriptions(:contact_details_with_address_subscription)
+    params = step3_params
+    params[:subscription][:person_attributes][:id] = with_address.person.id
+    api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    patch edit_join_path(:en, @union, @join_form, with_address.token), params
+    assert_response :redirect
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+    follow_redirect!
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be subscription"
+  end
 
-  # test "get step 4" do
-  #   @subscription = subscriptions(:contact_details_with_address_subscription)
-  #   get edit_join_path(:en, @union, @join_form, @subscription.token)
+  test "get step 4" do
+    @subscription = subscriptions(:contact_details_with_address_subscription)
+    get edit_join_path(:en, @union, @join_form, @subscription.token)
 
-  #   assert response.body.include?('data-step="subscription"'), "wrong step - should be address"
-  # end
+    assert response.body.include?('data-step="subscription"'), "wrong step - should be address"
+  end
 
-  # test "post step 4 - failure" do 
-  #   with_subscription = subscriptions(:contact_details_with_subscription_subscription)
-  #   params = step3_params
+  test "post step 4 - failure" do 
+    with_subscription = subscriptions(:contact_details_with_subscription_subscription)
+    params = step3_params
     
-  #   params[:subscription][:person_attributes][:id] = with_subscription.person.id
-  #   patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
-  #   assert_response :success
-  #   assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
-  #   #TODO figure out how to get the address validations to show for person
-  #   assert response.body.include?( 'Payment Method must be specified') , "no pay method error"
+    params[:subscription][:person_attributes][:id] = with_subscription.person.id
+    patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
+    assert_response :success
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
+    #TODO figure out how to get the address validations to show for person
+    assert response.body.include?( 'Payment Method must be specified') , "no pay method error"
   
-  #   params[:subscription].merge!(pay_method: "CC")
-  #   patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
-  #   assert response.body.include?( "couldn&#39;t be validated by our payment gateway.  Please try again."), "no error for missing stripe token"
+    params[:subscription].merge!(pay_method: "CC")
+    patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
+    assert response.body.include?( "couldn&#39;t be validated by our payment gateway.  Please try again."), "no error for missing stripe token"
 
-  #   params[:subscription].merge!(pay_method: "AB")
-  #   patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
-  #   assert response.body.include?( "BSB must be properly formatted BSB"), "no error for missing bsb"
-  #   assert response.body.include?( "Account Number must be properly formatted"), "no error for missing account number"
-  # end
+    params[:subscription].merge!(pay_method: "AB")
+    patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
+    assert response.body.include?( "BSB must be properly formatted BSB"), "no error for missing bsb"
+    assert response.body.include?( "Account Number must be properly formatted"), "no error for missing account number"
+  end
 
-  # test "post step 4 - success - australian bank" do 
-  #   @union = @join_form.union
-  #   @union.update( passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
+  test "post step 4 - success - australian bank" do 
+    @union = @join_form.union
+    @union.update( passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
     
-  #   with_subscription = subscriptions(:contact_details_with_subscription_subscription)
-  #   params = step3_params
+    with_subscription = subscriptions(:contact_details_with_subscription_subscription)
+    params = step3_params
     
-  #   params[:subscription][:person_attributes][:id] = with_subscription.person.id
-  #   params[:subscription].merge!(pay_method: "AB", bsb: "123-123", account_number: "1231231")
+    params[:subscription][:person_attributes][:id] = with_subscription.person.id
+    params[:subscription].merge!(pay_method: "AB", bsb: "123-123", account_number: "1231231")
 
-  #   patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
-  #   assert_response :redirect
+    api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    
+    patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
+    assert_response :redirect
 
-  #   follow_redirect!
-  #   assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
-  # end
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+    follow_redirect!
+    assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
+  end
   
-  # test "post step 4 - success - credit card" do 
-  #   @union = @join_form.union
-  #   @union.update( passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
+  test "post step 4 - success - credit card" do 
+    @union = @join_form.union
+    @union.update( passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
     
-  #   with_subscription = subscriptions(:contact_details_with_subscription_subscription)
-  #   params = step3_params
+    with_subscription = subscriptions(:contact_details_with_subscription_subscription)
+    params = step3_params
     
-  #   params[:subscription][:person_attributes][:id] = with_subscription.person.id
-  #   params[:subscription].merge!(pay_method: "CC", expiry_year: "2018", expiry_month: "06", card_number: "12341234123141234", stripe_token: "asdfasdf")
+    params[:subscription][:person_attributes][:id] = with_subscription.person.id
+    params[:subscription].merge!(pay_method: "CC", expiry_year: "2018", expiry_month: "06", card_number: "12341234123141234", stripe_token: "asdfasdf")
 
-  #   Stripe::Customer.expects(:create).returns (OpenStruct.new(id: 123))
-  #   Stripe::Charge.expects(:create).returns (true)
+    Stripe::Customer.expects(:create).returns (OpenStruct.new(id: 123))
+    Stripe::Charge.expects(:create).returns (true)
     
-  #   patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
-  #   assert_response :redirect
+    api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    
+    patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
+    assert_response :redirect
 
-  #   follow_redirect!
-  #   assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
-  # end
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+    follow_redirect!
+    
+    assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
+  end
 end
