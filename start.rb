@@ -126,7 +126,7 @@ class Application < Sinatra::Base
 				FirstName: api_data[:first_name], 
 				LastName: api_data[:last_name],
 				MemberEmailAddress: api_data[:email],
-				MobilePhone: api_data[:mobile],
+				MobilePhone: (api_data[:mobile]||"")[0..9],
 				Gender: (api_data[:gender]||"U"),
 				MemberResAddress1: api_data[:address1],
 				MemberResAddress2: api_data[:address2],
