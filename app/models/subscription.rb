@@ -157,7 +157,7 @@ class Subscription < ApplicationRecord
     payments_payload = payload[:payments_attributes]
 
     subscription_payload.each do |k,v|
-      self.write_attribute(k,v) unless v.blank?
+      self.send("#{k}=", v) unless v.blank?
     end
 
     person_payload.each do |k,v|
