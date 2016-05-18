@@ -121,5 +121,4 @@ module ApplicationHelper
   def subscription_short_path
     "/#{locale}/#{@union.short_name.downcase}/#{join_form_id(@join_form)}/#{@subscription.token}"
   end  
-
 end

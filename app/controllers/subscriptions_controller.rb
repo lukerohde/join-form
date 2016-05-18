@@ -150,9 +150,12 @@ class SubscriptionsController < ApplicationController
 
         # Hack date back to a regular format (for my API) TODO something better
         if params.dig(:subscription, :person_attributes, 'dob(1i)')
-          params[:subscription][:person_attributes][:dob] = "#{params['subscription']['person_attributes']['dob(1i)']}-#{params['subscription']['person_attributes']['dob(2i)']}-#{params['subscription']['person_attributes']['dob(3i)']}"
+          #params[:subscription][:person_attributes][:dob] = "#{params['subscription']['person_attributes']['dob(1i)']}-#{params['subscription']['person_attributes']['dob(2i)']}-#{params['subscription']['person_attributes']['dob(3i)']}"
+          dob_array = params[:subscription][:person_attributes].slice('dob(1i)', 'dob(2i)', 'dob(3i)').values.map(&:to_i)
+          params[:subscription][:person_attributes][:dob] = Date.new(*dob_array).iso8601
+          params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
         end
-        params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
+        
       end
       
       result = params.require(:subscription).permit(permitted_params)
