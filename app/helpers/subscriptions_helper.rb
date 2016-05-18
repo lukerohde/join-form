@@ -146,15 +146,11 @@ module SubscriptionsHelper
 
   def patch_subscription(subscription, params)
     params.except(:person_attributes).each do |k,v|
-      subscription.write_attribute(k,v) unless v.blank?
+      subscription.send("#{k}=", v) unless v.blank?
     end
 
     params[:person_attributes].each do |k,v|
-      if k.to_sym == :authorizer_id
-        subscription.person.authorizer_id = v unless v.blank?
-      else
-        subscription.person.write_attribute(k,v) unless v.blank?
-      end
+      subscription.person.send("#{k}=", v) unless v.blank?
     end
   end
 
@@ -185,31 +181,33 @@ module SubscriptionsHelper
 
   def nuw_end_point_load(subscription_params, join_form)
     subscription = nil
-    
     payload = nuw_end_point_person_get(subscription_params)
     unless payload.blank? 
+      # something found via the api, update existing record
       person = Person.find_by_external_id(payload.dig(:person_parameters, :external_id)) if payload.dig(:person_parameters, :external_id)
       person ||= Person.find_by_email(subscription_params.dig(:person_attributes, :email)) if subscription_params.dig(:person_attributes, :email)
       person ||= Person.find_by_email(payload[:email]) if payload[:email]
       person ||= Person.new()
 
       subscription = person.subscriptions.last unless person.new_record?
-      subscription ||= Subscription.new(person: person)
+      subscription ||= Subscription.new(person: person) # person exists without a subscription (user)
 
       subscription.join_form_id = join_form.id
       person.authorizer_id = join_form.person.id
       person.union_id = join_form.union.id
     
-      subscription.update_from_end_point(payload)
+      subscription.update_from_end_point(payload) # this will save
     else
+      # nothing found in api, may still be someone already in this database
       person = Person.find_by_email(subscription_params.dig(:person_attributes, :email))
       if person
         subscription = person.subscriptions.last
         subscription ||= Subscription.new(person: person)
+        # TODO I don't like that subscription might be unsaved, but should only affect admins
       end
     end
 
-    subscription
+    subscription  # might be nil if nothing found in this system or api
   end
 
 
@@ -266,8 +264,10 @@ module SubscriptionsHelper
   def nuw_end_point_sign(url, payload)
     # convert to json and back to fix date formats
     # sort to make sure param order is consistent (only json payloads have nested params and these dont need to be sorted)
+    secret = ENV['NUW_END_POINT_SECRET']
+    raise "NUW_END_POINT_SECRET not configured" unless secret
     data = url + JSON.parse(payload.sort.to_json).to_s
-    hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['NUW_END_POINT_SECRET'], data)}")
+    hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',secret, data)}")
     payload.merge!(hmac: hmac)
     payload
   end
@@ -303,6 +303,7 @@ module SubscriptionsHelper
 
   def nuw_end_point_transform_from_person(person_hash)
     result = person_params(person_hash)
+    # TODO Is it appropriate to fake here - I would have thought that'd be a concern of something higher up.
     result[:email] = temporary_email if result[:email].blank?
     result[:first_name] = temporary_first_name if result[:first_name].blank?
     result 

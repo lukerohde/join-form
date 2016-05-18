@@ -3,11 +3,13 @@
 WARNING: This may prevent <%= @subscription.person.first_name %> from renewing or result in them being double charged.  You are being sent this message so you can make sure everything is okay.
 
 The details they provided are as follows
-<% params.each do |k,v| %>
-	<%= if v.present? "    #{k}: v" %>
+<% @params.each do |k,v| %>
+	<%= "    #{k}: #{v}"  if v.present? %>
 <% end %>
 
-The details we had on our system are
-<% subscription.each do |k,v| %>
-	<%= if v.present? "    #{k}: v" %>
+<% if @subscription.person.present? %>
+	The details we had on our system are
+	<% @subscription.person.attributes.each do |k,v| %>
+		<%= "    #{k}: #{v}" if v.present?  %>
+	<% end %>
 <% end %>

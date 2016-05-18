@@ -21,7 +21,7 @@ class Person < ApplicationRecord
   scope :name_like, -> (name) {where("first_name ilike ? or last_name ilike ? or email ilike ?", "%#{name}%", "%#{name}%", "%#{name}%")}
 
   def contact_detail_must_be_complete
-    errors.add(:first_name, I18n.translate('people.errors.not_blank')) if self.first_name.blank? || self.first_name.downcase == "unknown"
+    errors.add(:first_name, I18n.translate('people.errors.not_blank')) if self.first_name.blank? #|| self.first_name.downcase == "unknown"
   end
 
   def name

@@ -97,8 +97,9 @@ class Subscription < ApplicationRecord
 
   def save_without_validation!
     @skip_validation = true
-    save!
+    result = save!
     @skip_validation = false
+    result
   end
 
   def step
@@ -160,11 +161,13 @@ class Subscription < ApplicationRecord
     end
 
     person_payload.each do |k,v|
-      if k == :authorizer_id
-        self.person.authorizer_id = v unless v.blank? # can't use write_attribute since its not a database attribute
-      else
-        self.person.write_attribute(k,v) unless v.blank?
-      end
+      self.person.send("#{k}=", v) unless v.blank?
+
+      #if k == :authorizer_id
+      #  self.person.authorizer_id = v unless v.blank? # can't use write_attribute since its not a database attribute
+      #else
+      #  self.person.write_attribute(k,v) unless v.blank?
+      #end
     end
 
     # either add or update payment, assumes eager loading, n^2 nastiness, to avoid multiple database hits

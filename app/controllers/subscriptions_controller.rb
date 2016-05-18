@@ -2,7 +2,7 @@ class SubscriptionsController < ApplicationController
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy]
   before_action :set_join_form
-  # TODO Re-enable with tests.  before_action :resubscribe?, only: [:create]
+  before_action :resubscribe?, only: [:create]
 
   layout 'subscription'
 
@@ -76,7 +76,7 @@ class SubscriptionsController < ApplicationController
     end 
 
     # TODO Guarentee delivery
-    # TODO Re-enable with tests.  nuw_end_point_person_put(@subscription) if result
+    nuw_end_point_person_put(@subscription) if result
       
     result
   end
@@ -122,7 +122,7 @@ class SubscriptionsController < ApplicationController
         forbidden
       else
         # update record from api if its been linked (TODO what if it hasn't? should background messaging link it)
-        # TODO Re-enable with tests.  @subscription = nuw_end_point_reload(@subscription)
+        @subscription = nuw_end_point_reload(@subscription) # Use when person is returning to their subscription, but unfortunately gets called on every step
       
         # blank these so they cannot be returned
         @subscription.card_number = ""
@@ -149,7 +149,9 @@ class SubscriptionsController < ApplicationController
         end
 
         # Hack date back to a regular format (for my API) TODO something better
-        params[:subscription][:person_attributes][:dob] = "#{params['subscription']['person_attributes']['dob(1i)']}-#{params['subscription']['person_attributes']['dob(2i)']}-#{params['subscription']['person_attributes']['dob(3i)']}"
+        if params.dig(:subscription, :person_attributes, 'dob(1i)')
+          params[:subscription][:person_attributes][:dob] = "#{params['subscription']['person_attributes']['dob(1i)']}-#{params['subscription']['person_attributes']['dob(2i)']}-#{params['subscription']['person_attributes']['dob(3i)']}"
+        end
         params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
       end
       
@@ -171,6 +173,8 @@ class SubscriptionsController < ApplicationController
     end
 
     def resubscribe?
+      return unless Subscription.new(subscription_params).valid?
+    
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
       @subscription = nuw_end_point_load(subscription_params, @join_form)
       if @subscription
@@ -188,7 +192,7 @@ class SubscriptionsController < ApplicationController
           # if the user has provided enough contact detail to verify their identity, then they can update their subscription
           patch_and_persist_subscription(subscription_params)
           redirect_to subscription_form_path(@subscription), notice: t('subscriptions.steps.renewal')
-        elsif @subscription.person.email.present?     
+        elsif ( @subscription.person.email.present? && !temporary_email?(@subscription.person.email) )
           # send email verfication message
           PersonMailer.verify_email(@subscription, subscription_params, request).deliver_now
           render :verify_email
@@ -207,7 +211,7 @@ class SubscriptionsController < ApplicationController
       # attributes with only those params that are 
       # present
       patch_subscription(@subscription, params)
-      result = @subscription.save
+      result = @subscription.save_without_validation!
       # TODO Guarantee delivery
       nuw_end_point_person_put(@subscription) if result
       result
@@ -226,7 +230,7 @@ class SubscriptionsController < ApplicationController
       score += 1 if p1[:email].present? && p1[:email] == p2[:email]
       #score += 1 if params[:external_id] == subscription[:external_id]
       score += 1 if p1[:dob].present? && Date.parse(p1[:dob]) == p2[:dob] rescue nil
-       
+      
       score >= 3
     end
 
@@ -243,6 +247,6 @@ class SubscriptionsController < ApplicationController
       sensitive = p2.slice(*sensitive_person_params)
 
       # if the hash has nothing
-      sensitive.blank?
+      sensitive.blank? # TODO make sure pay methods don't creep in
     end
 end
