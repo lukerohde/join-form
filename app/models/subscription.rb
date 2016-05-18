@@ -127,7 +127,6 @@ class Subscription < ApplicationRecord
     result = self.join_form.fee(self.frequency)
     result = self.join_form.fee(self.join_form.max_frequency) if result == 0 # This is probably stupid - defaults the user to the minimum amount chargeable if they have a different frequency
     # TODO add javascript to update the page, if the user changes the frequency when on the payment method step
-    # TODO I think i have a bug in here, where the subscription join form can vary from the joinform shown
     result
   end
 

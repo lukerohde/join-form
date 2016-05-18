@@ -316,4 +316,5 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   # TODO make address updates consistent so address2 isn't left behind
   # TODO if it matches me, but doesn't show it, because I'm potential, should I send a warning?
   # TODO add status change notes
+  # TODO why did the tests not pickup the missing application helper for verify email?
 end

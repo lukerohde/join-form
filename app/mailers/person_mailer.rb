@@ -2,6 +2,7 @@ class PersonMailer < ApplicationMailer
 	add_template_helper(ApplicationHelper)
 	add_template_helper(SubscriptionsHelper)
 	include SubscriptionsHelper
+  include ApplicationHelper
 
 	def join_form_notice(person, join_form, request)
 		@person = person
@@ -35,10 +36,10 @@ class PersonMailer < ApplicationMailer
 		mail(from: from(request), to: subscription.join_form.person.email, subject: "We may be duplicating a member")
 	end
 
-	def temp_alert(subscription)
+	def temp_alert(subscription, host)
 		@subscription = subscription
 		subject = "#{@subscription.person.present? ? @subscription.person.display_name : 'unknown' } - #{@subscription.step}"
-		mail(from: from(request), to: 'lrohde@nuw.org.au', subject: subject)
+		mail(from: "noreply@#{host}", to: 'lrohde@nuw.org.au', subject: subject)
 	end
 
 private
