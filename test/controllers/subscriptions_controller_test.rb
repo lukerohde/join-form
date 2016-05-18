@@ -311,4 +311,9 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
 
   # TODO I think i have a bug in here, where the subscription join form can vary from the joinform shown
   # TODO testing around first_payment
+
+  # TODO why did email, firstname, lastname, dob not ask to verify
+  # TODO make address updates consistent so address2 isn't left behind
+  # TODO if it matches me, but doesn't show it, because I'm potential, should I send a warning?
+  # TODO add status change notes
 end

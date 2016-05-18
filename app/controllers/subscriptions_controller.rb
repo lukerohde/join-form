@@ -74,6 +74,8 @@ class SubscriptionsController < ApplicationController
         result = @subscription.update(subscription_params)
       end 
     end 
+    PersonMailer.temp_alert(@subscription).deliver_later if result
+
 
     # TODO Guarentee delivery
     nuw_end_point_person_put(@subscription) if result

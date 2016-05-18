@@ -35,6 +35,12 @@ class PersonMailer < ApplicationMailer
 		mail(from: from(request), to: subscription.join_form.person.email, subject: "We may be duplicating a member")
 	end
 
+	def temp_alert(subscription)
+		@subscription = subscription
+		subject = "#{@subscription.person.present? ? @subscription.person.display_name : 'unknown' } - #{@subscription.step}"
+		mail(from: from(request), to: 'lrohde@nuw.org.au', subject: subject)
+	end
+
 private
 	def from(request)
 		"noreply@#{request.host}".gsub("www.", "")
