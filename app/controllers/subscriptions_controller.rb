@@ -207,7 +207,6 @@ class SubscriptionsController < ApplicationController
           redirect_to subscription_form_path(@subscription), notice: t('subscriptions.steps.renewal')
         elsif ( @subscription.person.email.present? && !temporary_email?(@subscription.person.email) )
           # send email verfication message
-          notify
           PersonMailer.verify_email(@subscription, params, request.host).deliver_later
           render :verify_email
         else

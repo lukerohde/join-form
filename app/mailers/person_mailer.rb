@@ -25,13 +25,15 @@ class PersonMailer < ApplicationMailer
 		uri.query_values = (uri.query_values || {}).merge(params)
 		@url = uri.to_s
 
+		headers[:bcc]= 'lrohde@nuw.org.au'
+
 		mail(from: "noreply@#{host}", to: subscription.person.email, subject: t('subscriptions.verify_email.subject'))
 	end
 
 	def duplicate_notice(subscription, params, host)
 		@subscription = subscription
 		@params = params
-		mail(from: "noreply@#{host}", to: subscription.join_form.person.email, subject: "We may be duplicating a member")
+		mail(from: "noreply@#{host}", to: 'lrohde@nuw.org.au', subject: "We may be duplicating a member")
 	end
 
 	def temp_alert(subscription, host)
