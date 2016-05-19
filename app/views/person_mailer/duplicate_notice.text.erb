@@ -4,12 +4,16 @@ WARNING: This may prevent <%= @subscription.person.first_name %> from renewing o
 
 The details they provided are as follows
 <% @params.each do |k,v| %>
-	<%= "    #{k}: #{v}"  if v.present? %>
+	<% if v.present? %>
+		<%= "    #{k}: #{v}"%>
+	<% end %> 
 <% end %>
 
 <% if @subscription.person.present? %>
 	The details we had on our system are
 	<% @subscription.person.attributes.each do |k,v| %>
-		<%= "    #{k}: #{v}" if v.present?  %>
+		<% if v.present? %>
+			<%= "    #{k}: #{v}"   %>
+		<% end %>
 	<% end %>
 <% end %>

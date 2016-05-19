@@ -97,7 +97,7 @@ gem "puma"
 
 gem "exception_notification"
 
-gem 'sucker_punch', '< 2.0.0'
+gem 'sucker_punch', '~> 2.0.0'
 
 gem 'stripe'
 

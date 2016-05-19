@@ -73,15 +73,17 @@ class SubscriptionsController < ApplicationController
       else
         result = @subscription.update(subscription_params)
       end 
+    end
+
+    if result
+      notify 
+      # TODO Guarentee delivery
+      nuw_end_point_person_put(@subscription)
     end 
-    PersonMailer.temp_alert(@subscription, request.host).deliver_later if result
 
-
-    # TODO Guarentee delivery
-    nuw_end_point_person_put(@subscription) if result
-      
     result
   end
+
 
   def next_step
     unless @subscription.pay_method_saved?
@@ -205,11 +207,12 @@ class SubscriptionsController < ApplicationController
           redirect_to subscription_form_path(@subscription), notice: t('subscriptions.steps.renewal')
         elsif ( @subscription.person.email.present? && !temporary_email?(@subscription.person.email) )
           # send email verfication message
-          PersonMailer.verify_email(@subscription, params, request).deliver_now
+          notify
+          PersonMailer.verify_email(@subscription, params, request.host).deliver_later
           render :verify_email
         else
           # Can't verify identify so potentially create a duplicate
-          PersonMailer.duplicate_notice(@subscription, params, request).deliver_now
+          PersonMailer.duplicate_notice(@subscription, params, request.host).deliver_later
         end
       end
     end
@@ -224,7 +227,12 @@ class SubscriptionsController < ApplicationController
       patch_subscription(@subscription, params)
       result = @subscription.save_without_validation!
       # TODO Guarantee delivery
-      nuw_end_point_person_put(@subscription) if result
+
+      if result
+        nuw_end_point_person_put(@subscription)
+        notify
+      end 
+
       result
     end
 
@@ -259,5 +267,9 @@ class SubscriptionsController < ApplicationController
 
       # if the hash has nothing
       sensitive.blank? # TODO make sure pay methods don't creep in
+    end
+
+    def notify
+      PersonMailer.temp_alert(@subscription, request.host).deliver_later 
     end
 end

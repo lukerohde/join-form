@@ -7,6 +7,9 @@ require 'minitest/reporters'
 require 'mocha/mini_test'
 require 'ostruct'
 
+# makes aysnc synchronouse
+require 'sucker_punch/testing/inline'
+
 reporter_options = { color: true }
 Minitest::Reporters.use! [Minitest::Reporters::ProgressReporter.new(reporter_options)]
 

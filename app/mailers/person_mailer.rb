@@ -16,24 +16,22 @@ class PersonMailer < ApplicationMailer
 		mail(from: from.email, to: to.email, bcc: from.email, subject: subject)
 	end
 
-	def verify_email(subscription, subscription_params, request)
+	def verify_email(subscription, subscription_params, host)
 		@subscription = subscription
-		@request = request
-		uri = Addressable::URI.parse("#{request.protocol}#{request.host}:#{request.port}#{subscription_form_path(@subscription)}")
+		uri = Addressable::URI.parse("https://#{host}#{subscription_form_path(@subscription)}")
 		
 		# TODO refactor to share helper flattening for callback
 		params = flatten_subscription_params(subscription_params)
 		uri.query_values = (uri.query_values || {}).merge(params)
 		@url = uri.to_s
 
-		mail(from: from(request), to: subscription.person.email, subject: t('subscriptions.verify_email.subject'))
+		mail(from: "noreply@#{host}", to: subscription.person.email, subject: t('subscriptions.verify_email.subject'))
 	end
 
-	def duplicate_notice(subscription, params, request)
+	def duplicate_notice(subscription, params, host)
 		@subscription = subscription
-		@request = request
 		@params = params
-		mail(from: from(request), to: subscription.join_form.person.email, subject: "We may be duplicating a member")
+		mail(from: "noreply@#{host}", to: subscription.join_form.person.email, subject: "We may be duplicating a member")
 	end
 
 	def temp_alert(subscription, host)
