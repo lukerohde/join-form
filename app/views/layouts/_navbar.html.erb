@@ -18,13 +18,16 @@
       <ul class="nav navbar-nav navbar-right">
         <% if person_signed_in? -%>
           <li>
-            <%= link_to "unions", unions_path %>
+            <%= link_to "forms", join_forms_path %>
           </li>
           <li>
             <%= link_to "subscriptions", subscriptions_path %>
           </li>
           <li>
             <%= link_to "users", people_path %>
+          </li>
+          <li>
+            <%= link_to "unions", unions_path %>
           </li>
           <!--<li><%= link_to "sign out", destroy_person_session_path, :method=>'delete' %>-->
               </li>

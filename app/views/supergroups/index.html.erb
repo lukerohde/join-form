@@ -1,4 +1,6 @@
-<p id="notice"><%= notice %></p>
+<% if notice.present? %>
+  <p id="notice" class="alert alert-info"><%= notice %></p>
+<% end %>
 <div class="row">
   <div class="col-sm-8 col-sm-offset-2">
       <%= link_to "New #{supergroup.titlecase}", new_polymorphic_path(@klass), style: "margin-top: 15px",class: "btn btn-default pull-right" if owner? %>

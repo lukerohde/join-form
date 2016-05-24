@@ -1,3 +1,7 @@
+<% if current_person %> 
+  <%= link_to 'Edit Form', edit_join_form_path(@join_form), style: "margin-top: 15px" , class: "btn btn-default pull-right" %>
+<% end %>  
+
 <style>
   <%=@subscription.join_form.css.html_safe %>
 </style>

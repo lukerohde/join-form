@@ -1,9 +1,4 @@
 
-<% if notice.present? %>
-  <p id="notice" class="alert alert-info"><%= notice %></p>
-<% end %>
-
-
 <% if @union.stripe_connected? %>
   <%= link_to "Disconnect Stripe",stripe_path(@union), method: :delete, class: "btn btn-danger ", style: "margin: 15px; color: white", data: {confirm: "Are you really really sure?"} %>
 <% else %>

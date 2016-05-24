@@ -1,3 +1,7 @@
+<% if notice.present? %>
+  <p id="notice" class="alert alert-info"><%= notice %></p>
+<% end %>
+
 <h1>Editing <%=supergroup.titlecase%></h1>
 
 <%= render 'form' %>

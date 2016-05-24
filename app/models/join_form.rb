@@ -76,10 +76,15 @@ class JoinForm < ApplicationRecord
 				color: #D33;
 			}
 
+						
 			/* membership card styling */
-			#membership-card {
+			.membership-card {
 				background-color: white; 
-				box-shadow: 5px 5px 15px 5px
+				width: 300px;
+				height: 170px;
+				border-radius: 10px;
+				margin-left: auto;
+				margin-right: auto;
 			}
 
 			#membership-card-top-panel {
@@ -87,7 +92,8 @@ class JoinForm < ApplicationRecord
 			  height: 90px;
 			  padding-top: 15px; 
 			  padding-left: 15px; 
-			  padding-right: 15px
+			  padding-right: 10px;
+			  border-radius: 10px 10px 0px 0px;
 			}
 
 			#membership-card-union-name {
@@ -115,6 +121,7 @@ class JoinForm < ApplicationRecord
 			  padding-right:15px; 
 			  padding-left:15px;
 			  padding-top:15px;
+			  border-radius: 0px 0px 10px 10px;
 			}
 
 			#membership-card-person-name {
@@ -131,6 +138,7 @@ class JoinForm < ApplicationRecord
 			  float: left;
 			  font-size: 1rem;
 			}
+
 		CSS
 
 	end

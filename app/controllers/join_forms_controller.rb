@@ -48,7 +48,7 @@ class JoinFormsController < ApplicationController
     @join_form.authorizer = current_person
     respond_to do |format|
       if @join_form.update(join_form_params)
-        format.html { redirect_to @join_form.union, notice: 'The join form was successfully updated.' }
+        format.html { redirect_to edit_union_join_form_path(@join_form.union, @join_form, locale: locale), notice: 'The join form was successfully updated.' }
         format.json { render :show, status: :ok, location: @join_form }
       else
         format.html { render :edit }

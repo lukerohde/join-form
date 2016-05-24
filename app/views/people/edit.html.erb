@@ -1,5 +1,8 @@
+<% if notice.present? %>
+	<p id="notice" class="alert alert-info"><%= notice %></p>
+<% end %>
+
 <div class="col-sm-8 col-sm-offset-2"/>
-	<p id="notice"><%= notice %></p>
 	
   <% unless @person.union.nil? %>
 	  <%= link_to @person.union.short_name + " Join Forms", union_path(@person.union), class: "btn btn-default pull-right" %>

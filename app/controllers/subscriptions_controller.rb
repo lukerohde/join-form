@@ -12,6 +12,7 @@ class SubscriptionsController < ApplicationController
   # GET /subscriptions.json
   def index
     @subscriptions = Subscription.eager_load([:person, :join_form]).order(:created_at).where('not subscriptions.person_id is null')
+    @subscriptions = @subscriptions.where(['people.union_id = ?', current_person.union_id])
   end
 
   # GET /subscriptions/1

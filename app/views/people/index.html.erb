@@ -1,5 +1,7 @@
+<% if notice.present? %>
+  <p id="notice" class="alert alert-info"><%= notice %></p>
+<% end %>
 <div class="col-sm-8 col-sm-offset-2"/>
-  <p id="notice"><%= notice %></p>
   <%= link_to 'Invite someone', new_person_invitation_path, style: "margin-top: 15px" , class: "btn btn-default pull-right" %>
     <h2 class="no-left-margin">Users</h2>
     

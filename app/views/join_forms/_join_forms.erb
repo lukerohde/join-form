@@ -8,6 +8,7 @@
         <th>Description</th>
         <th>Establishment Fee</th>
         <th>Weekly Rate</th>
+        <th></th>
       </tr>
     </thead>
 
@@ -26,6 +27,10 @@
           </td>
           <td>
             <%= join_form.base_rate_weekly %>
+          </td>
+          <td>
+            <%= link_to "Preview", union_join_form_path(join_form.union, join_form, locale:locale) %> |
+            <%= link_to "Edit", edit_union_join_form_path(join_form.union, join_form, locale:locale) %> 
           </td>
         </tr>
       <% end %>

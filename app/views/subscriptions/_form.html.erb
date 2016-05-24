@@ -1,3 +1,7 @@
+<% if current_person %> 
+  <%= link_to 'Edit Form', edit_join_form_path(@join_form), style: "margin-top: 15px" , class: "btn btn-default pull-right" %>
+<% end %>  
+ 
 <% set_title(@join_form.page_title) %>
 <div id="step" data-step="<%=@subscription.step%>"></div>
 <style>
