@@ -13,7 +13,7 @@
     </thead>
 
     <tbody>
-      <% @join_forms.each do |join_form| %>
+      <% @join_forms.order(:short_name).each do |join_form| %>
         <tr class="">
           <td><%= join_form.union.short_name if join_form.union%></td>
           <td>
