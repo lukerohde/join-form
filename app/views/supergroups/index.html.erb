@@ -3,7 +3,7 @@
   <div class="col-sm-8 col-sm-offset-2">
       <%= link_to "New #{supergroup.titlecase}", new_polymorphic_path(@klass), style: "margin-top: 15px",class: "btn btn-default pull-right" if owner? %>
     <% unless @supergroups.blank? %>
-      <h2 class="no-left-margin">Listing <%=supergroup.titlecase.pluralize%></h2>
+      <h2 class="no-left-margin"><%=supergroup.titlecase.pluralize%></h2>
   
       <table class="table table-condensed table-striped box-shadow">
         <thead>

@@ -148,7 +148,6 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     # TODO Should be a get here but because put is mocked, the member isn't updated with an ID
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'})) 
-    binding.pry
     assert ActionMailer::Base.deliveries[-2].subject == "We may be duplicating a member", "duplication mail not sent"
     
     follow_redirect!
@@ -318,6 +317,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   # TODO if it matches me, but doesn't show it, because I'm potential, should I send a warning?
   # TODO add status change notes
   # TODO why did the tests not pickup the missing application helper for verify email?
+
 
 # Person.all.order(:created_at).map{|p| 
 #   p

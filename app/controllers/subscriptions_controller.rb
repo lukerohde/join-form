@@ -1,22 +1,23 @@
 class SubscriptionsController < ApplicationController
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy]
-  before_action :set_join_form
+  before_action :set_join_form, except: [:index]
   before_action :resubscribe?, only: [:create]
 
-  layout 'subscription'
+  layout 'subscription', except: [:index]
 
   include SubscriptionsHelper
 
   # GET /subscriptions
   # GET /subscriptions.json
   def index
-    @subscriptions = Subscription.all
+    @subscriptions = Subscription.eager_load([:person, :join_form]).order(:created_at).where('not subscriptions.person_id is null')
   end
 
   # GET /subscriptions/1
   # GET /subscriptions/1.json
   def show
+
   end
 
   # GET /subscriptions/new
