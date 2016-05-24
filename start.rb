@@ -221,7 +221,6 @@ class Application < Sinatra::Base
 	end
 
 	def check_signature(payload)
-		
 		# build message for signing
 		data = payload.reject { |k,v| k == "hmac" }
 		data = JSON.parse(data.sort.to_json).to_s
