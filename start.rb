@@ -221,11 +221,14 @@ class Application < Sinatra::Base
 	end
 
 	def check_signature(payload)
-		
 		# build message for signing
 		data = payload.reject { |k,v| k == "hmac" }
+
 		data = JSON.parse(data.sort.to_json).to_s
-    data = ENV['nuw_end_point_url'] + request.path_info + data
+		# http://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
+		data = data.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
+    		
+    		data = ENV['nuw_end_point_url'] + request.path_info + data
 
     # sign message
 		hmac_received = payload['hmac'].to_s
@@ -239,7 +242,5 @@ class Application < Sinatra::Base
       
     	halt 401, "Not Authorized\n"
     end
-	end 
-
-	run! if app_file == $0
-end 
+  end
+end
