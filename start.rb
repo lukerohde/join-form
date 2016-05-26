@@ -120,22 +120,29 @@ class Application < Sinatra::Base
 
 	def tblMember_attributes(api_data, person = nil)
 
-		
+		note = "" 
+		note += "Online join on #{Date.today.strftime('%d-%b-%Y')}.  "
+		note += "Initial charge: #{api_data[:subscription][:establishment_fee]}.  " if (api_data.dig(:subscription, :establishment_fee)||"0").to_f > 0
+		if api_data.dig(:subscription, :data)
+			note += api_data[:subscription][:data].map { |k,v| "#{k}: #{v}" }.join(", ") + ".  "
+		end
+		note += "url: #{api_data[:subscription][:url]}  " if api_data.dig(:subscription,:url)
+		# note += person.paymentNote if person.paymentNote, figure out how not to erase existing payment note, but also not concat redundant notes
+
 		result = {
 				MemberID: api_data[:external_id], 
 				FirstName: api_data[:first_name], 
 				LastName: api_data[:last_name],
 				MemberEmailAddress: api_data[:email],
-				MobilePhone: (api_data[:mobile]||"")[0..9],
+				MobilePhone: (api_data[:mobile]||"").gsub('+61', '0').gsub(/[^\d]/,'')[0..9],
 				Gender: (api_data[:gender]||"U"),
 				MemberResAddress1: api_data[:address1],
 				MemberResAddress2: api_data[:address2],
 				MemberResSuburb: api_data[:suburb],
 				MemberResState: api_data[:state],
-				MemberResPostcode: api_data[:postcode],
-				paymentNote: "online join received #{Date.today.strftime('%d-%b-%Y')}"
+				MemberResPostcode: (api_data[:postcode]||"")[0..3],
+				paymentNote: (note||"")[0..3999] # varchar max
 			}
-
 
 		if api_data[:subscription]
 			
@@ -145,7 +152,8 @@ class Application < Sinatra::Base
 			#status = "14" if (current_status == "1") && api_data[:subscription][:pay_method] # TODO I don't want to update a person's status when we ahven't tested their card, but I do want to provide feedback that we are expecting payment, Maybe fake a status by looking at the retrypaymentdate
 			status = "1" if api_data[:subscription][:payments] && api_data[:subscription][:payments].length > 0
 			result[:Status] = status if status
-			
+			result[:StatusChangeDate] = Date.today if status
+
 			result[:MemberPayFrequency] = (api_data[:subscription][:frequency]||"W")[0]
 			result[:MemberFeeGroupID] = api_data[:subscription][:plan]
 			result[:MemberPaymentType] = api_data[:subscription][:pay_method] == "Credit Card" ? "C" : "D"
@@ -166,7 +174,11 @@ class Application < Sinatra::Base
 		{
 			EmpType: "C",
 			BranchID: "NA",
-			CompanyID: "", # TODO unalloc
+			CompanyID: "NA00001", 
+			MemberPayCompanyID: "NA00001",
+			CompanyStartDate: Date.today, 
+			FinDate: Date.today-1,
+			JoinDate: Date.today, 
 			MemberAwardID: "", 
 			MemberFeeGroupID: "GroupNoFee", 
 			LastName: "Unknown", 
@@ -201,7 +213,7 @@ class Application < Sinatra::Base
 						AccountType: 'S',
 						bsb: decrypt(subscription[:bsb]),
 						AccountNo: an,
-						FeeOverride: subscription[:establishment_fee] || 0,
+						FeeOverride: (subscription[:establishment_fee] || "0").to_f,
 						RetryPaymentDate: Date.today, 
 						RetryPaymentUser: 'nuw-api'
 					})
@@ -224,6 +236,7 @@ class Application < Sinatra::Base
 		# build message for signing
 		data = payload.reject { |k,v| k == "hmac" }
 		data = JSON.parse(data.sort.to_json).to_s
+    data = data.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
     data = ENV['nuw_end_point_url'] + request.path_info + data
 
     # sign message
