@@ -127,9 +127,14 @@ class SubscriptionsController < ApplicationController
       if @subscription.nil?
         forbidden
       else
-        # update record from api if its been linked (TODO what if it hasn't? should background messaging link it)
-        @subscription = nuw_end_point_reload(@subscription) # Use when person is returning to their subscription, but unfortunately gets called on every step
-      
+        
+        if @subscription.external_id && @subscription.updated_at < (Time.now - 1.hour)
+          # If the subscription is linked (has external_id) 
+          # Use when person is returning to their subscription, after more than 1 hour.
+
+          @subscription = nuw_end_point_reload(@subscription) 
+        end
+
         # blank these so they cannot be returned
         @subscription.card_number = ""
         @subscription.ccv = ""
@@ -164,7 +169,7 @@ class SubscriptionsController < ApplicationController
         
       end
       
-      result = params.require(:subscription).permit(permitted_params)
+      result = params.require(:subscription).permit(permitted_params << [data: (@join_form.schema[:columns]||[])])
     end
 
     def set_join_form

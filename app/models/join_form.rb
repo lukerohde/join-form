@@ -8,10 +8,11 @@ class JoinForm < ApplicationRecord
 	validates :base_rate_weekly, numericality: { allow_blank: true }	
 	validate :is_authorized?
 
+	serialize :schema, HashSerializer
+
 	#translates :header, :description
 
 	after_initialize :set_defaults
-
 
 	def max_frequency
 		case
@@ -142,6 +143,15 @@ class JoinForm < ApplicationRecord
 		CSS
 
 	end
+
+	def column_list=(cols)
+			self.schema[:columns] = (cols||"").split(',')
+	end
+
+	def column_list
+		(self.schema[:columns]||[]).join(',')
+	end
+
 
 	def authorizer=(person)
 		@authorizer = person

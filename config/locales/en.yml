@@ -25,6 +25,7 @@ en:
       join_form:
         short_name: Slug
         short_name_placeholder: Please enter an short name for this join form, for the url
+        columns_placeholder: A comma separated list of extra questions you'd like to ask
         description: Subscription Description
         description_placeholder: Please enter a short description of the subscription, to be shown to the user. 
         page_title: Page Title

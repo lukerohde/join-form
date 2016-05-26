@@ -41,7 +41,7 @@ class AdminManagingJoinFormsTest < ActionDispatch::IntegrationTest
   	assert_response :success
 
   	patch join_form_path(one.id), join_form: { short_name: "new name", person_id: @current_person.id, base_rate_id: "GROUPNVA"} 
-  	assert_redirected_to union_path(one.union)
+  	assert_redirected_to edit_union_join_form_path(one.union, one)
 		assert 'The join form was successfully updated.' == flash[:notice], "Update flash was wrong"
 		one.reload
 		assert_equal "new name", one.short_name
@@ -53,4 +53,16 @@ class AdminManagingJoinFormsTest < ActionDispatch::IntegrationTest
   	get join_form_path(join_forms(:one))
     assert_redirected_to "http://www.example.com/en/#{u.short_name}/#{j.short_name}/join"
   end
+
+  test "admin can add custom columns" do
+    one = join_forms(:one)
+    get edit_join_form_path(one)
+    assert_response :success
+    
+    assert response.body.include?('name="join_form[column_list]"'), "column list field is missing"  
+    patch join_form_path(one.id), join_form: { short_name: "new name", person_id: @current_person.id, column_list: "a,b"} 
+    one.reload
+    assert one.column_list == "a,b", "custom columns cannot be set"
+  end
+
 end

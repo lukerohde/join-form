@@ -11,10 +11,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160421091936) do
+ActiveRecord::Schema.define(version: 20160526001612) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "ar_internal_metadata", primary_key: "key", force: :cascade do |t|
+    t.string   "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "bootsy_image_galleries", force: :cascade do |t|
+    t.string   "bootsy_resource_type"
+    t.integer  "bootsy_resource_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bootsy_images", force: :cascade do |t|
+    t.string   "image_file"
+    t.integer  "image_gallery_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "join_forms", force: :cascade do |t|
     t.string   "short_name"
@@ -27,8 +47,8 @@ ActiveRecord::Schema.define(version: 20160421091936) do
     t.decimal  "base_rate_quarterly",     precision: 6, scale: 2
     t.decimal  "base_rate_half_yearly",   precision: 6, scale: 2
     t.decimal  "base_rate_yearly",        precision: 6, scale: 2
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at",                                                   null: false
+    t.datetime "updated_at",                                                   null: false
     t.integer  "union_id"
     t.integer  "person_id"
     t.string   "base_rate_id"
@@ -36,9 +56,11 @@ ActiveRecord::Schema.define(version: 20160421091936) do
     t.string   "page_title"
     t.json     "fee_schedule"
     t.json     "plans"
+    t.jsonb    "schema",                                          default: {}, null: false
   end
 
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
+  add_index "join_forms", ["schema"], name: "index_join_forms_on_schema", using: :gin
   add_index "join_forms", ["union_id"], name: "index_join_forms_on_union_id", using: :btree
 
   create_table "payments", force: :cascade do |t|
@@ -108,8 +130,8 @@ ActiveRecord::Schema.define(version: 20160421091936) do
     t.string   "account_number"
     t.string   "ccv"
     t.string   "bsb"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
     t.integer  "expiry_month"
     t.integer  "expiry_year"
     t.string   "stripe_token"
@@ -118,9 +140,10 @@ ActiveRecord::Schema.define(version: 20160421091936) do
     t.string   "token"
     t.string   "callback_url"
     t.string   "status"
-    t.json     "plan_data"
+    t.jsonb    "data",           default: {}, null: false
   end
 
+  add_index "subscriptions", ["data"], name: "index_subscriptions_on_data", using: :gin
   add_index "subscriptions", ["join_form_id"], name: "index_subscriptions_on_join_form_id", using: :btree
   add_index "subscriptions", ["person_id"], name: "index_subscriptions_on_person_id", using: :btree
 

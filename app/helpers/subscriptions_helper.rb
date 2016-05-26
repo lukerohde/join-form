@@ -165,17 +165,18 @@ module SubscriptionsHelper
 
   def nuw_end_point_reload(subscription)
     if subscription.person.present? && subscription.person.external_id.present?
-      payload = nuw_end_point_person_get(person_attributes: {external_id: subscription.person.external_id})
-      subscription.person.authorizer_id = subscription.join_form.person.id
-      
-      # My API adds mock values so the subscription can be saved. 
-      # Remove them here, because we don't them wanting to be overridden
-      # TODO figure out why this feels so wrong - It shouldn't be the APIs responsbility nor can it be the models, maybe these values should be added not in person get, but in NUW endpoint load
-      payload[:person_attributes] = payload[:person_attributes].except(:email) if temporary_email?(payload[:person_attributes][:email])
-      payload[:person_attributes] = payload[:person_attributes].except(:first_name) if temporary_first_name?(payload[:person_attributes][:first_name])
-      payload[:person_attributes] = payload[:person_attributes].except(:last_name) if temporary_last_name?(payload[:person_attributes][:last_name])
+      if payload = nuw_end_point_person_get(person_attributes: {external_id: subscription.person.external_id})
+        subscription.person.authorizer_id = subscription.join_form.person.id
+        
+        # My API adds mock values so the subscription can be saved. 
+        # Remove them here, because we don't them wanting to be overridden
+        # TODO figure out why this feels so wrong - It shouldn't be the APIs responsbility nor can it be the models, maybe these values should be added not in person get, but in NUW endpoint load
+        payload[:person_attributes] = payload[:person_attributes].except(:email) if temporary_email?(payload[:person_attributes][:email])
+        payload[:person_attributes] = payload[:person_attributes].except(:first_name) if temporary_first_name?(payload[:person_attributes][:first_name])
+        payload[:person_attributes] = payload[:person_attributes].except(:last_name) if temporary_last_name?(payload[:person_attributes][:last_name])
 
-      subscription.update_from_end_point(payload)
+        subscription.update_from_end_point(payload)
+      end
     end
     subscription
   end
@@ -221,8 +222,16 @@ module SubscriptionsHelper
     
     url.query_values = (url.query_values || {}).merge(payload)
     
-    response = RestClient::Request.execute url: url.to_s, method: :get, verify_ssl: false
-    nuw_end_point_transform_from(JSON.parse(response).deep_symbolize_keys)
+    begin
+      response = RestClient::Request.execute url: url.to_s, method: :get, verify_ssl: false
+      nuw_end_point_transform_from(JSON.parse(response).deep_symbolize_keys)
+    rescue Exception => exception
+      # TODO A catch all like this is pretty nasty.
+      ExceptionNotifier.notify_exception(exception,
+        :env => request.env, :data => {:message => "nuw_end_point_person_get failed but was caught"})
+      
+      nil 
+    end
   end
   
   def nuw_end_point_person_put(subscription)
@@ -230,11 +239,18 @@ module SubscriptionsHelper
     
     payload = nuw_end_point_transform_to(subscription)
     payload = nuw_end_point_sign(url.to_s, payload)
-    response = RestClient::Request.execute url: url.to_s, method: :put, payload: payload.to_json, content_type: :json, verify_ssl: false
-    
-    result = JSON.parse(response.body).deep_symbolize_keys
-    nuw_api_process_put_response(subscription, result)
-    result
+    begin
+      response = RestClient::Request.execute url: url.to_s, method: :put, payload: payload.to_json, content_type: :json, verify_ssl: false
+      result = JSON.parse(response.body).deep_symbolize_keys
+      nuw_api_process_put_response(subscription, result)
+      result
+    rescue Exception => exception
+      # TODO A catch all like this is pretty nasty.
+      ExceptionNotifier.notify_exception(exception,
+        :env => request.env, :data => {:message => "nuw_end_point_person_put failed but was caught"})
+      
+      nil 
+    end
   end
 
   def nuw_api_process_put_response(subscription, payload)
@@ -339,7 +355,7 @@ module SubscriptionsHelper
 
   def nuw_end_point_transform_to_subscription(subscription)
     hash = subscription.attributes.symbolize_keys
-    result = hash.slice(:frequency, :plan)
+    result = hash.slice(:frequency, :plan, :data)
     result[:establishment_fee] = subscription.total
 
     if subscription.pay_method_saved?

@@ -3,6 +3,10 @@ admin:
   email: admin@nuw.org.au
   encrypted_password: <%= Devise::Encryptor.digest(Person, 'password') %>
   union: owner
+one:
+  first_name: one
+  email: one@nuw.org.au
+  union: owner
 contact_details_only_person:
   first_name: luke
   email: contact_details_only@nuw.org.au 

@@ -3,6 +3,13 @@
 
   <%= render 'errors' if @subscription.step == :subscription %>
 
+  <% (@subscription.schema[:columns]||[]).each do |column| %>
+    <div class="form-group">
+      <%= label_tag "subscription[data[#{column}]]", column %><br>
+      <%= text_field_tag "subscription[data[#{column}]]", @subscription.data[column], class: "form-control" %>
+    </div>
+  <% end %>
+
   <% if @subscription.join_form.description.present? %>
     <div class="form-group">
       <%= f.label :description, t('helpers.label.subscription.description') %><br>

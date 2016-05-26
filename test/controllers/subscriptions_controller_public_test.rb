@@ -40,8 +40,11 @@ include SubscriptionsHelper
 # SOMETHING HAS CAUSED MY 300 payment to get applied to other records, like it post payments independently of members
 # TEST THAT UNAUTHENTICATED PEOPLE CAN'T ACCESS SUBSCRIPTIONS BY ID
 
+#TODO 26 May 2016
+# Handle put being called before get
+# Test with api being down, returning nil
 
-class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
+class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
   setup do
     @join_form = join_forms(:one)
     @union = @join_form.union
@@ -91,7 +94,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns({ external_id: 'NV123456', first_name: 'Luke', email: 'lrohde@nuw.org.au'})
     post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: "lrohde", email: "lrohde@nuw.org.au" } }
     assert_response :redirect
-    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
     follow_redirect!
     assert response.body.include?('data-step="address"'), "wrong step - should be contact_details"
   end
@@ -108,7 +111,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: "lrohde", email: "lrohde@nuw.org.au" } }
     assert_response :redirect
     
-    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
     follow_redirect!
     assert response.body.include?('data-step="address"'), "wrong step - should be contact_details"  
   end
@@ -118,7 +121,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns({ external_id: 'NV123456', first_name: 'Luke', email: 'lrohde@nuw.org.au'})
     post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: "lrohde", email: "lrohde@nuw.org.au" } }
     assert_response :redirect
-    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
     follow_redirect!
     assert response.body.include?('data-step="address"'), "wrong step - should be contact_details"
   end
@@ -128,7 +131,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns({ external_id: 'NV123456', first_name: 'Luke', email: 'lrohde@nuw.org.au'})
     post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: "Lucas", email: "lrohde@nuw.org.au", 'dob(1i)' =>  '1978', 'dob(2i)' =>  '06', 'dob(3i)' =>  '14' } }
     assert_response :redirect
-    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
     follow_redirect!
     assert response.body.include?('data-step="address"'), "wrong step - should be contact_details"
   end
@@ -188,7 +191,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     params[:subscription][:person_attributes][:id] = @without_address.person.id
     patch edit_join_path(:en, @union, @join_form, @without_address.token), params
     assert_response :redirect
-    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
   end
@@ -229,7 +232,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
     patch edit_join_path(:en, @union, @join_form, with_address.token), params
     assert_response :redirect
-    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('data-step="pay_method"'), "wrong step - should be subscription"
   end
@@ -279,7 +282,7 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
     assert_response :redirect
 
-    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
   end
@@ -303,11 +306,72 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
     assert_response :redirect
 
-    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     
     assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
   end
+
+  test "get form with column list" do
+    @subscription = subscriptions(:column_list)
+    get edit_join_path(:en, @union, @subscription.join_form, @subscription.token)
+
+    assert response.body.include?('subscription[data[worksite]]'), "missing custom worksite field"
+    assert response.body.include?('subscription[data[worksite]]'), "missing custom employer field"
+    assert response.body.include?('nuw bourke street'), "missing custom worksite value"
+    assert response.body.include?('freechange'), "missing custom employer value"
+  end
+
+  test "post form with column list - failure" do 
+    @subscription = subscriptions(:column_list)
+    params = step3_params
+    params[:subscription][:join_form_id] = @subscription.join_form_id
+    params[:subscription][:person_attributes][:id] = @subscription.person.id
+    params[:subscription][:data] = {}
+    params[:subscription][:data][:worksite] = ""
+    params[:subscription][:data][:employer] = ""
+    
+    patch edit_join_path(:en, @union, @subscription.join_form, @subscription.token), params
+    assert_response :success
+    
+    assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
+    #TODO figure out how to get the address validations to show for person
+    assert response.body.include?( 'Worksite can&#39;t be blank') , "no worksite error"
+    assert response.body.include?( 'Employer can&#39;t be blank') , "no employer error"
+  end
+ 
+
+  test "post form with column list - success" do 
+    @subscription = subscriptions(:column_list)
+    params = step3_params
+    params[:subscription][:join_form_id] = @subscription.join_form_id
+    params[:subscription][:person_attributes][:id] = @subscription.person.id
+    params[:subscription][:data] = {}
+    params[:subscription][:data][:worksite] = "asdf_w"
+    params[:subscription][:data][:employer] = "asdf_e"
+    
+    patch edit_join_path(:en, @union, @subscription.join_form, @subscription.token), params
+    assert_response :redirect
+    
+    @subscription.reload
+    assert @subscription.data["worksite"] == "asdf_w", "custom column worksite didn't update"
+    assert @subscription.data["employer"] == "asdf_e", "custom column employer didn't update"
+  end
+ 
+
+  # test "post form with column list - success" do 
+  #   with_address = subscriptions(:contact_details_with_address_subscription)
+  #   params = step3_params
+  #   params[:subscription][:person_attributes][:id] = with_address.person.id
+  #   api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
+  #   SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+  #   patch edit_join_path(:en, @union, @join_form, with_address.token), params
+  #   assert_response :redirect
+  #   #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
+  #   follow_redirect!
+  #   assert response.body.include?('data-step="pay_method"'), "wrong step - should be subscription"
+  # end
+
 
   # TODO I think i have a bug in here, where the subscription join form can vary from the joinform shown
   # TODO testing around first_payment

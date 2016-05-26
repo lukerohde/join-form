@@ -11,6 +11,11 @@ class Subscription < ApplicationRecord
   validate :address_must_be_complete, if: :contact_details_saved?
   validate :pay_method_must_be_complete, if: :subscription_saved?
 
+  delegate :external_id, to: :person, allow_nil: true 
+  delegate :schema, to: :join_form, allow_nil: true
+  
+  serialize :data, HashSerializer
+
   encrypt_with_public_key :card_number, :ccv, :account_number, :bsb, 
     :symmetric => :never,
     :base64 => true,
@@ -66,6 +71,11 @@ class Subscription < ApplicationRecord
 
     errors.add(:plan,I18n.translate("subscriptions.errors.not_blank")) if plan.blank?
     errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank?
+    
+    # validate presence of custom columns
+    (self.schema[:columns]||[]).each do |column| 
+      errors.add(column,I18n.translate("subscriptions.errors.not_blank")) if data[column].blank?
+    end
   end
 
   def address_must_be_complete

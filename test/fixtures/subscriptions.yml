@@ -9,7 +9,7 @@ one:
   account_number: MyString
   ccv: MyString
   bsb: MyString
-
+  token: one
 contact_details_only_subscription:
   join_form: two
   person: contact_details_only_person
@@ -24,3 +24,10 @@ contact_details_with_subscription_subscription:
   token: contact_details_with_subscription_token
   plan: asdf
   frequency: "W"
+column_list:
+  join_form: column_list
+  person: contact_details_with_address_person
+  token: column_list
+  data:
+    worksite: nuw bourke street
+    employer: freechange

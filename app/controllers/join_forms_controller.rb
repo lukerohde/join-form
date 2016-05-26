@@ -76,7 +76,7 @@ class JoinFormsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def join_form_params
-      result = params.require(:join_form).permit(:short_name, :description, :css, :header, :page_title, :base_rate_id, :base_rate_establishment, :base_rate_weekly, :base_rate_fortnightly, :base_rate_monthly, :base_rate_quarterly, :base_rate_half_yearly, :base_rate_yearly, :union_id, :person_id, :message_types => [])
+      result = params.require(:join_form).permit(:short_name, :description, :css, :header, :page_title, :base_rate_id, :base_rate_establishment, :base_rate_weekly, :base_rate_fortnightly, :base_rate_monthly, :base_rate_quarterly, :base_rate_half_yearly, :base_rate_yearly, :union_id, :person_id, :column_list, :message_types => [])
       result['message_types'].delete("") if result['message_types']
       result
     end
