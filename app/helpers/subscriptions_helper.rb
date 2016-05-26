@@ -256,7 +256,8 @@ module SubscriptionsHelper
   def nuw_api_process_put_response(subscription, payload)
     subscription.person.external_id = payload[:external_id]
     subscription.person.authorizer_id = @join_form.person.id
-
+    subscription.status = payload.dig(:subscription, :status)
+    
     payments = payload.dig(:subscription, :payments)
 
     if payments.present?
@@ -356,9 +357,10 @@ module SubscriptionsHelper
   def nuw_end_point_transform_to_subscription(subscription)
     hash = subscription.attributes.symbolize_keys
     result = hash.slice(:frequency, :plan, :data)
-    result[:establishment_fee] = subscription.total
+    result[:url] = ENV['APPLICATION_ROOT'] + subscription_form_path(subscription)
 
     if subscription.pay_method_saved?
+      result[:establishment_fee] = subscription.total
       pm = 
         case subscription.pay_method
           when "CC"
