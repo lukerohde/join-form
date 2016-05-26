@@ -8,6 +8,8 @@ class Application
 		has_many :payments, foreign_key: "MemberID", autosave: true
 		has_one :pay_method, foreign_key: "MemberID", autosave: true
 
+		delegate :FeeOverride, to: :pay_method, allow_nil: true
+
 		def self.search(api_data)
 			result = self.find_by_MemberID(api_data[:external_id]) if api_data[:external_id].to_s != ""
 			# find by email (except deceased) - husbands and wives share email, but there are more typos and alt spellings, better off just picking the most recent
@@ -46,6 +48,17 @@ class Application
 					date: p.TransactionDate,
 					amount: p.TransactionAmount,
 					external_id: p.tblTransactionUniqueID
+				}
+			end
+
+			# Fake a payment for the sake of showing it as done
+			# Brilliant or Nasty - not sure - should be faking an invoice, or having an unpaid status
+			if self.FeeOverride
+				transactions << {
+					id: "ORDER#{pay_method.DateOfEntry.to_i}",
+					date: pay_method.DateOfEntry,
+					amount: pay_method.FeeOverride,
+					external_id: "ORDER#{pay_method.DateOfEntry.to_i}"
 				}
 			end
 			
