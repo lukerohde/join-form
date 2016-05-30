@@ -1,6 +1,6 @@
 root = "#{Dir.getwd}"
 
-activate_control_app "tcp://0.0.0.0:9293",{ no_token: true }
+activate_control_app "tcp://0.0.0.0:9294",{ no_token: true }
 #bind "unix:///tmp/puma.pumatra.sock"
 bind "tcp://0.0.0.0:9292"
 pidfile "#{root}/pids/puma.pid"

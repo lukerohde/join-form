@@ -242,11 +242,12 @@ class Application < Sinatra::Base
 	def check_signature(payload)
 		# build message for signing
 		data = payload.reject { |k,v| k == "hmac" }
-		data = JSON.parse(data.sort.to_json).to_s
-    data = data.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
-    data = ENV['nuw_end_point_url'] + request.path_info + data
 
-    # sign message
+		data = JSON.parse(data.sort.to_json).to_s
+                data = data.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
+                data = ENV['nuw_end_point_url'] + request.path_info + data
+
+    		# sign message
 		hmac_received = payload['hmac'].to_s
 		hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['nuw_end_point_secret'], data)}")
     
@@ -258,7 +259,5 @@ class Application < Sinatra::Base
       
     	halt 401, "Not Authorized\n"
     end
-	end 
-
-	run! if app_file == $0
-end 
+  end
+end
