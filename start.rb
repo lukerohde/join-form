@@ -199,19 +199,22 @@ class Application < Sinatra::Base
 		case subscription[:pay_method]
 			when "CC"
 				if cn = decrypt(subscription[:card_number])
+					m = "0#{subscription[:expiry_month].to_s}"[-2..-1] # pad with proceeding zero
+					y = (subscription[:expiry_year].to_s)[2..4]
 					result = result.merge({
 						AccountType: cn[0] == '4' ? 'V' : 'M',
 						AccountNo: cn,
-						Expiry: "#{subscription[:expiry_month]}/#{(subscription[:expiry_year].to_s)[2..4]}",
+						Expiry: "#{m}/#{y}",
 						RetryPaymentDate: Date.today, 
 						RetryPaymentUser: 'nuw-api'
 					})
 				end
 			when "AB"
 				if an = decrypt(subscription[:account_number])
+					b = decrypt(subscription[:bsb]).to_s
 					result = result.merge({
 						AccountType: 'S',
-						bsb: decrypt(subscription[:bsb]),
+						bsb: "#{b[0..2]}-#{b[-3..-1]}",
 						AccountNo: an,
 						FeeOverride: (subscription[:establishment_fee] || "0").to_f,
 						RetryPaymentDate: Date.today, 
