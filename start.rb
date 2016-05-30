@@ -224,6 +224,8 @@ class Application < Sinatra::Base
 					result = {
 						FeeOverride: f
 					}
+				else
+					result = {}
 				end
 			end
 
