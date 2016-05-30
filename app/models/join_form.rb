@@ -16,17 +16,17 @@ class JoinForm < ApplicationRecord
 
 	def max_frequency
 		case
-			when self.base_rate_weekly > 0
+			when self.base_rate_weekly||0 > 0
 				"W"
-			when self.base_rate_fortnightly > 0
+			when self.base_rate_fortnightly||0 > 0
 				"F"
-			when self.base_rate_monthly > 0
+			when self.base_rate_monthly||0 > 0
 				"M"
-			when self.base_rate_quarterly > 0
+			when self.base_rate_quarterly||0 > 0
 				"Q"
-			when self.base_rate_half_yearly > 0
+			when self.base_rate_half_yearly||0 > 0
 				"H"
-			when self.base_rate_yearly > 0
+			when self.base_rate_yearly||0 > 0
 				"Y"
 			end	
 	end
