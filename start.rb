@@ -218,6 +218,13 @@ class Application < Sinatra::Base
 						RetryPaymentUser: 'nuw-api'
 					})
 				end
+			when "-"
+				f = (subscription[:establishment_fee] || "0").to_f
+				if f >= 0.01
+					result = {
+						FeeOverride: f
+					}
+				end
 			end
 
 		result = result.reject {|k,v| v.nil?}
