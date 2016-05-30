@@ -367,6 +367,8 @@ module SubscriptionsHelper
             hash.slice(:pay_method, :card_number, :expiry_month, :expiry_year, :ccv)
           when "AB"
             hash.slice(:pay_method, :bsb, :account_number)
+          else 
+            { pay_method: "-" } if result[:establishment_fee] >= 0.01 # is including a symbol to indicate existing pm a bad idea? A shared literal seems so.
           end
     
       result.merge!(pm) if pm
