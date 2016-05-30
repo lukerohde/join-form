@@ -260,4 +260,6 @@ class Application < Sinatra::Base
     	halt 401, "Not Authorized\n"
     end
   end
+
+  run! if app_file == $0
 end
