@@ -278,9 +278,9 @@ class SubscriptionsController < ApplicationController
     def notify
       #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later 
       if @subscription.step == :thanks
-        JoinNoticeJob.perform_later(@subscription)
+        JoinNoticeJob.perform_later(@subscription.id)
       else
-        IncompleteJoinNoticeJob.perform_in(30 * 60, @subscription, @subscription.updated_at.to_i)
+        IncompleteJoinNoticeJob.perform_in(30 * 60, @subscription.id, @subscription.updated_at.to_i)
       end
     end
 end
