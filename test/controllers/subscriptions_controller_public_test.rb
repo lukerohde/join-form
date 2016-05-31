@@ -145,6 +145,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
   end
 
   test "post step 1 - success, someone matched, duplicate" do
+    mail_count = ActionMailer::Base.deliveries.count
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", last_name: 'Rohde',  mobile: "0439541888", dob: '1978-06-14'}))
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns({ external_id: 'NV123456', first_name: "Lucas", email: "lrohde@nuw.org.au", mobile: "0439541888"})
     post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: "Lucas", email: "lrohde@nuw.org.au", mobile: "0439541888" } }
@@ -189,11 +190,13 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
     params[:subscription][:person_attributes][:id] = @without_address.person.id
+    mail_count = ActionMailer::Base.deliveries.count
     patch edit_join_path(:en, @union, @join_form, @without_address.token), params
     assert_response :redirect
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
+    assert ActionMailer::Base.deliveries.last.subject == "luke didn't join - subscription", "didn't send didn't join #{ActionMailer::Base.deliveries} "
   end
 
   def step3_params
@@ -285,6 +288,8 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
+  
+    assert ActionMailer::Base.deliveries.last.subject == "luke joined - thanks"
   end
   
   test "post step 4 - success - credit card" do 

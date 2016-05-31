@@ -24,6 +24,15 @@ contact_details_with_subscription_subscription:
   token: contact_details_with_subscription_token
   plan: asdf
   frequency: "W"
+contact_details_with_subscription_and_pay_method_subscription:
+  join_form: two
+  person: contact_details_with_address_person
+  token: contact_details_with_subscription_token
+  plan: asdf
+  frequency: "W"
+  pay_method: "AB"
+  bsb: 123-123
+  account_number: 123123
 column_list:
   join_form: column_list
   person: contact_details_with_address_person

@@ -37,6 +37,12 @@ heroku addons:create ssl:endpoint
 heroku certs:add keys/join.crt keys/join.key
 # got cname tochigi-71066.herokussl.com
 
+== FEATURE - alert on join or stall
+A user can follow a join form
+- When a user joins, user is notified on thanks (good if prior status was included)
+- When a join stalls, no pay method, user is notifed after x minutes
+
+== TODO Got an email in use error when attempting to match a person which had too few details, but was in the join system?  Also got errors on overjoin join show?  
 
 
 == README
