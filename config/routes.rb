@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     resources :unions, controller: :supergroups, type: 'Union' do
       resources :join_forms do 
         resources :subscriptions
+        resource :follow, only: [:update], controller: 'join_forms/follow'
       end
       resource :key, only: [:show, :new, :edit, :update], controller: 'unions/key'
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160531103326) do
+ActiveRecord::Schema.define(version: 20160531120315) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -35,6 +35,17 @@ ActiveRecord::Schema.define(version: 20160531103326) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "follows", force: :cascade do |t|
+    t.string   "follower_type"
+    t.integer  "follower_id"
+    t.string   "followable_type"
+    t.integer  "followable_id"
+    t.datetime "created_at"
+  end
+
+  add_index "follows", ["followable_id", "followable_type"], name: "fk_followables", using: :btree
+  add_index "follows", ["follower_id", "follower_type"], name: "fk_follows", using: :btree
 
   create_table "join_forms", force: :cascade do |t|
     t.string   "short_name"
@@ -62,6 +73,17 @@ ActiveRecord::Schema.define(version: 20160531103326) do
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
   add_index "join_forms", ["schema"], name: "index_join_forms_on_schema", using: :gin
   add_index "join_forms", ["union_id"], name: "index_join_forms_on_union_id", using: :btree
+
+  create_table "mentions", force: :cascade do |t|
+    t.string   "mentioner_type"
+    t.integer  "mentioner_id"
+    t.string   "mentionable_type"
+    t.integer  "mentionable_id"
+    t.datetime "created_at"
+  end
+
+  add_index "mentions", ["mentionable_id", "mentionable_type"], name: "fk_mentionables", using: :btree
+  add_index "mentions", ["mentioner_id", "mentioner_type"], name: "fk_mentions", using: :btree
 
   create_table "payments", force: :cascade do |t|
     t.date     "date"

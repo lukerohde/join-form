@@ -42,16 +42,16 @@ class PersonMailer < ApplicationMailer
 		mail(from: "noreply@#{host}", to: 'lrohde@nuw.org.au', subject: subject)
 	end
 
-	def incomplete_join_notice(subscription, host)
+	def incomplete_join_notice(subscription, host, email)
 		@subscription = subscription
 		subject = "#{@subscription.person.present? ? @subscription.person.display_name : 'unknown' } didn't join - #{@subscription.step}"
-		mail(from: "noreply@#{host}", to: 'lrohde@nuw.org.au', subject: subject)
+		mail(from: "noreply@#{host}", to: email, subject: subject)
 	end
 
-	def join_notice(subscription, host)
+	def join_notice(subscription, host, email)
 		@subscription = subscription
 		subject = "#{@subscription.person.present? ? @subscription.person.display_name : 'unknown' } joined - #{@subscription.step}"
-		mail(from: "noreply@#{host}", to: 'lrohde@nuw.org.au', subject: subject)
+		mail(from: "noreply@#{host}", to: email, subject: subject)
 	end
 
 private

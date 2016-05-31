@@ -10,7 +10,9 @@ class IncompleteJoinNoticeJob #< ActiveJob::Base
     subscription = Subscription.find(subscription_id)
     
 		if subscription.step != :thanks && timestamp_int == subscription.updated_at.to_i
-    	PersonMailer.incomplete_join_notice(subscription, ENV['mailgun_host']).deliver_now
+    	subscription.join_form.followers(Person).each do |person|
+        PersonMailer.incomplete_join_notice(subscription, ENV['mailgun_host'], person.email).deliver_now
+      end 
     end
   end
 end

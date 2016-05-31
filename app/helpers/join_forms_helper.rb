@@ -30,4 +30,9 @@ module JoinFormsHelper
 			)
 	end
 
+	def follow_link
+		label = @join_form.followed_by?(current_person) ? "stop following" : "follow"
+
+		link_to label, union_join_form_follow_path(@union, @join_form, locale: locale), method: :patch, class: 'btn btn-default pull-right'
+	end
 end

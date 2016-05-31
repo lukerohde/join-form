@@ -10,6 +10,7 @@ class JoinForm < ApplicationRecord
 
 	serialize :schema, HashSerializer
 
+	acts_as_followable
 	#translates :header, :description
 
 	after_initialize :set_defaults
