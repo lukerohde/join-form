@@ -4,7 +4,7 @@ class Subscription < ApplicationRecord
   belongs_to :subscription
   belongs_to :join_form
   accepts_nested_attributes_for :person
-  has_many :payments, autosave: true
+  has_many :payments, autosave: true, dependent: :destroy
   
   validates :person, :join_form, presence: true
   validate :subscription_must_be_complete, if: :address_saved?

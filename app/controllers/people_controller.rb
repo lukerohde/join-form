@@ -49,10 +49,10 @@ class PeopleController < ApplicationController
     @person.destroy rescue nil
     respond_to do |format|
       if @person.destroyed?
-        format.html { redirect_to people_url, notice: 'Person was successfully destroyed.' }
+        format.html { redirect_to request.referer || subscriptions_url, notice: 'Person was successfully destroyed.' }
         format.json { head :no_content }
       else
-        format.html { redirect_to edit_person_path(@person), notice: "Could not delete person, probably because they've posted content.  TODO Create a way to deactivate and hide people."
+        format.html { redirect_to request.referer || edit_person_path(@person), notice: "Could not delete person, probably because they've posted content.  TODO Create a way to deactivate and hide people."
         }
         format.json { render json: @person.errors, status: :unprocessable_entity }
       end

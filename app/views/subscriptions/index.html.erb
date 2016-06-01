@@ -31,9 +31,9 @@
               <td><%= subscription.step %></td>
               <td class="hidden-sm hidden-xs"><%= subscription.created_at %></td>
               <td>
-                <%= link_to "<span class=\"glyphicon glyphicon-eye-open\"></span>".html_safe, join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token ) %> | 
-                <%= link_to "<span class=\"glyphicon glyphicon-cog\"></span>".html_safe, edit_join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token) %> | 
-                <%= link_to "<span class=\"glyphicon glyphicon-trash\"></span>".html_safe, subscription, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+                <%= link_to "<span class=\"glyphicon glyphicon-eye-open\"></span>".html_safe, join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token ) %>
+                <%= link_to "<span class=\"glyphicon glyphicon-cog\"></span>".html_safe, edit_join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token) %>
+                <%= link_to "<span class=\"glyphicon glyphicon-trash\"></span>".html_safe, subscription.person.user? ? subscription : subscription.person, method: :delete, data: { confirm: 'Are you sure?' } %></td>
             </tr>
           <% end %>
         </tbody>

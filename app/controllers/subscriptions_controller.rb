@@ -112,10 +112,16 @@ class SubscriptionsController < ApplicationController
   # DELETE /subscriptions/1
   # DELETE /subscriptions/1.json
   def destroy
-    @subscription.destroy
+    @subscription.destroy rescue nil
     respond_to do |format|
-      format.html { redirect_to subscriptions_url, notice: 'Subscription was successfully destroyed.' }
-      format.json { head :no_content }
+      if @subscription.destroyed?
+        format.html { redirect_to request.referer || subscriptions_url, notice: 'Subscription was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.html { redirect_to request.referer || subscriptions_url, notice: "Could not delete subscription"
+        }
+        format.json { render json: @person.errors, status: :unprocessable_entity }
+      end
     end
   end
 

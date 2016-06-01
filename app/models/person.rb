@@ -9,8 +9,8 @@ class Person < ApplicationRecord
   mount_uploader :attachment, ProfileUploader
   
   belongs_to :union
-  has_many :subscriptions
-  has_many :payments
+  has_many :subscriptions, dependent: :destroy
+  has_many :payments, dependent: :destroy
 
   #validates :email, presence: true # devise does this already
   validates :union, presence: true
@@ -100,6 +100,10 @@ class Person < ApplicationRecord
     # patch devise password reset to include authorizer
     self.authorizer = self
     super(new_password, new_password_confirmation)
+  end
+
+  def user? 
+    self.invitation_accepted_at.present?
   end
 
   def set_default_password
