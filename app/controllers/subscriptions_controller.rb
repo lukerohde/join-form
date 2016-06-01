@@ -1,7 +1,7 @@
 class SubscriptionsController < ApplicationController
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy]
-  before_action :set_join_form, except: [:index]
+  before_action :set_join_form, except: [:index, :temp_report]
   before_action :resubscribe?, only: [:create]
 
   layout 'subscription', except: [:index]
@@ -84,6 +84,34 @@ class SubscriptionsController < ApplicationController
     end 
 
     result
+  end
+
+  def temp_report
+    report = ""
+    ctot = 0
+    ftot = 0 
+
+    JoinForm.all.each do |j|
+      subscriptions = j.subscriptions.where(['created_at > ?', Time.parse(params[:since]||'1900-01-01')])
+      complete = subscriptions.select{|s| s.step == :thanks}
+      followup = subscriptions.select{|s| s.step != :thanks}
+      ctot += complete.count
+      ftot += followup.count
+
+      if complete.count > 0
+        report += "\r\n\r\n-- #{j.short_name.upcase} completes --\r\n"
+        report += complete.collect {|s| "#{s.external_id} #{s.person.display_name}, #{s.step} (#{s.status||"Pending"}), #{edit_join_url(s.join_form.union.short_name, s.join_form.short_name, s.token)}"}.join("\r\n")
+        report += "\r\nTOTAL: #{complete.count}\r\n"
+      end
+      if followup.count > 0
+        report += "\r\n\r\n-- #{j.short_name.upcase} for follow up --\r\n"
+        report += followup.collect {|s| "#{s.external_id} #{s.person.display_name}, #{s.step} (#{s.status||"Pending"}), #{edit_join_url(s.join_form.union.short_name, s.join_form.short_name, s.token)}"}.join("\r\n")
+        report += "\r\nTOTAL: #{followup.count}\r\n"
+      end
+    end
+
+    report += "\r\nCOMPLETE TOTAL: #{ctot}   FOLLOWUP TOTAL: #{ftot}\r\n"
+    render text: report, layout: false, content_type: 'text/plain'
   end
 
 

@@ -34,6 +34,7 @@ Rails.application.routes.draw do
     get '/:union_id/:join_form_id/join/:id', to: 'subscriptions#edit', as: :edit_join
     patch '/:union_id/:join_form_id/join/:id', to:  'subscriptions#update'
     get '/:union_id/:join_form_id/:id', to:  'subscriptions#show', as: :join
+    get '/temp_report', to: 'subscriptions#temp_report'
 
     root "join_forms#index"
   end
