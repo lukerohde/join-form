@@ -82,6 +82,7 @@ subscription =
   $("#edit_au_bank_account").toggle (e.value is "AB")
 
 pay_method_ready = ->
+  $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, lineTop: 68})
   $('#edit_credit_card').hide()
   $('#edit_au_bank_account').hide()
   switch $('#subscription_pay_method').val()
