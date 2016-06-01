@@ -1,6 +1,12 @@
 require 'test_helper'
 
 class JoinNoticeJobTest < ActiveJob::TestCase
+
+  setup do 
+    people(:admin).follow!(join_forms(:two))
+  end
+
+
   test "join notice only sends when joined" do
   	subscription = subscriptions(:contact_details_with_subscription_and_pay_method_subscription)
     JoinNoticeJob.perform_now(subscription.id)

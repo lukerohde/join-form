@@ -49,6 +49,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     @join_form = join_forms(:one)
     @union = @join_form.union
     @new_subscription = Subscription.new(join_form: @join_form, person: Person.new)
+    people(:admin).follow!(@join_form)
   end
 
   def step1_params
