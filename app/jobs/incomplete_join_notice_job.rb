@@ -7,11 +7,13 @@ class IncompleteJoinNoticeJob #< ActiveJob::Base
     # A) the user may have completed, so we shouldn't send an incomplete_notice
 		# B) subscription has been changed since notice was sent, so don't send
 		#binding.pry if subscription.step == :subscription
-    subscription = Subscription.find(subscription_id)
-    if subscription.step != :thanks && timestamp_int == subscription.updated_at.to_i
-    	subscription.join_form.followers(Person).each do |person|
-        PersonMailer.incomplete_join_notice(subscription, ENV['mailgun_host'], person.email).deliver_now
-      end 
+    ActiveRecord::Base.connection_pool.with_connection do
+      subscription = Subscription.find(subscription_id)
+      if subscription.step != :thanks && timestamp_int == subscription.updated_at.to_i
+      	subscription.join_form.followers(Person).each do |person|
+          PersonMailer.incomplete_join_notice(subscription, ENV['mailgun_host'], person.email).deliver_now
+        end 
+      end
     end
   end
 end
