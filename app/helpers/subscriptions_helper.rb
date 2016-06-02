@@ -103,6 +103,7 @@ module SubscriptionsHelper
           :bsb, 
           :plan, 
           :callback_url,
+          :signature_vector,
           person_attributes: [
               :external_id,
               :first_name,

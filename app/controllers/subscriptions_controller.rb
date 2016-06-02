@@ -180,6 +180,7 @@ class SubscriptionsController < ApplicationController
           @subscription.person.first_name = "" if temporary_first_name?(@subscription.person.first_name)
           @subscription.person.last_name = "" if temporary_last_name?(@subscription.person.last_name)
         end 
+        @subscription.signature_vector = "" unless current_person.present? # users can't sign, but do see the signature; non-users always have to sign and don't see the sig
       end
     end
 

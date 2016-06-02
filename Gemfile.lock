@@ -385,6 +385,9 @@ GEM
     select2-rails (4.0.2)
       thor (~> 0.14)
     shellany (0.0.1)
+    signature-pad-rails (0.5)
+      jquery-rails (>= 3.0.0, < 5.1)
+      rails (>= 3.0.0, < 5.1)
     slop (3.6.0)
     spring (1.7.1)
     sprockets (3.6.0)
@@ -459,6 +462,7 @@ DEPENDENCIES
   rest-client
   sass-rails (>= 3.2)
   select2-rails
+  signature-pad-rails
   socialization!
   spring
   stripe

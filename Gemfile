@@ -110,3 +110,5 @@ gem 'strongbox'
 gem 'globalize'#, git: "https://github.com/globalize/globalize", branch: "master"
 
 #gem 'activemodel-serializers-xml'
+
+gem 'signature-pad-rails'

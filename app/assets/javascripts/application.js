@@ -18,4 +18,5 @@
 //= require jquery.playSound
 //= require application_helpers
 //= require jquery-ui
+//= require signature-pad
 //= require_tree .
