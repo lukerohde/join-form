@@ -82,7 +82,13 @@ subscription =
   $("#edit_au_bank_account").toggle (e.value is "AB")
 
 pay_method_ready = ->
-  $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, lineTop: 68})
+  if $('#signature_vector').val()?
+    if $('#signature_vector').val() != ""
+      sig = $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, displayOnly: true, lineTop: 68})
+      sig.regenerate($('#signature_vector').val())
+    else
+      $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, lineTop: 68, validateFields: false})
+  
   $('#edit_credit_card').hide()
   $('#edit_au_bank_account').hide()
   switch $('#subscription_pay_method').val()
@@ -92,16 +98,9 @@ pay_method_ready = ->
       $('#edit_au_bank_account').show()
   return
      
-firefox_form_reset = ->
-  if $('meta[name="js-context"]').attr('controller') == "subscriptions"
-    $('#subscription_submit').attr('disabled', false)
-    subscription.swapSubmitLabel()
-
 subscription_ready = ->
   if $('meta[name="js-context"]').attr('controller') == "subscriptions"
     subscription_helper_ready()
     pay_method_ready()
 
 $(document).ready(subscription_ready);
-#$(document).on('turbolinks:load', subscription_ready);
-#$(window).unload firefox_form_reset

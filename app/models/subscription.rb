@@ -22,6 +22,9 @@ class Subscription < ApplicationRecord
     :key_pair => :get_key_pair,
     :deferred_encryption => true
 
+  mount_uploader :signature_image, SignatureUploader
+  before_save :generate_signature_image
+  
   def get_key_pair
     self.join_form.union.key_pair
   end
@@ -103,6 +106,9 @@ class Subscription < ApplicationRecord
   	else
   		errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
   	end
+    if join_form.signature_required && signature_vector.blank?
+      errors.add(:signature_vector, I18n.translate("subscriptions.errors.not_blank"))
+    end
   end
 
   def save_without_validation!
@@ -212,5 +218,16 @@ class Subscription < ApplicationRecord
     end
     save!
     @skip_validation = false
+  end
+
+  def generate_signature_image 
+    unless self.signature_vector.blank?
+      instructions = JSON.parse(signature_vector).map { |h| "line #{h['mx'].to_i},#{h['my'].to_i} #{h['lx'].to_i},#{h['ly'].to_i}" } * ' '
+      tempfile = Tempfile.new(["signature", '.png'])
+      Open3.popen3("convert -size 298x98 xc:transparent -stroke blue -draw @- #{tempfile.path}") do |input, output, error|
+        input.puts instructions
+      end
+      self.signature_image = File.open(tempfile)
+    end
   end
 end

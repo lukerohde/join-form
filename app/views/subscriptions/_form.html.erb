@@ -1,5 +1,5 @@
 <% if current_person %> 
-  <%= link_to 'Edit Form', edit_join_form_path(@join_form), style: "margin-top: 15px" , class: "btn btn-default pull-right" %>
+  <%= link_to 'Edit Form', edit_union_join_form_path(@join_form.union, @join_form), style: "margin-top: 15px" , class: "btn btn-default pull-right" %>
 <% end %>  
  
 <% set_title(@join_form.page_title) %>

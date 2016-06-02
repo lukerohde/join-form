@@ -42,6 +42,7 @@ zh-TW:
         card_number: "信用卡持有人"
         expiry: "效期"
         ccv: "信用卡驗證码（英文 Card Verification Value)"
+        signature_vector: Signature
       person:
         external_id: "會員號碼"
         first_name: "名"

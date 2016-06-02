@@ -89,11 +89,6 @@
   <h2> Appearance </h2>
 
   <div class="form-group">
-    <%= f.label :column_list %><br>
-    <%= f.text_field :column_list, class: "form-control", placeholder: t('helpers.label.join_form.columns_placeholder') %>
-  </div>  
-
-  <div class="form-group">
     <%= f.label :page_title %><br>
     <%= f.text_area :page_title, class: "form-control", placeholder: t('helpers.label.join_form.page_title_placeholder') %>
   </div>
@@ -107,6 +102,16 @@
     <%= f.label :css %><br>
     <%= f.text_area :css, class: "form-control", placeholder: t('helpers.label.join_form.css_placeholder'), rows: 20 %>
   </div>
+
+  <div class="form-group">
+    <%= f.label :column_list %><br>
+    <%= f.text_field :column_list, class: "form-control", placeholder: t('helpers.label.join_form.columns_placeholder') %>
+  </div>  
+
+  <div class="form-group">
+    <%= f.label :signature_required %><br>
+    <%= f.check_box :signature_required, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
+  </div>  
 
   <%= f.hidden_field :person_id, value: current_person.id %>
   

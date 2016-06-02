@@ -50,5 +50,19 @@
     By submitting this form, I authorize the <%=@join_form.union.name %> to deduct from my account <%= @subscription.total > 0 ? "an advanced payment of #{number_to_currency(@subscription.total, locale: locale)} in dues then " : "" %> <%= @subscription.reoccurring_fee > 0 ? "a reoccurring fee of #{number_to_currency(@subscription.reoccurring_fee, locale: locale)}" : "a reoccurring fee" %> which is subject to occasional variation.
   </small>
 
- 
+  <% if @subscription.join_form.signature_required %>
+    <%= hidden_field_tag "signature_vector", @subscription.signature_vector %>
+    <div class="sigPad" style="width:300px; margin-top: 16px; margin-bottom: 16px;">
+      <ul class="sigNav">
+        <li class="drawIt"><a href="#draw-it" >Sign Here</a></li>
+        <li class="clearButton"><a href="#clear">Clear</a></li>
+      </ul>
+      <div class="sig sigWrapper" style="width:300px; height: 100px;">
+        <div class="typed"></div>
+        <canvas class="pad" width="298px" height="98px"></canvas>
+        <input type="hidden" name="subscription[signature_vector]" class="output">
+      </div>
+    </div>
+  <% end %>
+
 </div>

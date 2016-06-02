@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160531120315) do
+ActiveRecord::Schema.define(version: 20160601113239) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -58,8 +58,8 @@ ActiveRecord::Schema.define(version: 20160531120315) do
     t.decimal  "base_rate_quarterly",     precision: 6, scale: 2
     t.decimal  "base_rate_half_yearly",   precision: 6, scale: 2
     t.decimal  "base_rate_yearly",        precision: 6, scale: 2
-    t.datetime "created_at",                                                   null: false
-    t.datetime "updated_at",                                                   null: false
+    t.datetime "created_at",                                                      null: false
+    t.datetime "updated_at",                                                      null: false
     t.integer  "union_id"
     t.integer  "person_id"
     t.string   "base_rate_id"
@@ -67,7 +67,8 @@ ActiveRecord::Schema.define(version: 20160531120315) do
     t.string   "page_title"
     t.json     "fee_schedule"
     t.json     "plans"
-    t.jsonb    "schema",                                          default: {}, null: false
+    t.jsonb    "schema",                                          default: {},    null: false
+    t.boolean  "signature_required",                              default: false
   end
 
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
@@ -152,8 +153,8 @@ ActiveRecord::Schema.define(version: 20160531120315) do
     t.string   "account_number"
     t.string   "ccv"
     t.string   "bsb"
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.integer  "expiry_month"
     t.integer  "expiry_year"
     t.string   "stripe_token"
@@ -162,7 +163,9 @@ ActiveRecord::Schema.define(version: 20160531120315) do
     t.string   "token"
     t.string   "callback_url"
     t.string   "status"
-    t.jsonb    "data",           default: {}, null: false
+    t.jsonb    "data",             default: {}, null: false
+    t.string   "signature_vector"
+    t.string   "signature_image"
   end
 
   add_index "subscriptions", ["data"], name: "index_subscriptions_on_data", using: :gin
