@@ -249,7 +249,7 @@ class Application < Sinatra::Base
 		data = payload.reject { |k,v| k == "hmac" }
 
 		data = JSON.parse(data.sort.to_json).to_s
-                data = data.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
+                data = data.gsub(/\\u([0-9A-Za-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
                 data = ENV['nuw_end_point_url'] + request.path_info + data
 
     		# sign message
