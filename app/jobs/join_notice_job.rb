@@ -5,9 +5,11 @@ class JoinNoticeJob < ActiveJob::Base
   	ActiveRecord::Base.connection_pool.with_connection do
 	    subscription = Subscription.find(subscription_id)
 	    if subscription.step == :thanks
-	    	subscription.join_form.followers(Person).each do |person|
-	      	PersonMailer.join_notice(subscription, ENV['mailgun_host'], person.email).deliver_now
-	   		end
+	    	subject = "JOIN: Online join from #{ subscription.person.display_name }"
+      	emails = subscription.join_form.followers(Person).collect(&:email).join(',')
+        unless emails.blank?
+        	PersonMailer.subscription_pdf(subscription, emails, subject).deliver_now
+	    	end
 	    end
 	  end
   end

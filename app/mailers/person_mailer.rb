@@ -42,25 +42,17 @@ class PersonMailer < ApplicationMailer
 		mail(from: "noreply@#{host}", to: 'lrohde@nuw.org.au', subject: subject)
 	end
 
-	def incomplete_join_notice(subscription, host, email)
-		@subscription = subscription
-		subject = "#{@subscription.person.present? ? @subscription.person.display_name : 'unknown' } didn't join - #{@subscription.step}"
-		mail(from: "noreply@#{host}", to: email, subject: subject)
-	end
-
-	def join_notice(subscription, host, email)
-		@subscription = subscription
-		subject = "#{@subscription.person.present? ? @subscription.person.display_name : 'unknown' } joined - #{@subscription.step}"
-		mail(from: "noreply@#{host}", to: email, subject: subject)
-	end
-
-	def attach_pdf(subscription, email)
+	def subscription_pdf(subscription, emails, subject)
 		#PersonMailer.attach_pdf(Subscription.find_by_token('21TBslpIDBcDaO-C76GVBg'), 'lrohde@nuw.org.au').deliver_now
 		@subscription = subscription
-		@subscription_url = "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en', with_sig: true)}"
-		attachments["join_form_#{subscription.external_id || subscription.token}.pdf"] = WickedPdf.new.pdf_from_url(@subscription_url)
-		subject = "Join Form for #{subscription.person.display_name}"
-		mail(from: @subscription.join_form.person.email, to: email, subject: subject )
+		@subscription_url = "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en', pdf: true)}"
+		@host = "www.#{host}"
+		begin
+			attachments["join_form_#{subscription.external_id || subscription.token}.pdf"] = WickedPdf.new.pdf_from_url(@subscription_url)
+		rescue
+			subject += " - PDF Error"
+		end
+		mail(from: @subscription.person.email, to: emails, subject: subject )
 	end
 
 private

@@ -1,0 +1,10 @@
+Hi 
+
+Please find attached an online join form (it may not be complete) 
+
+The online join can be found here <%= @subscription_url %>
+
+From,
+<%= @subscription.person.display_name %><%= @subscription.person.external_id ? " (#{@subscription.person.external_id})" : "" %> 
+
+This email was automatically generated from <%= @host %>
