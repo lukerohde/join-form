@@ -61,6 +61,7 @@ en:
         card_number: "Credit Card Number"
         expiry: "Expiry"
         ccv: "CCV (the 3 digits on the back of the card)"
+        signature_vector: Signature
       person:
         external_id: "Member ID"
         first_name: "First Name"

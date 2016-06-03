@@ -1,3 +1,4 @@
+require 'open3'
 class Subscription < ApplicationRecord
 
   belongs_to :person
