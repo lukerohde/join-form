@@ -1,0 +1,32 @@
+<%= t("devise.mailer.invitation_instructions.hello", first_name: @resource.first_name) %>
+
+<%= t("devise.mailer.invitation_instructions.someone_invited_you", inviter: @resource.invited_by.display_name, union: @resource.invited_by.union.name,  url: root_url) %>
+
+Accept your invitation here
+
+<%= accept_invitation_url(@resource, :invitation_token => @token) %>
+
+--- What's this for? ---
+
+This website has been put together by the NUW to help organisers and partner organisations create union join forms.  This system differs from the join form on a union's main website, which attracts people with individual grievances.  Instead it makes it easy for organisers to customize their own join forms, tailored to the specifics of their small scale workplace campaigns.  These forms shouldn't attract such random hard-cases since they're only to be promoted in these limited and oft short-lived contexts.    
+
+--- Interested? What do I do next? ---
+
+*  Click the following link to accept your invitation and setup your account <%= accept_invitation_url(@resource, :invitation_token => @token) %> 
+*  Then create a new join form from this here <%= new_join_form_url(locale: I18n.locale) %> 
+
+--- Not interested? ---
+
+If you are not the right person, please reply and tell me who is, so I can invite them instead.  Or accept the invite, then invite them yourself from this link <%= new_person_invitation_url %>.  
+
+Thanks.
+
+<%= t("devise.mailer.invitation_instructions.ignore").html_safe %>
+
+In Solidarity,
+
+<%= @resource.invited_by.display_name %>
+<%= "#{@resource.invited_by.title}".html_safe if @resource.invited_by.title.present?%>
+<%= "#{@resource.invited_by.union.name}".html_safe %>
+
+p.s. This message was generated from <%=root_url%> 

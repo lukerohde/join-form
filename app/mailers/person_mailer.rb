@@ -45,10 +45,11 @@ class PersonMailer < ApplicationMailer
 	def subscription_pdf(subscription, emails, subject)
 		#PersonMailer.attach_pdf(Subscription.find_by_token('21TBslpIDBcDaO-C76GVBg'), 'lrohde@nuw.org.au').deliver_now
 		@subscription = subscription
-		@subscription_url = "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en', pdf: true)}"
+		@subscription_url = "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}"
+		@pdf_url = "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en', pdf: true)}"
 		@host = "www.#{host}"
 		begin
-			attachments["join_form_#{subscription.external_id || subscription.token}.pdf"] = WickedPdf.new.pdf_from_url(@subscription_url)
+			attachments["join_form_#{subscription.external_id || subscription.token}.pdf"] = WickedPdf.new.pdf_from_url(@pdf_url)
 		rescue
 			subject += " - PDF Error"
 		end
