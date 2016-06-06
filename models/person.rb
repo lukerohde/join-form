@@ -33,7 +33,7 @@ class Application
 		def friendly_status
 				result = ActiveRecord::Base.connection.exec_query("select returnvalue2 from tblLookup where returnvalue1 = '#{self.Status}' and maincriteria = 'tblMember.status'").rows[0][0]
 				unless ["awaiting 1st payment", "paying"].include?(result.downcase) 
-						result = 'Pending' if RetryPaymentDate
+						result = 'Pending' if self.RetryPaymentDate
 				end
 				result
 		end
