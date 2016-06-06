@@ -198,7 +198,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
-    assert ActionMailer::Base.deliveries.last.subject == "JOIN_FOLLOW_UP: Incomplete online join luke - stalled on subscription", "didn't send didn't join #{ActionMailer::Base.deliveries} "
+    assert ActionMailer::Base.deliveries.last.subject.starts_with?("JOIN_FOLLOW_UP:"), "was expecting join follow up email"
   end
 
   def step3_params
@@ -290,7 +290,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
-    assert ActionMailer::Base.deliveries.last.subject == "JOIN: Online join from luke "
+    assert ActionMailer::Base.deliveries.last.subject.starts_with?("JOIN:"), "was expecting a join email"
   end
   
   test "post step 4 - success - credit card" do 

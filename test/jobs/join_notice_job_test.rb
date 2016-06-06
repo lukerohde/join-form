@@ -11,7 +11,7 @@ class JoinNoticeJobTest < ActiveJob::TestCase
   test "join notice only sends when joined" do
   	subscription = subscriptions(:contact_details_with_subscription_and_pay_method_subscription)
     JoinNoticeJob.perform_now(subscription.id)
-    assert ActionMailer::Base.deliveries.last.subject == "JOIN: Online join from luke "
+    assert ActionMailer::Base.deliveries.last.subject.starts_with?("JOIN:"), "was expecting join message"
   end
 
 	test "join notice doesn't send when join is incomplete" do

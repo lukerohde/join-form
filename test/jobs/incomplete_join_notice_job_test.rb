@@ -14,7 +14,7 @@ class IncompleteJoinNoticeJobTest < ActiveJob::TestCase
 
   test "notice can send" do
     IncompleteJoinNoticeJob.perform_async(@subscription.id, @subscription.updated_at.to_i)
-    assert ActionMailer::Base.deliveries.last.subject == "JOIN_FOLLOW_UP: Incomplete online join luke - stalled on address"
+    assert ActionMailer::Base.deliveries.last.subject.starts_with?("JOIN_FOLLOW_UP:"), "was expecting incomplete online join email"
   end
 
    test "notice won't send if subscription updated since" do
