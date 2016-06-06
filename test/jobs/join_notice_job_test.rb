@@ -4,13 +4,14 @@ class JoinNoticeJobTest < ActiveJob::TestCase
 
   setup do 
     people(:admin).follow!(join_forms(:two))
+    WickedPdf.any_instance.stubs(:pdf_from_url).returns("PDF MOCK")
   end
 
 
   test "join notice only sends when joined" do
   	subscription = subscriptions(:contact_details_with_subscription_and_pay_method_subscription)
     JoinNoticeJob.perform_now(subscription.id)
-    assert ActionMailer::Base.deliveries.last.subject == "JOIN: Online join from luke - PDF Error"
+    assert ActionMailer::Base.deliveries.last.subject == "JOIN: Online join from luke "
   end
 
 	test "join notice doesn't send when join is incomplete" do

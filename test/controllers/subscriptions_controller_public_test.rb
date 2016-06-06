@@ -50,6 +50,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     @union = @join_form.union
     @new_subscription = Subscription.new(join_form: @join_form, person: Person.new)
     people(:admin).follow!(@join_form)
+    WickedPdf.any_instance.stubs(:pdf_from_url).returns("PDF MOCK")
   end
 
   def step1_params
@@ -197,7 +198,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('data-step="subscription"'), "wrong step - should be subscription"
-    assert ActionMailer::Base.deliveries.last.subject == "JOIN_FOLLOW_UP: Incomplete online join luke - stalled on subscription - PDF Error", "didn't send didn't join #{ActionMailer::Base.deliveries} "
+    assert ActionMailer::Base.deliveries.last.subject == "JOIN_FOLLOW_UP: Incomplete online join luke - stalled on subscription", "didn't send didn't join #{ActionMailer::Base.deliveries} "
   end
 
   def step3_params
@@ -289,7 +290,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
-    assert ActionMailer::Base.deliveries.last.subject == "JOIN: Online join from luke - PDF Error"
+    assert ActionMailer::Base.deliveries.last.subject == "JOIN: Online join from luke "
   end
   
   test "post step 4 - success - credit card" do 
