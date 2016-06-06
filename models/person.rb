@@ -2,7 +2,7 @@ class Application
 	class Person < ActiveRecord::Base
 		self.table_name = "tblMember"
 		self.primary_key = "MemberID"
-
+		
 		ignore_columns :tblMemberUniqueID
 
 		has_many :payments, foreign_key: "MemberID", autosave: true
@@ -11,6 +11,46 @@ class Application
 
 		delegate :FeeOverride, to: :pay_method, allow_nil: true
 		delegate :RetryPaymentDate, to: :pay_method, allow_nil: true
+
+		before_update :note_changes
+
+		def note_changes
+			note_text = changes.collect do |k,v|
+			  unless k=="paymentNote"
+					oldval = v[0]
+					newval = v[1]
+					oldval = oldval.strftime('%d-%b-%Y') if oldval.is_a?(Time)
+					newval = newval.strftime('%d-%b-%Y') if newval.is_a?(Time)
+					"#{k}: \"#{oldval}\" -> \"#{newval}\"" 
+				end
+			end
+
+			note_text = note_text.join(", ")
+
+			if note_text.present?
+				self.notes.build({
+					MemberID: self.id,
+					EmployeeID: 'web_api',
+					NoteDate: Time.now, 
+					NoteText: "Online Update - #{note_text}", 
+					NoteType: '4', # staff 
+					EffectiveFrom: Time.now, 
+					FollowUp: 0
+					})
+			end
+
+			if self.paymentNote_changed? && self.paymentNote_was.present?
+				self.notes.build({
+					MemberID: self.id,
+					EmployeeID: 'web_api',
+					NoteDate: Time.now, 
+					NoteText: "Online update - Old Payment Note: \"#{self.paymentNote_was}\"", 
+					NoteType: '4', # staff 
+					EffectiveFrom: Time.now, 
+					FollowUp: 0
+					})
+			end
+		end
 
 		def self.search(api_data)
 			result = self.find_by_MemberID(api_data[:external_id]) if api_data[:external_id].to_s != ""

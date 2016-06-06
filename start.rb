@@ -30,7 +30,7 @@ class Application < Sinatra::Base
 		check_signature(params)
 		p = Person.search(params)
 		response = (p||{}).to_json
-		if (params[:external_id]||"") != "" && !p.nil?
+		if (params[:external_id]||"") == "" && !p.nil?
 			#fuzzy match
 			logger.info "Fuzzy Matched: #{p.to_json}"
 		end
@@ -133,7 +133,7 @@ class Application < Sinatra::Base
 		note += "url: #{api_data[:subscription][:url]}  " if api_data.dig(:subscription,:url)
 		# note += person.paymentNote if person.paymentNote, figure out how not to erase existing payment note, but also not concat redundant notes
 
-		dob = Date.parse(api_data[:dob]) rescue nil
+		dob = Time.parse(api_data[:dob]) rescue nil # use Time instead of Date since sql returns datetime ( needed for correct comparison and change logging )
 
 		result = {
 				MemberID: api_data[:external_id], 
@@ -256,7 +256,7 @@ class Application < Sinatra::Base
 		data = payload.reject { |k,v| k == "hmac" }
 
 		data = JSON.parse(data.sort.to_json).to_s
-    data = data.gsub(/\\u([0-9A-Za-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
+    data = data.gsub(/\\u([0-9A-Za-z]{4})/) {|s| [$1.to_i(16)].pack("U")} # repack unicode
     data = ENV['nuw_end_point_url'] + request.path_info + data
 
     		# sign message
