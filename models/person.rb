@@ -6,9 +6,11 @@ class Application
 		ignore_columns :tblMemberUniqueID
 
 		has_many :payments, foreign_key: "MemberID", autosave: true
+		has_many :notes, foreign_key: "MemberID", autosave: true
 		has_one :pay_method, foreign_key: "MemberID", autosave: true
 
 		delegate :FeeOverride, to: :pay_method, allow_nil: true
+		delegate :RetryPaymentDate, to: :pay_method, allow_nil: true
 
 		def self.search(api_data)
 			result = self.find_by_MemberID(api_data[:external_id]) if api_data[:external_id].to_s != ""
@@ -32,7 +34,7 @@ class Application
 		def friendly_status
 				result = ActiveRecord::Base.connection.exec_query("select returnvalue2 from tblLookup where returnvalue1 = '#{self.Status}' and maincriteria = 'tblMember.status'").rows[0][0]
 				unless ["awaiting 1st payment", "paying"].include?(result.downcase) 
-						result = 'Pending' if pay_method.RetryPaymentDate
+						result = 'Pending' if self.RetryPaymentDate
 				end
 				result
 		end
