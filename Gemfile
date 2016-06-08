@@ -116,3 +116,5 @@ gem 'signature-pad-rails'
 gem 'wicked_pdf'
 
 gem 'liquid'
+
+gem 'roadie', '~> 3.1.1'
