@@ -5,7 +5,7 @@ class EmailTemplateMailer < ApplicationMailer
   #
   #   en.email_template_mailer.merge.subject
   #
-  def merge(email_template_id, data)
+  def merge(email_template_id, data, email)
     @email_template = EmailTemplate.find(email_template_id)
     @subject = Liquid::Template.parse(@email_template.subject).render(data)
     @body_html = Liquid::Template.parse(@email_template.body_html).render(data)
@@ -15,6 +15,6 @@ class EmailTemplateMailer < ApplicationMailer
     @body_html_css.url_options = {host: ENV['mailgun_host'], protocol: "https"}
     @body_html_css = @body_html_css.transform
 
-    mail to: "lrohde@nuw.org.au"
+    mail to: email, from: "noreply@#{ENV['mailgun_host']}" 
   end
 end

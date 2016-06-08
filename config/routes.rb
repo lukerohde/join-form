@@ -1,10 +1,13 @@
 Rails.application.routes.draw do
-  resources :email_templates
   scope "(:locale)", locale: /en|en-AU|zh-TW/ do
     
     resources :subscriptions
     # mount ActionCable.server => '/cable'
-
+    
+    resources :email_templates do 
+      resource :preview, only: [:edit, :update], controller: 'email_templates/preview'
+    end
+  
 
     #get 'stripe/index'
     resources :stripe, only: [:index, :destroy]
