@@ -97,8 +97,8 @@ class SubscriptionsController < ApplicationController
         nuw_end_point_reload(s)
       end  
       
-      complete = subscriptions.select{|s| ['Paying', 'Awaiting 1st Payment'].include?(s.status) }
-      followup = subscriptions.select{|s| ['Paying', 'Awaiting 1st Payment'].include?(s.status) }
+      complete = subscriptions.select{|s| ['Paying', 'Awaiting 1st payment'].include?(s.status) }
+      followup = subscriptions.select{|s| !['Paying', 'Awaiting 1st payment'].include?(s.status) }
       
       ctot += complete.count
       ftot += followup.count
