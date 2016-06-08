@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :email_templates
   scope "(:locale)", locale: /en|en-AU|zh-TW/ do
     
     resources :subscriptions
