@@ -93,8 +93,13 @@ class SubscriptionsController < ApplicationController
 
     JoinForm.all.each do |j|
       subscriptions = j.subscriptions.where(['created_at > ?', Time.parse(params[:since]||'1900-01-01')])
-      complete = subscriptions.select{|s| s.step == :thanks}
-      followup = subscriptions.select{|s| s.step != :thanks}
+      subscriptions.each do |s|
+        nuw_end_point_reload(s)
+      end  
+      
+      complete = subscriptions.select{|s| ['Paying', 'Awaiting 1st Payment'].include?(s.status) }
+      followup = subscriptions.select{|s| ['Paying', 'Awaiting 1st Payment'].include?(s.status) }
+      
       ctot += complete.count
       ftot += followup.count
 
