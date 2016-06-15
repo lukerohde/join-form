@@ -45,11 +45,11 @@ class Application < Sinatra::Base
 			p.MemberID = member_id
 		end
 
-		if payload.dig(:subscription, :pay_method) 
+		if payload.dig(:subscription, :pay_method).present?
 			set_pay_method(p, payload)
 		end
 
-		if payload.dig(:subscription, :payments)
+		if payload.dig(:subscription, :payments).present?
 			save_payments(p, payload.dig(:subscription, :payments))
 		end
 

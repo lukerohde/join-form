@@ -3,12 +3,13 @@ module NUWDBHelper
 
 
 	def save_payments(person, payments)
+		person.FinDate ||= (Date.today - 1.day) # shouldn't be needed, but just in case
 		payments.each do |payment|
 			p = person.payments.build(tblTransaction_attributes(person, payment))
 			person.PrevFinDate = person.FinDate
 			person.FinDate = p.TransactionNewFinDate
 		end
-		person.nextpaymentdate = get_next_payment_date_after(person.FinDate, person.nextpaymentdate, person.MemberPayFrequency)
+		person.nextpaymentdate = get_next_payment_date_after(person.FinDate, person.nextpaymentdate || person.FinDate, person.MemberPayFrequency)
 	end
 
 	def tblTransaction_attributes(person, payment)
