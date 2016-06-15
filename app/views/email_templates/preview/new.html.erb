@@ -6,6 +6,18 @@
 	<h1>Previewing Email Template</h1>
 	<%=link_to "Edit", edit_email_template_path(@email_template), class: "btn btn-default pull-right" %>
 
+	<hr/>
+	<h2 class="text-center">Data</h2>
+	<div class="row"> 
+			<%=link_to "prev", new_email_template_preview_path(@email_template, subscription_id: @prev.id), class: 'btn btn-default' if @prev.present? %>
+
+			<%=link_to "next", new_email_template_preview_path(@email_template, subscription_id: @next.id), class: 'btn btn-default' if @next.present? %>
+
+			
+	<pre>
+<%= JSON.pretty_generate(@data) %>
+	</pre>
+	
 	<br/><hr/>
 	
 	<div class="form-group">
