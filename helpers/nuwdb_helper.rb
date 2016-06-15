@@ -129,7 +129,8 @@ module NUWDBHelper
 			end 
 		end
 
-		result.delete_if { |k,v| v.blank? }
+		# delete keys if they are blank, unless they are address fields
+		result.delete_if { |k,v| v.blank? && !k.to_s.starts_with?('MemberRes') && !k.to_s.starts_with?('MemberPost')}
 
 		result
 	end
