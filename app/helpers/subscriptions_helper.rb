@@ -58,7 +58,13 @@ module SubscriptionsHelper
     # this is used for both calling system call back
     # and membership API
     result = person.slice(:external_id,*sensitive_person_params)
-    result = result.reject {|k,v| v.blank? }
+    result = result.reject do |k,v| 
+      if [:address1, :address2, :suburb, :state, :postcode].include?(k.to_sym)
+        person.address1.blank?
+      else
+        v.blank?
+      end
+    end
     result
   end
 
@@ -379,6 +385,7 @@ module SubscriptionsHelper
   end
 
   def nuw_end_point_has_good_pay_method(subscription)
+    # TODO only return true if user has valid bank details, handle PRD more explicitly
     nuw_end_point_has_good_pay_method = ["pending", "awaiting 1st payment", "paying"].include?((subscription.status||"").downcase)
   end
 
