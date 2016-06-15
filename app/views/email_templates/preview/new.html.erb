@@ -1,0 +1,40 @@
+<% if notice.present? %>
+	<p id="notice" class="alert alert-info"><%= notice %></p>
+<% end %>
+
+<div class="col-sm-8 col-sm-offset-2"/>
+	<h1>Previewing Email Template</h1>
+	<%=link_to "Edit", edit_email_template_path(@email_template), class: "btn btn-default pull-right" %>
+
+	<br/><hr/>
+	
+	<div class="form-group">
+	  <%= label_tag :subject %><br/>
+	  <%= content_tag :div, @subject, class: "form-control" %>
+	</div>
+
+	<hr/>
+	<h2 class="text-center">Plain Body</h2>
+	<div class="email-preview">
+		<%= @body_plain.gsub("\r\n", '<br/>').html_safe %>
+	</div>
+
+	<hr/>
+	<h2 class="text-center">HTML Body</h2>
+	<div class="email-preview">
+		<%= @body_html_css.html_safe %>
+	</div>
+
+	<hr/>
+	<h2 class="text-center">Send Preview</h2>
+	<%= form_for @email_template, url: email_template_preview_path(@email_template), method: :post do |f| %>
+		<div class="form-group">
+	    <%= label_tag :preview_email, "To:" %><br/>
+	    <%= text_field_tag :preview_email, @email, class: "form-control" %>
+	  </div>
+	  <%= f.submit "Send", class: "btn btn-default"%> 
+	<% end %>
+
+</div>
+
+

@@ -10,11 +10,17 @@ class EmailTemplatesController < ApplicationController
   # GET /email_templates/1
   # GET /email_templates/1.json
   def show
-  end
+      redirect_to new_email_template_preview_path(@email_template)
+  end 
 
   # GET /email_templates/new
   def new
-    @email_template = EmailTemplate.new
+    if params[:duplicate_email_template_id].present?
+      @email_template = EmailTemplate.find(params[:duplicate_email_template_id]).dup
+      @email_template.short_name = "Copy of #{@email_template.short_name}"
+    else
+      @email_template = EmailTemplate.new()
+    end
   end
 
   # GET /email_templates/1/edit
@@ -69,6 +75,6 @@ class EmailTemplatesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def email_template_params
-      params.require(:email_template).permit(:subject, :body_html, :css, :body_plain, :attachment)
+      params.require(:email_template).permit(:short_name, :subject, :body_html, :css, :body_plain, :attachment, :bootsy_image_gallery_id)
     end
 end

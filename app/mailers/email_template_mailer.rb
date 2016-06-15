@@ -15,6 +15,6 @@ class EmailTemplateMailer < ApplicationMailer
     @body_html_css.url_options = {host: ENV['mailgun_host'], protocol: "https"}
     @body_html_css = @body_html_css.transform
 
-    mail to: email, from: "noreply@#{ENV['mailgun_host']}" 
+    mail to: email, from: "noreply@#{ENV['mailgun_host']}", subject: @subject 
   end
 end

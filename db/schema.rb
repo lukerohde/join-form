@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160608063130) do
+ActiveRecord::Schema.define(version: 20160615050528) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,8 +23,8 @@ ActiveRecord::Schema.define(version: 20160608063130) do
   end
 
   create_table "bootsy_image_galleries", force: :cascade do |t|
-    t.string   "bootsy_resource_type"
     t.integer  "bootsy_resource_id"
+    t.string   "bootsy_resource_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 20160608063130) do
     t.string   "attachment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "short_name"
   end
 
   create_table "follows", force: :cascade do |t|

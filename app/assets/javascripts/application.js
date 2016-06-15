@@ -19,4 +19,5 @@
 //= require application_helpers
 //= require jquery-ui
 //= require signature-pad
+//= require bootsy
 //= require_tree .

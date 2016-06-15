@@ -11,27 +11,44 @@
     </div>
   <% end %>
 
-  <div class="field">
+  <div class="form-group">
+    <%= f.label :short_name %><br>
+    <%= f.text_field :short_name, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
     <%= f.label :subject %><br>
-    <%= f.text_field :subject %>
+    <%= f.text_field :subject, class: "form-control" %>
   </div>
-  <div class="field">
-    <%= f.label :body_html %><br>
-    <%= f.text_area :body_html %>
-  </div>
-  <div class="field">
-    <%= f.label :css %><br>
-    <%= f.text_area :css %>
-  </div>
-  <div class="field">
-    <%= f.label :body_plain %><br>
-    <%= f.text_area :body_plain %>
-  </div>
-  <div class="field">
+
+  <div class="form-group">
     <%= f.label :attachment %><br>
-    <%= f.text_field :attachment %>
+    <%= f.text_field :attachment, class: "form-control" %>
   </div>
+
+  <hr/>
+  <h2 class="text-center"> PLAIN TEXT MESSAGE BODY </h2>
+
+  <div class="form-group">
+    <%= f.label :body_plain %><br>
+    <%= f.text_area :body_plain, class: "form-control", rows: 20 %>
+  </div>
+
+  <hr/>
+  <h2 class="text-center"> HTML MESSAGE BODY </h2>
+
+  <div class="form-group">
+    <%= f.label :body_html %><br>
+    <%= f.text_area :body_html, class: "form-control", rows: 20 %>
+    <!--<%= f.bootsy_area :body_html, class: "form-control", rows: 20, editor_options: {html: true} %> -->
+  </div>
+  <div class="form-group">
+    <%= f.label :css %><br>
+    <%= f.text_area :css, class: "form-control", rows: 20 %>
+  </div>
+  
+  <hr/>
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit class: "btn btn-default" %>
   </div>
 <% end %>

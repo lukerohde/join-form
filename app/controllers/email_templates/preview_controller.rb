@@ -1,7 +1,7 @@
 class EmailTemplates::PreviewController < ApplicationController
   before_action :set_email_template
 
-	def edit
+	def new
 		@subject = Liquid::Template.parse(@email_template.subject).render(sample_data)
 		
 		@body_html = Liquid::Template.parse(@email_template.body_html).render(sample_data)
@@ -14,9 +14,9 @@ class EmailTemplates::PreviewController < ApplicationController
 		
 	end
 
-	def update
+	def create
 		EmailTemplateMailer.merge(@email_template.id, sample_data, params[:preview_email]).deliver_now
-		redirect_to edit_email_template_preview_path(@email_template)
+		redirect_to new_email_template_preview_path(@email_template), notice: "Preview Email Sent"
 	end
 
 private

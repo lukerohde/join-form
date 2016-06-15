@@ -55,6 +55,9 @@ GEM
     bootstrap-sass (3.3.6)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
+    bootsy (2.3.0)
+      carrierwave (~> 0.11)
+      mini_magick (~> 4.5)
     builder (3.2.2)
     byebug (8.2.5)
     capybara (2.7.1)
@@ -439,6 +442,7 @@ DEPENDENCIES
   addressable
   autoprefixer-rails
   bootstrap-sass (~> 3.3.6)
+  bootsy
   carrierwave
   coffee-rails (~> 4.1.0)
   devise
