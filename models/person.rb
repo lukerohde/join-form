@@ -124,10 +124,12 @@ class Application
 						status: self.friendly_status,
 						frequency: self.MemberPayFrequency,
 						plan: self.MemberFeeGroupID == "GroupNoFee" ? "" : self.MemberFeeGroupID,
-						pay_method: '-', #case when self.MemberPaymentType == 'C' then 'CC' else 'AB' end, 
+						next_payment_date: self.nextpaymentdate,
+						financial_date: self.FinDate,  
 						payments: transactions,
 					}, 
 				})
+				result[:subscription][:pay_method] = "-" if self.pay_method && self.pay_method.valid?
 			end
 
 			result.to_json
