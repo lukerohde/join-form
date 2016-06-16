@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160615050528) do
+ActiveRecord::Schema.define(version: 20160616060719) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -164,8 +164,8 @@ ActiveRecord::Schema.define(version: 20160615050528) do
     t.string   "account_number"
     t.string   "ccv"
     t.string   "bsb"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
     t.integer  "expiry_month"
     t.integer  "expiry_year"
     t.string   "stripe_token"
@@ -174,9 +174,11 @@ ActiveRecord::Schema.define(version: 20160615050528) do
     t.string   "token"
     t.string   "callback_url"
     t.string   "status"
-    t.jsonb    "data",             default: {}, null: false
+    t.jsonb    "data",              default: {}, null: false
     t.string   "signature_vector"
     t.string   "signature_image"
+    t.date     "next_payment_date"
+    t.date     "financial_date"
   end
 
   add_index "subscriptions", ["data"], name: "index_subscriptions_on_data", using: :gin

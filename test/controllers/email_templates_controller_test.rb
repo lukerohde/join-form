@@ -1,7 +1,15 @@
 require 'test_helper'
 
 class EmailTemplatesControllerTest < ActionController::TestCase
-  setup do
+  include Devise::TestHelpers
+
+  def sign_in_admin
+    @admin = people(:admin)
+    sign_in @admin
+  end
+
+  def setup
+    sign_in_admin
     @email_template = email_templates(:one)
   end
 
@@ -18,7 +26,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test "should create email_template" do
     assert_difference('EmailTemplate.count') do
-      post :create, email_template: { attachment: @email_template.attachment, body_html: @email_template.body_html, body_plain: @email_template.body_plain, css: @email_template.css, subject: @email_template.subject }
+      post :create, email_template: { attachment: @email_template.attachment, body_html: @email_template.body_html, body_plain: @email_template.body_plain, css: @email_template.css, subject: @email_template.subject, short_name: @email_template.short_name }
     end
 
     assert_redirected_to email_template_path(assigns(:email_template))
@@ -26,7 +34,8 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test "should show email_template" do
     get :show, id: @email_template
-    assert_response :success
+    assert_response :redirect
+    assert response.redirect_url ==  new_email_template_preview_url(@email_template), "didn't redirect to preview"
   end
 
   test "should get edit" do
@@ -35,7 +44,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   end
 
   test "should update email_template" do
-    patch :update, id: @email_template, email_template: { attachment: @email_template.attachment, body_html: @email_template.body_html, body_plain: @email_template.body_plain, css: @email_template.css, subject: @email_template.subject }
+    patch :update, id: @email_template, email_template: { attachment: @email_template.attachment, body_html: @email_template.body_html, body_plain: @email_template.body_plain, css: @email_template.css, subject: @email_template.subject, short_name: @email_template.short_name }
     assert_redirected_to email_template_path(assigns(:email_template))
   end
 

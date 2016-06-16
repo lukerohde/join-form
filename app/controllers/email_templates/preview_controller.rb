@@ -26,7 +26,8 @@ private
 	def set_subscription
 		@subscription = Subscription.find_by_id(params[:subscription_id])
 		@subscription ||= Subscription.last
-		@data = flatten_subscription(@subscription)
+	  nuw_end_point_reload(@subscription)
+	  @data = flatten_subscription(@subscription)
 		@prev = Subscription.where(['id < ?', @subscription.id]).last
 		@next = Subscription.where(['id > ?', @subscription.id]).first
 	end 
