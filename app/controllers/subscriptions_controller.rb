@@ -177,7 +177,7 @@ class SubscriptionsController < ApplicationController
         @subscription.ccv = ""
         @subscription.account_number = ""
         @subscription.bsb = ""
-        @subscription.stripe_token = ""
+        @subscription.stripe_token = "" # TODO I suspect perfectly good stripe tokens are getting lost when the form is reposted (with use my existing payment method)
         if @subscription.person
           @subscription.person.email = "" if temporary_email?(@subscription.person.email)
           @subscription.person.first_name = "" if temporary_first_name?(@subscription.person.first_name)
