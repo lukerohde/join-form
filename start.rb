@@ -19,9 +19,9 @@ class Application < Sinatra::Base
 		response = (p||{}).to_json
 		if (params[:external_id]||"") == "" && !p.nil?
 			#fuzzy match
-			logger.info "Fuzzy Matched: #{p.to_json}"
+			logger.info "Fuzzy Matched: #{p.to_json}" rescue nil
 		end
-		logger.info "GET Response: #{response}"
+		logger.info "GET Response: #{response}" rescue nil
 		response
 	end
 
@@ -35,7 +35,7 @@ class Application < Sinatra::Base
 		payload[:subscription].symbolize_keys! if payload[:subscription]
 		
 
-		p = Person.search(payload)
+		p = Person.search(payload.slice(:external_id)) # only match a put on external_id, else a fuzzy matched put will by pass verification
 		if p
 			# update
 			p.assign_attributes(tblMember_attributes(payload, p))

@@ -127,9 +127,46 @@ class Application
 						next_payment_date: self.nextpaymentdate,
 						financial_date: self.FinDate,  
 						payments: transactions,
+						fetched_at: Time.now
 					}, 
 				})
-				result[:subscription][:pay_method] = "-" if self.pay_method && self.pay_method.valid?
+
+				if self.pay_method && self.pay_method.valid?
+					#result[:subscription][:pay_method] = "-" 
+					# TODO I'm concerned about overwriting new payment details, that haven't yet been transmitted.
+					pm =
+						if self.pay_method.credit_card?
+							{
+								pay_method: "CC",
+								partial_card_number: self.pay_method.AccountNo.gsub(/\d(?=.{3})/, 'X'), # replace with X except last four chars
+								expiry_year: ("20#{self.pay_method.Expiry[-2..-1]}"  rescue nil),
+								expiry_month: (self.pay_method.Expiry[/(\d{1,2})/,1] rescue nil), 
+ 								partial_account_number: nil, 
+ 								partial_bsb: nil
+ 							}
+						elsif self.pay_method.au_bank_account?  	
+							{
+								pay_method: "AB", 
+								partial_account_number: (self.pay_method.AccountNo.gsub(/\d(?=.{3})/, 'X') rescue nil), # replace with X except last three chars
+								partial_bsb: (self.pay_method.bsb.gsub(/\d(?=.{3})/, 'X') rescue nil),
+								partial_card_number: nil,
+								expiry_year: nil, 
+								expiry_month: nil,
+								up_front_payment: self.pay_method.FeeOverride||0,
+								first_recurrent_payment_date: get_first_recurrent_payment_date(self.nextpaymentdate, self.FinDate, self.pay_method.FeeOverride||0, self.MemberPayFrequency, self.MemberFeeGroupID, self.DateOfBirth)
+							}
+						else 
+							{
+								pay_method: nil,
+								partial_account_number: nil, 
+								partial_bsb: nil,
+								partial_card_number: nil,
+								expiry_year: nil, 
+								expiry_month: nil
+							}
+						end
+					result[:subscription].merge!(pm)
+				end
 			end
 
 			result.to_json

@@ -60,6 +60,10 @@ module NUWDBHelper
 		ActiveRecord::Base.connection.exec_query("select dbo.GetNextPaymentDateAfter('#{after.to_date.iso8601}', '#{dte.to_date.iso8601}', '#{freq}')").rows[0][0]
 	end
 
+	def get_first_recurrent_payment_date(next_payment_date, findate, establishment_fee, freq, feegroup, dob)
+		new_findate = get_new_findate(findate, establishment_fee, freq, feegroup, dob)
+		get_next_payment_date_after(new_findate, next_payment_date, freq)
+	end
 
 	def tblMember_attributes(api_data, person = nil)
 
