@@ -61,6 +61,11 @@ class Subscription < ApplicationRecord
   	errors.empty? && (stripe_token_was.present? || (bsb_was.present? && account_number_was.present?) || pay_method == "-") || @skip_validation
   end
 
+  def has_existing_pay_method?
+    # TODO figure out some sane way of telling the difference between invalid new details and good functioning prior details
+    partial_account_number_was.present? || (partial_card_number_was.present? ) # && stripe_token.present?)
+  end
+
   def bsb_valid?
     # e.g. 123-123 or 123123
   	bsb.decrypt =~ /^\d{3}-?\d{3}$/ || bsb.decrypt == "*encrypted*"

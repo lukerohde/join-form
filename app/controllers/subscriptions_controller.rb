@@ -4,7 +4,7 @@ class SubscriptionsController < ApplicationController
   before_action :set_join_form, except: [:index, :temp_report]
   before_action :resubscribe?, only: [:create]
 
-  layout 'subscription', except: [:index]
+#  layout 'subscription', except: [:index]
 
   include SubscriptionsHelper
 
@@ -166,11 +166,9 @@ class SubscriptionsController < ApplicationController
       if @subscription.nil?
         forbidden
       else
-        
-        if @subscription.external_id && @subscription.updated_at < (Time.now - 1.hour)
+        if @subscription.external_id && @subscription.updated_at < (Time.now - 1.hour) && !@subscription.end_point_put_required
           # If the subscription is linked (has external_id) 
           # Use when person is returning to their subscription, after more than 1 hour.
-
           @subscription = nuw_end_point_reload(@subscription) 
         end
 
@@ -206,7 +204,13 @@ class SubscriptionsController < ApplicationController
          params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
         end 
       end
+
+      # intercept and save partial card details before encryption
+      params[:subscription][:partial_card_number] = params[:subscription][:card_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:card_number].present?
+      params[:subscription][:partial_account_number] = params[:subscription][:account_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:account_number].present?
+      params[:subscription][:partial_bsb] = params[:subscription][:bsb].gsub(/\d(?=.{3})/,'X') if params[:subscription][:bsb].present?
       
+      params[:subscription][:end_point_put_required] = true
       result = params.require(:subscription).permit(permitted_params << [data: (@join_form.schema[:columns]||[])])
     end
 

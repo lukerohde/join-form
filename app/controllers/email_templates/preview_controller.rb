@@ -27,10 +27,23 @@ private
 		@subscription = Subscription.find_by_id(params[:subscription_id])
 		@subscription ||= Subscription.last
 	  nuw_end_point_reload(@subscription)
-	  @data = flatten_subscription(@subscription)
+	  @data = merge_data(@subscription)
 		@prev = Subscription.where(['id < ?', @subscription.id]).last
 		@next = Subscription.where(['id > ?', @subscription.id]).first
 	end 
+
+	def merge_data(subscription)
+		result = subscription.attributes
+	  result.merge!(subscription.person.attributes)
+	  result.merge!({
+        frequency: friendly_frequency(subscription[:frequency]),
+        fee: friendly_fee(subscription.join_form, subscription[:frequency])
+      })
+	  result.reject!{|k,v| v.nil? }
+	  result["url"] = @subscription_url = "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}"
+		
+	  result
+	end
 
 	def set_email_template
 		@email_template = EmailTemplate.find(params[:email_template_id])

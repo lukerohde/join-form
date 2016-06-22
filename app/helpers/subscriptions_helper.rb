@@ -10,13 +10,13 @@ module SubscriptionsHelper
 
 	def pay_method_options(subscription)
     result = []
-    result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if nuw_end_point_has_good_pay_method(subscription)
+    result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if subscription.has_existing_pay_method?
     result << [t('subscriptions.pay_method.edit.credit_card'), 'CC']
     result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB']
     
     options_for_select(
       result, 
-      nuw_end_point_has_good_pay_method(subscription) ? "-" : (subscription.pay_method || "CC")
+      subscription.has_existing_pay_method? ? "-" : (subscription.pay_method || "CC")
     )
   end
 
@@ -37,6 +37,29 @@ module SubscriptionsHelper
       current_selection
     )
 
+  end
+  
+  def friendly_frequency(freq)
+    case freq
+      when "W"
+        t('subscriptions.subscription.edit.weekly')
+      when "F" 
+        t('subscriptions.subscription.edit.fortnightly')
+      when "M" 
+        t('subscriptions.subscription.edit.monthly')
+      when "Q" 
+        t('subscriptions.subscription.edit.quarterly')
+      when "H" 
+        t('subscriptions.subscription.edit.half_yearly')
+      when "Y" 
+        t('subscriptions.subscription.edit.yearly')
+      else
+        #raise "Unknown frequency '#{freq}'"
+      end
+  end
+
+  def friendly_fee(join_form, freq)
+    number_to_currency(join_form.fee(freq), locale: locale)
   end
 
   def callback_url(url, extra_params = {})
@@ -90,36 +113,10 @@ module SubscriptionsHelper
       :status, 
       :next_payment_date,
       :financial_date
-      ).merge({
-        frequency: friendly_frequency(subscription[:frequency]),
-        fee: friendly_fee(subscription.join_form, subscription[:frequency])
-      })
+      )
     result = result.reject {|k,v| v.blank? }
   end
 
-  
-  def friendly_frequency(freq)
-    case freq
-      when "W"
-        t('subscriptions.subscription.edit.weekly')
-      when "F" 
-        t('subscriptions.subscription.edit.fortnightly')
-      when "M" 
-        t('subscriptions.subscription.edit.monthly')
-      when "Q" 
-        t('subscriptions.subscription.edit.quarterly')
-      when "H" 
-        t('subscriptions.subscription.edit.half_yearly')
-      when "Y" 
-        t('subscriptions.subscription.edit.yearly')
-      else
-        #raise "Unknown frequency '#{freq}'"
-      end
-  end
-
-  def friendly_fee(join_form, freq)
-    number_to_currency(join_form.fee(freq), locale: locale)
-  end
 
   def permitted_params
      [
@@ -137,6 +134,10 @@ module SubscriptionsHelper
           :plan, 
           :callback_url,
           :signature_vector,
+          :partial_bsb, 
+          :partial_account_number,
+          :partial_card_number,
+          :end_point_put_required, 
           person_attributes: [
               :external_id,
               :first_name,
@@ -270,7 +271,6 @@ module SubscriptionsHelper
   
   def nuw_end_point_person_put(subscription)
     url = nuw_end_point_uri
-    
     payload = nuw_end_point_transform_to(subscription)
     payload = nuw_end_point_sign(url.to_s, payload)
     begin
@@ -306,15 +306,28 @@ module SubscriptionsHelper
       end
     end
     
-    # TODO after card details have been posted, they are no longer required
+    # TODO after card details have been posted, they are no longer required (even encrypted)
     if subscription.pay_method_saved?
       subscription[:card_number] = nil
       subscription[:ccv] = nil
-      subscription[:bsb] = nil
       subscription[:account_number]= nil
-      subscription.pay_method = "-" # dash indicates that the details are already on the system
+      subscription[:bsb] = nil 
+
+      # keep partial details so we know how a member pay, for welcome
+      subscription[:pay_method] = payload.dig(:subscription, :pay_method)
+      subscription[:partial_bsb] = payload.dig(:subscription, :partial_bsb)
+      subscription[:partial_account_number] = payload.dig(:subscription, :partial_account_number)
+      # TODO Test stripe token invalidation, remarked until then 
+      #subscription[:stripe_token] = nil if subscription[:partial_card_number] != payload.dig(:subscription, :partial_card_number) # if the card number changes, then our stripe token is probably invalid
+      subscription[:partial_card_number] = payload.dig(:subscription, :partial_card_number)
+      subscription[:expiry_month] = payload.dig(:subscription, :expiry_month)
+      subscription[:expiry_year] = payload.dig(:subscription, :expiry_year)
+      
+      #subscription[:expiry] = nil
+      #subscription.pay_method = "-" # dash indicates that the details are already on the system
     end 
     
+    subscription[:end_point_put_required] = false
     subscription.save_without_validation!
   end
 
@@ -344,13 +357,12 @@ module SubscriptionsHelper
   def nuw_end_point_transform_from_subscription(subscription_hash)
     return {} if subscription_hash.nil?
     result = subscription_hash.slice(:frequency, :plan, :pay_method, :status, :next_payment_date, :financial_date)
-
     pm = 
       case result[:pay_method]
         when "CC"
-          subscription_hash.slice(:card_number, :expiry_month, :expiry_year, :ccv)
+          subscription_hash.slice(:card_number, :partial_card_number, :expiry_month, :expiry_year, :ccv)
         when "AB"
-          subscription_hash.slice(:bsb, :account_number)
+          subscription_hash.slice(:bsb, :partial_bsb, :account_number, :partial_account_number)
         end
     
     result.merge!(pm) if pm
@@ -411,11 +423,6 @@ module SubscriptionsHelper
     end
 
     result
-  end
-
-  def nuw_end_point_has_good_pay_method(subscription)
-    # TODO only return true if user has valid bank details, handle PRD more explicitly
-    nuw_end_point_has_good_pay_method = ["pending", "awaiting 1st payment", "paying"].include?((subscription.status||"").downcase)
   end
 
   def temporary_email
