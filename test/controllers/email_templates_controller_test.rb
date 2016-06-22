@@ -49,6 +49,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   end
 
   test "should destroy email_template" do
+    # TODO Handle destruction of emails attached to join forms
     assert_difference('EmailTemplate.count', -1) do
       delete :destroy, id: @email_template
     end

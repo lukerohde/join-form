@@ -17,7 +17,7 @@ class EmailTemplates::PreviewController < ApplicationController
 	end
 
 	def create
-		EmailTemplateMailer.merge(@email_template.id, @data, params[:preview_email]).deliver_now
+		EmailTemplateMailer.merge(@email_template.id, @subscription.id, params[:preview_email]).deliver_now
 		redirect_to new_email_template_preview_path(@email_template, subscription_id: @subscription.id), notice: "Preview Email Sent"
 	end
 
@@ -31,19 +31,6 @@ private
 		@prev = Subscription.where(['id < ?', @subscription.id]).last
 		@next = Subscription.where(['id > ?', @subscription.id]).first
 	end 
-
-	def merge_data(subscription)
-		result = subscription.attributes
-	  result.merge!(subscription.person.attributes)
-	  result.merge!({
-        frequency: friendly_frequency(subscription[:frequency]),
-        fee: friendly_fee(subscription.join_form, subscription[:frequency])
-      })
-	  result.reject!{|k,v| v.nil? }
-	  result["url"] = @subscription_url = "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}"
-		
-	  result
-	end
 
 	def set_email_template
 		@email_template = EmailTemplate.find(params[:email_template_id])

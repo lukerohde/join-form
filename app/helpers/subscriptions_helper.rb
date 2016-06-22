@@ -59,7 +59,12 @@ module SubscriptionsHelper
   end
 
   def friendly_fee(join_form, freq)
-    number_to_currency(join_form.fee(freq), locale: locale)
+    fee = join_form.fee(freq)
+    if fee.present? && fee > 0
+      number_to_currency(fee, locale: locale)
+    else
+      ""
+    end
   end
 
   def callback_url(url, extra_params = {})
@@ -188,6 +193,22 @@ module SubscriptionsHelper
     params[:person_attributes].each do |k,v|
       subscription.person.send("#{k}=", v) unless v.blank?
     end
+  end
+
+
+  def merge_data(subscription)
+    # For Email Merge
+    result = subscription.attributes
+    result.merge!(subscription.person.attributes)
+    result.merge!({
+        'frequency' => (friendly_frequency(subscription[:frequency])||"").downcase,
+        'fee' => friendly_fee(subscription.join_form, subscription[:frequency]),
+        'formatted_up_front_payment' => number_to_currency(subscription[:up_front_payment], locale: locale)
+      })
+    result.reject!{|k,v| v.nil? }
+    result["url"] = @subscription_url = "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}"
+    
+    result
   end
 
 
@@ -323,6 +344,9 @@ module SubscriptionsHelper
       subscription[:expiry_month] = payload.dig(:subscription, :expiry_month)
       subscription[:expiry_year] = payload.dig(:subscription, :expiry_year)
       
+      subscription[:first_recurrent_payment_date] = payload.dig(:subscription, :first_recurrent_payment_date)
+      subscription[:up_front_payment] = payload.dig(:subscription, :up_front_payment)
+      
       #subscription[:expiry] = nil
       #subscription.pay_method = "-" # dash indicates that the details are already on the system
     end 
@@ -362,7 +386,7 @@ module SubscriptionsHelper
         when "CC"
           subscription_hash.slice(:card_number, :partial_card_number, :expiry_month, :expiry_year, :ccv)
         when "AB"
-          subscription_hash.slice(:bsb, :partial_bsb, :account_number, :partial_account_number)
+          subscription_hash.slice(:bsb, :partial_bsb, :account_number, :partial_account_number, :up_front_payment, :first_recurrent_payment_date)
         end
     
     result.merge!(pm) if pm

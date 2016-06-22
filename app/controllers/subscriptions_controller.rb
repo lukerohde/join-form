@@ -321,8 +321,19 @@ class SubscriptionsController < ApplicationController
       #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later 
       if @subscription.step == :thanks
         JoinNoticeJob.perform_later(@subscription.id)
+        welcome
       else
         IncompleteJoinNoticeJob.perform_in(30 * 60, @subscription.id, @subscription.updated_at.to_i)
+      end
+    end
+
+    def welcome
+      begin
+        template_id = @subscription.join_form.welcome_email_template_id
+        EmailTemplateMailer.merge(template_id, @subscription.id, 'lrohde@nuw.org.au').deliver_later if template_id.present?
+      rescue Exception => exception
+        ExceptionNotifier.notify_exception(exception,
+          :env => request.env, :data => {:message => "failed to send welcome email"})
       end
     end
 end

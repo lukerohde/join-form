@@ -1,17 +1,16 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  subject: 'Hi {{name}}!'
-  body_html: 'Hi {{name}} html'
+  subject: 'Hi {{first_name}}!'
+  body_html: 'Hi {{first_name}} html'
   css: MyText
-  body_plain: 'Hi {{name}} plain'
+  body_plain: 'Hi {{first_name}} plain'
   attachment: MyString
   short_name: MyName
-
-two:
-  subject: MyString
-  body_html: MyText
+welcome:
+  subject: 'welcome {{first_name}}!'
+  body_html: 'Hi {{first_name}} html'
   css: MyText
-  body_plain: MyText
+  body_plain: 'Hi {{first_name}} plain'
   attachment: MyString
   short_name: MyName

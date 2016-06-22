@@ -14,6 +14,23 @@ one:
   union: owner
   person: admin
   updated_at: <%= Time.now - 2.hours %>
+  # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+welcome:
+  short_name: MyString
+  description: MyText
+  css: MyText
+  base_rate_id: 'groupnva'
+  base_rate_establishment: 100.00
+  base_rate_weekly: 9.99
+  base_rate_fortnightly: 9.99
+  base_rate_monthly: 9.99
+  base_rate_quarterly: 9.99
+  base_rate_half_yearly: 9.99
+  base_rate_yearly: 9.99
+  union: owner
+  person: admin
+  updated_at: <%= Time.now - 2.hours %>
+  welcome_email_template: welcome
 two:
   short_name: MyString
   description: MyText

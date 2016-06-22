@@ -6,9 +6,10 @@ class JoinNoticeJob < ActiveJob::Base
 	    subscription = Subscription.find(subscription_id)
 	    if subscription.step == :thanks
 	    	subject = "JOIN: Online join from #{ subscription.person.display_name } #{subscription.person.external_id}"
-      	emails = subscription.join_form.followers(Person).collect(&:email).join(',')
-        unless emails.blank?
-        	PersonMailer.subscription_pdf(subscription, emails, subject).deliver_now
+      	to = subscription.join_form.person.email
+        cc = subscription.join_form.followers(Person).collect(&:email).join(',')
+        unless to.blank? && cc.blank?
+        	PersonMailer.subscription_pdf(subscription, to, cc, subject).deliver_now
 	    	end
 	    end
 	  end

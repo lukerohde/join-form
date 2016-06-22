@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160621104237) do
+ActiveRecord::Schema.define(version: 20160622060436) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,15 +62,15 @@ ActiveRecord::Schema.define(version: 20160621104237) do
     t.string   "short_name"
     t.text     "description"
     t.text     "css"
-    t.decimal  "base_rate_establishment", precision: 6, scale: 2
-    t.decimal  "base_rate_weekly",        precision: 6, scale: 2
-    t.decimal  "base_rate_fortnightly",   precision: 6, scale: 2
-    t.decimal  "base_rate_monthly",       precision: 6, scale: 2
-    t.decimal  "base_rate_quarterly",     precision: 6, scale: 2
-    t.decimal  "base_rate_half_yearly",   precision: 6, scale: 2
-    t.decimal  "base_rate_yearly",        precision: 6, scale: 2
-    t.datetime "created_at",                                                      null: false
-    t.datetime "updated_at",                                                      null: false
+    t.decimal  "base_rate_establishment",   precision: 6, scale: 2
+    t.decimal  "base_rate_weekly",          precision: 6, scale: 2
+    t.decimal  "base_rate_fortnightly",     precision: 6, scale: 2
+    t.decimal  "base_rate_monthly",         precision: 6, scale: 2
+    t.decimal  "base_rate_quarterly",       precision: 6, scale: 2
+    t.decimal  "base_rate_half_yearly",     precision: 6, scale: 2
+    t.decimal  "base_rate_yearly",          precision: 6, scale: 2
+    t.datetime "created_at",                                                        null: false
+    t.datetime "updated_at",                                                        null: false
     t.integer  "union_id"
     t.integer  "person_id"
     t.string   "base_rate_id"
@@ -78,13 +78,15 @@ ActiveRecord::Schema.define(version: 20160621104237) do
     t.string   "page_title"
     t.json     "fee_schedule"
     t.json     "plans"
-    t.jsonb    "schema",                                          default: {},    null: false
-    t.boolean  "signature_required",                              default: false
+    t.jsonb    "schema",                                            default: {},    null: false
+    t.boolean  "signature_required",                                default: false
+    t.integer  "welcome_email_template_id"
   end
 
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
   add_index "join_forms", ["schema"], name: "index_join_forms_on_schema", using: :gin
   add_index "join_forms", ["union_id"], name: "index_join_forms_on_union_id", using: :btree
+  add_index "join_forms", ["welcome_email_template_id"], name: "index_join_forms_on_welcome_email_template_id", using: :btree
 
   create_table "mentions", force: :cascade do |t|
     t.string   "mentioner_type"
@@ -164,8 +166,8 @@ ActiveRecord::Schema.define(version: 20160621104237) do
     t.string   "account_number"
     t.string   "ccv"
     t.string   "bsb"
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
+    t.datetime "created_at",                                                           null: false
+    t.datetime "updated_at",                                                           null: false
     t.integer  "expiry_month"
     t.integer  "expiry_year"
     t.string   "stripe_token"
@@ -174,7 +176,7 @@ ActiveRecord::Schema.define(version: 20160621104237) do
     t.string   "token"
     t.string   "callback_url"
     t.string   "status"
-    t.jsonb    "data",                   default: {},    null: false
+    t.jsonb    "data",                                                 default: {},    null: false
     t.string   "signature_vector"
     t.string   "signature_image"
     t.date     "next_payment_date"
@@ -182,7 +184,9 @@ ActiveRecord::Schema.define(version: 20160621104237) do
     t.string   "partial_account_number"
     t.string   "partial_card_number"
     t.string   "partial_bsb"
-    t.boolean  "end_point_put_required", default: false
+    t.boolean  "end_point_put_required",                               default: false
+    t.decimal  "up_front_payment",             precision: 8, scale: 2
+    t.date     "first_recurrent_payment_date"
   end
 
   add_index "subscriptions", ["data"], name: "index_subscriptions_on_data", using: :gin
@@ -205,6 +209,7 @@ ActiveRecord::Schema.define(version: 20160621104237) do
     t.text     "key_pair"
   end
 
+  add_foreign_key "join_forms", "email_templates", column: "welcome_email_template_id"
   add_foreign_key "join_forms", "people"
   add_foreign_key "join_forms", "supergroups", column: "union_id"
   add_foreign_key "payments", "people"

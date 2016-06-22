@@ -1,6 +1,7 @@
 class JoinForm < ApplicationRecord
 	belongs_to :union
 	belongs_to :person
+	belongs_to :welcome_email_template, class_name: "EmailTemplate"
 	has_many :subscriptions, dependent: :delete_all
 	
 	validates :short_name, :person, :union, presence: true
