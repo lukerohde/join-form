@@ -42,6 +42,29 @@ A user can follow a join form
 - When a user joins, user is notified on thanks (good if prior status was included)
 - When a join stalls, no pay method, user is notifed after x minutes
 
+== FEATURE - welcome message (includes debit information)
+- Includes MemberID
+- deduction amount Yes, frequency Yes, next debit, in api
+- URL
+- Only send on new join? When status changes to a1p, paying or leave without pay, on first payment? does from null to a1p/paying count. Have a welcomed flag, or history of mailing? 
+- Welcome Scenarios
+-- No match in database
+-- Match potential or ex member
+-- Match current member or member with payment problem, or someone who has paid recently
+-- User is logged in and completes join			
+-- There is no establishment fee and the user has paid their first fee by credit card, 
+-- There is an establishment fee, which is waived to due past payment and they have paid their first fee by credit card
+-- The user has paid a partial establishment fee by credit card (an amount greater than one whole fee)
+-- The user has paid their entire establishment fee by credit card
+-- There is no establishment fee and the user has provided bank details and will be charged their first fee on a day of their choosing, which is a working day
+-- There is no establishment fee and the user has provided bank details and will be charged their first fee on a day of their choosing, which isn't a working day
+-- There is an establishment fee, which is waived and the user has provided bank details and will be charged their first fee on a day of their choosing, which isn't a working day
+-- There is an establishment fee, which is partially waived and the user has provided bank details and will be charged on a day of their choosing and will not be charged until their advanced fee has elapsed.
+-- There is an establishment fee, which is not waived and the user has provided bank details and charged on the day of their choosing and not be charged again until their advanced fee has elapsed.
+
+== FEATURE - user can specify their next debit day
+
+
 == TODO Got an email in use error when attempting to match a person which had too few details, but was in the join system?  Also got errors on overjoin join show?  
 
 

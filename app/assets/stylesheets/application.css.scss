@@ -17,6 +17,7 @@
  *= require jquery-ui.structure
  *= require jquery-ui.theme
  *= require signature-pad
+ *= require bootsy
  */
 @import "bootstrap-sprockets";
 @import "bootstrap";
@@ -122,4 +123,9 @@ $a-tags-hover: 'a:active, a:hover';
 .do-not-stack {
   width: auto;
   display: inline-block;
+}
+
+.email-preview {
+  border:1px solid #aaa; 
+  box-shadow: 5px 5px 6px 6px #aaa;
 }

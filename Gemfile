@@ -114,3 +114,9 @@ gem 'globalize'#, git: "https://github.com/globalize/globalize", branch: "master
 gem 'signature-pad-rails'
 
 gem 'wicked_pdf'
+
+gem 'liquid'
+
+gem 'roadie', '~> 3.1.1'
+
+gem 'bootsy'

@@ -40,7 +40,7 @@
   <div class="actions ">
     <% 
       if @subscription.subscription_saved? 
-        if nuw_end_point_has_good_pay_method(@subscription)
+        if @subscription.has_existing_pay_method?
           submit_label = t(".submit_renew") # TODO this logic is dumb
         else
           submit_label = t(".submit_join")

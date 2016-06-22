@@ -4,7 +4,7 @@ class SubscriptionsController < ApplicationController
   before_action :set_join_form, except: [:index, :temp_report]
   before_action :resubscribe?, only: [:create]
 
-  layout 'subscription', except: [:index]
+#  layout 'subscription', except: [:index]
 
   include SubscriptionsHelper
 
@@ -166,11 +166,9 @@ class SubscriptionsController < ApplicationController
       if @subscription.nil?
         forbidden
       else
-        
-        if @subscription.external_id && @subscription.updated_at < (Time.now - 1.hour)
+        if @subscription.external_id && @subscription.updated_at < (Time.now - 1.hour) && !@subscription.end_point_put_required
           # If the subscription is linked (has external_id) 
           # Use when person is returning to their subscription, after more than 1 hour.
-
           @subscription = nuw_end_point_reload(@subscription) 
         end
 
@@ -179,7 +177,7 @@ class SubscriptionsController < ApplicationController
         @subscription.ccv = ""
         @subscription.account_number = ""
         @subscription.bsb = ""
-        @subscription.stripe_token = ""
+        @subscription.stripe_token = "" # TODO I suspect perfectly good stripe tokens are getting lost when the form is reposted (with use my existing payment method)
         if @subscription.person
           @subscription.person.email = "" if temporary_email?(@subscription.person.email)
           @subscription.person.first_name = "" if temporary_first_name?(@subscription.person.first_name)
@@ -206,7 +204,13 @@ class SubscriptionsController < ApplicationController
          params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
         end 
       end
+
+      # intercept and save partial card details before encryption
+      params[:subscription][:partial_card_number] = params[:subscription][:card_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:card_number].present?
+      params[:subscription][:partial_account_number] = params[:subscription][:account_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:account_number].present?
+      params[:subscription][:partial_bsb] = params[:subscription][:bsb].gsub(/\d(?=.{3})/,'X') if params[:subscription][:bsb].present?
       
+      params[:subscription][:end_point_put_required] = true
       result = params.require(:subscription).permit(permitted_params << [data: (@join_form.schema[:columns]||[])])
     end
 
@@ -317,8 +321,19 @@ class SubscriptionsController < ApplicationController
       #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later 
       if @subscription.step == :thanks
         JoinNoticeJob.perform_later(@subscription.id)
+        welcome
       else
         IncompleteJoinNoticeJob.perform_in(30 * 60, @subscription.id, @subscription.updated_at.to_i)
+      end
+    end
+
+    def welcome
+      begin
+        template_id = @subscription.join_form.welcome_email_template_id
+        EmailTemplateMailer.merge(template_id, @subscription.id, 'lrohde@nuw.org.au').deliver_later if template_id.present?
+      rescue Exception => exception
+        ExceptionNotifier.notify_exception(exception,
+          :env => request.env, :data => {:message => "failed to send welcome email"})
       end
     end
 end

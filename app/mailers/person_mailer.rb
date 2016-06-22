@@ -42,7 +42,7 @@ class PersonMailer < ApplicationMailer
 		mail(from: "noreply@#{host}", to: 'lrohde@nuw.org.au', subject: subject)
 	end
 
-	def subscription_pdf(subscription, emails, subject)
+	def subscription_pdf(subscription, to, cc, subject)
 		#PersonMailer.attach_pdf(Subscription.find_by_token('21TBslpIDBcDaO-C76GVBg'), 'lrohde@nuw.org.au').deliver_now
 		@subscription = subscription
 		@subscription_url = "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}"
@@ -53,7 +53,7 @@ class PersonMailer < ApplicationMailer
 		rescue
 			subject += " - PDF Error"
 		end
-		mail(from: @subscription.person.email, to: emails, subject: subject )
+		mail(from: "noreply@#{host}", to: to, cc: cc, subject: subject )
 	end
 
 private

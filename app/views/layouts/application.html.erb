@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Join a union!</title>
+  <title><%=get_title(yield(:title)) %></title>
   <%= csrf_meta_tags %>
   <%# RAILS5 = action_cable_meta_tag %>
   <!-- Google fonts -->
@@ -17,9 +17,9 @@
   <%= tag :meta, :name => "js-context", controller:  params[:controller], action: params[:action] %>
 </head>
 <body>
-  <%= render "layouts/navbar" %>
-	<div class="container-fluid content-area">
-		<%= yield %>
-	</div>
+  <%= render "layouts/navbar" if current_person %>
+  <div class="container-fluid content-area">
+    <%= yield %>
+  </div>
 </body>
 </html>

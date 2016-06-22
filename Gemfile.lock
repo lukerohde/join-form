@@ -55,6 +55,9 @@ GEM
     bootstrap-sass (3.3.6)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
+    bootsy (2.3.0)
+      carrierwave (~> 0.11)
+      mini_magick (~> 4.5)
     builder (3.2.2)
     byebug (8.2.5)
     capybara (2.7.1)
@@ -78,6 +81,8 @@ GEM
       execjs
     coffee-script-source (1.10.0)
     concurrent-ruby (1.0.2)
+    css_parser (1.3.7)
+      addressable
     debug_inspector (0.0.2)
     devise (4.1.0)
       bcrypt (~> 3.0)
@@ -264,6 +269,7 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (1.8.3)
+    liquid (3.0.6)
     listen (3.1.3)
       rb-fsevent (~> 0.9, >= 0.9.7)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -373,6 +379,9 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
+    roadie (3.1.1)
+      css_parser (~> 1.3.4)
+      nokogiri (>= 1.5.0, < 1.7.0)
     ruby-progressbar (1.8.0)
     ruby_dep (1.2.0)
     sass (3.4.22)
@@ -433,6 +442,7 @@ DEPENDENCIES
   addressable
   autoprefixer-rails
   bootstrap-sass (~> 3.3.6)
+  bootsy
   carrierwave
   coffee-rails (~> 4.1.0)
   devise
@@ -446,6 +456,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-fileupload-rails
   jquery-rails
+  liquid
   m
   mailgun_rails
   mini_magick
@@ -461,6 +472,7 @@ DEPENDENCIES
   rails (= 4.2.6)
   rails_12factor
   rest-client
+  roadie (~> 3.1.1)
   sass-rails (>= 3.2)
   select2-rails
   signature-pad-rails

@@ -1,0 +1,54 @@
+<%= form_for(@email_template) do |f| %>
+  <% if @email_template.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@email_template.errors.count, "error") %> prohibited this email_template from being saved:</h2>
+
+      <ul>
+      <% @email_template.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :short_name %><br>
+    <%= f.text_field :short_name, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :subject %><br>
+    <%= f.text_field :subject, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :attachment %><br>
+    <%= f.text_field :attachment, class: "form-control" %>
+  </div>
+
+  <hr/>
+  <h2 class="text-center"> PLAIN TEXT MESSAGE BODY </h2>
+
+  <div class="form-group">
+    <%= f.label :body_plain %><br>
+    <%= f.text_area :body_plain, class: "form-control", rows: 20 %>
+  </div>
+
+  <hr/>
+  <h2 class="text-center"> HTML MESSAGE BODY </h2>
+
+  <div class="form-group">
+    <%= f.label :body_html %><br>
+    <%= f.text_area :body_html, class: "form-control", rows: 20 %>
+    <!--<%= f.bootsy_area :body_html, class: "form-control", rows: 20, editor_options: {html: true} %> -->
+  </div>
+  <div class="form-group">
+    <%= f.label :css %><br>
+    <%= f.text_area :css, class: "form-control", rows: 20 %>
+  </div>
+  
+  <hr/>
+  <div class="actions">
+    <%= f.submit class: "btn btn-default" %>
+  </div>
+<% end %>

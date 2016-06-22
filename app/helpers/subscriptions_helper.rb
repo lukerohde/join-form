@@ -2,6 +2,7 @@ module SubscriptionsHelper
   require 'addressable/uri'
   require 'rest-client'
   require 'openssl'
+  include ActionView::Helpers::NumberHelper
 
   def start_hidden(step)
     @subscription.step == step ? "start_hidden" : ""
@@ -9,27 +10,24 @@ module SubscriptionsHelper
 
 	def pay_method_options(subscription)
     result = []
-    result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if nuw_end_point_has_good_pay_method(subscription)
+    result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if subscription.has_existing_pay_method?
     result << [t('subscriptions.pay_method.edit.credit_card'), 'CC']
     result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB']
     
     options_for_select(
       result, 
-      nuw_end_point_has_good_pay_method(subscription) ? "-" : (subscription.pay_method || "CC")
+      subscription.has_existing_pay_method? ? "-" : (subscription.pay_method || "CC")
     )
   end
 
   def frequency_options(subscription)
     result = []
-    f = subscription.join_form
+    form = subscription.join_form
 
-    result << ["#{t('subscriptions.subscription.edit.weekly')} - #{number_to_currency(f.base_rate_weekly, locale: locale)}", "W"] if f.base_rate_weekly
-    result << ["#{t('subscriptions.subscription.edit.fortnightly')} - #{number_to_currency(f.base_rate_fortnightly, locale: locale)}", "F"] if f.base_rate_fortnightly
-    result << ["#{t('subscriptions.subscription.edit.monthly')} - #{number_to_currency(f.base_rate_monthly, locale: locale)}", "M"] if f.base_rate_monthly
-    result << ["#{t('subscriptions.subscription.edit.quarterly')} - #{number_to_currency(f.base_rate_quarterly, locale: locale)}", "Q"] if f.base_rate_quarterly
-    result << ["#{t('subscriptions.subscription.edit.half_yearly')} - #{number_to_currency(f.base_rate_half_yearly, locale: locale)}", "H"] if f.base_rate_half_yearly
-    result << ["#{t('subscriptions.subscription.edit.yearly')} - #{number_to_currency(f.base_rate_yearly, locale: locale)}", "Y"] if f.base_rate_yearly
-    
+    %w(W F M Q H Y).each do |freq|
+      result << ["#{friendly_frequency(freq)} - #{friendly_fee(form, freq)}", freq] if form.fee(freq) > 0
+    end
+
     current_selection = subscription.frequency || "F"
     current_selection = result.find { |i| i[1] == current_selection.upcase }
     current_selection = result[0] unless current_selection
@@ -39,6 +37,34 @@ module SubscriptionsHelper
       current_selection
     )
 
+  end
+  
+  def friendly_frequency(freq)
+    case freq
+      when "W"
+        t('subscriptions.subscription.edit.weekly')
+      when "F" 
+        t('subscriptions.subscription.edit.fortnightly')
+      when "M" 
+        t('subscriptions.subscription.edit.monthly')
+      when "Q" 
+        t('subscriptions.subscription.edit.quarterly')
+      when "H" 
+        t('subscriptions.subscription.edit.half_yearly')
+      when "Y" 
+        t('subscriptions.subscription.edit.yearly')
+      else
+        #raise "Unknown frequency '#{freq}'"
+      end
+  end
+
+  def friendly_fee(join_form, freq)
+    fee = join_form.fee(freq)
+    if fee.present? && fee > 0
+      number_to_currency(fee, locale: locale)
+    else
+      ""
+    end
   end
 
   def callback_url(url, extra_params = {})
@@ -58,7 +84,13 @@ module SubscriptionsHelper
     # this is used for both calling system call back
     # and membership API
     result = person.slice(:external_id,*sensitive_person_params)
-    result = result.reject {|k,v| v.blank? }
+    result = result.reject do |k,v| 
+      if [:address1, :address2, :suburb, :state, :postcode].include?(k.to_sym)
+        person[:address1].blank?
+      else
+        v.blank?
+      end
+    end
     result
   end
 
@@ -80,13 +112,16 @@ module SubscriptionsHelper
 
   def subscription_callback_params(subscription)
     result = subscription.slice(
-      :frequency,
       :plan,
       :pay_method,
-      :callback_url
+      :callback_url,
+      :status, 
+      :next_payment_date,
+      :financial_date
       )
     result = result.reject {|k,v| v.blank? }
   end
+
 
   def permitted_params
      [
@@ -104,6 +139,10 @@ module SubscriptionsHelper
           :plan, 
           :callback_url,
           :signature_vector,
+          :partial_bsb, 
+          :partial_account_number,
+          :partial_card_number,
+          :end_point_put_required, 
           person_attributes: [
               :external_id,
               :first_name,
@@ -154,6 +193,22 @@ module SubscriptionsHelper
     params[:person_attributes].each do |k,v|
       subscription.person.send("#{k}=", v) unless v.blank?
     end
+  end
+
+
+  def merge_data(subscription)
+    # For Email Merge
+    result = subscription.attributes
+    result.merge!(subscription.person.attributes)
+    result.merge!({
+        'frequency' => (friendly_frequency(subscription[:frequency])||"").downcase,
+        'fee' => friendly_fee(subscription.join_form, subscription[:frequency]),
+        'formatted_up_front_payment' => number_to_currency(subscription[:up_front_payment], locale: locale)
+      })
+    result.reject!{|k,v| v.nil? }
+    result["url"] = @subscription_url = "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}"
+    
+    result
   end
 
 
@@ -237,7 +292,6 @@ module SubscriptionsHelper
   
   def nuw_end_point_person_put(subscription)
     url = nuw_end_point_uri
-    
     payload = nuw_end_point_transform_to(subscription)
     payload = nuw_end_point_sign(url.to_s, payload)
     begin
@@ -258,9 +312,12 @@ module SubscriptionsHelper
     subscription.person.external_id = payload[:external_id]
     subscription.person.authorizer_id = @join_form.person.id
     subscription.status = payload.dig(:subscription, :status)
+    subscription.next_payment_date = payload.dig(:subscription, :next_payment_date)
+    subscription.financial_date = payload.dig(:subscription, :financial_date)
     
     payments = payload.dig(:subscription, :payments)
 
+    # receipt payments
     if payments.present?
       subscription.payments.each do |p1|
         if p1.external_id.nil?
@@ -270,15 +327,31 @@ module SubscriptionsHelper
       end
     end
     
-    # TODO after card details have been posted, they are no longer required
+    # TODO after card details have been posted, they are no longer required (even encrypted)
     if subscription.pay_method_saved?
       subscription[:card_number] = nil
       subscription[:ccv] = nil
-      subscription[:bsb] = nil
       subscription[:account_number]= nil
-      subscription.pay_method = "-" # dash indicates that the details are already on the system
+      subscription[:bsb] = nil 
+
+      # keep partial details so we know how a member pay, for welcome
+      subscription[:pay_method] = payload.dig(:subscription, :pay_method)
+      subscription[:partial_bsb] = payload.dig(:subscription, :partial_bsb)
+      subscription[:partial_account_number] = payload.dig(:subscription, :partial_account_number)
+      # TODO Test stripe token invalidation, remarked until then 
+      #subscription[:stripe_token] = nil if subscription[:partial_card_number] != payload.dig(:subscription, :partial_card_number) # if the card number changes, then our stripe token is probably invalid
+      subscription[:partial_card_number] = payload.dig(:subscription, :partial_card_number)
+      subscription[:expiry_month] = payload.dig(:subscription, :expiry_month)
+      subscription[:expiry_year] = payload.dig(:subscription, :expiry_year)
+      
+      subscription[:first_recurrent_payment_date] = payload.dig(:subscription, :first_recurrent_payment_date)
+      subscription[:up_front_payment] = payload.dig(:subscription, :up_front_payment)
+      
+      #subscription[:expiry] = nil
+      #subscription.pay_method = "-" # dash indicates that the details are already on the system
     end 
     
+    subscription[:end_point_put_required] = false
     subscription.save_without_validation!
   end
 
@@ -306,16 +379,14 @@ module SubscriptionsHelper
   end
 
   def nuw_end_point_transform_from_subscription(subscription_hash)
-    # This is used in both directions!
     return {} if subscription_hash.nil?
-    result = subscription_hash.slice(:frequency, :plan, :pay_method, :status)
-
+    result = subscription_hash.slice(:frequency, :plan, :pay_method, :status, :next_payment_date, :financial_date)
     pm = 
       case result[:pay_method]
         when "CC"
-          subscription_hash.slice(:card_number, :expiry_month, :expiry_year, :ccv)
+          subscription_hash.slice(:card_number, :partial_card_number, :expiry_month, :expiry_year, :ccv)
         when "AB"
-          subscription_hash.slice(:bsb, :account_number)
+          subscription_hash.slice(:bsb, :partial_bsb, :account_number, :partial_account_number, :up_front_payment, :first_recurrent_payment_date)
         end
     
     result.merge!(pm) if pm
@@ -376,10 +447,6 @@ module SubscriptionsHelper
     end
 
     result
-  end
-
-  def nuw_end_point_has_good_pay_method(subscription)
-    nuw_end_point_has_good_pay_method = ["pending", "awaiting 1st payment", "paying"].include?((subscription.status||"").downcase)
   end
 
   def temporary_email

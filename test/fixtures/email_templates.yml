@@ -1,0 +1,16 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  subject: 'Hi {{first_name}}!'
+  body_html: 'Hi {{first_name}} html'
+  css: MyText
+  body_plain: 'Hi {{first_name}} plain'
+  attachment: MyString
+  short_name: MyName
+welcome:
+  subject: 'welcome {{first_name}}!'
+  body_html: 'Hi {{first_name}} html'
+  css: MyText
+  body_plain: 'Hi {{first_name}} plain'
+  attachment: MyString
+  short_name: MyName

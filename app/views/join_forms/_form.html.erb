@@ -86,6 +86,42 @@
     <%= f.text_field :base_rate_yearly, class: "form-control" %>
   </div>
 
+  <h2> Notifications </h2>
+
+  <div class="form-group">
+    <%= f.label :person_id %> <%=link_to "invite person", new_person_invitation_path, class: "small", :target => "_blank"%><br>
+    <%= f.select :person_id,
+      selected_option(@join_form.person),
+      {
+          include_blank: false,
+      },
+      data: { 
+        placeholder: "Please nominate a responsible admin person for new joins.",
+        url: people_path
+      }, 
+      class: "ac-select2 form-control", 
+      style: "width: 100%;"
+    %>
+  </div>
+
+  <!--<%= f.hidden_field :person_id, value: current_person.id %>-->
+  <div class="form-group">
+    <%= f.label :welcome_email_template_id %><br>
+    <%= f.select :welcome_email_template_id,
+      selected_option(@join_form.welcome_email_template),
+      {
+          include_blank: false,
+      },
+      data: { 
+        placeholder: "Please select an email template to be emailed to the member after they join.",
+        url: email_templates_path
+      }, 
+      class: "ac-select2 form-control", 
+      style: "width: 100%;"
+    %>
+  </div>
+  
+
   <h2> Appearance </h2>
 
   <div class="form-group">
@@ -113,7 +149,6 @@
     <%= f.check_box :signature_required, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
   </div>  
 
-  <%= f.hidden_field :person_id, value: current_person.id %>
   
   <div class="actions">
     <%= f.submit value: "Save Join Form", class: "btn btn-default"%>
