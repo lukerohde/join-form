@@ -28,7 +28,7 @@ module JoinAUnion
         "zh-TW" => "中文版",
     }
     config.i18n.available_locales = config.languages.keys << "en-AU"
-    config.i18n.default_locale = :en
+    config.i18n.default_locale = "en"
     config.i18n.fallbacks = true
 
     config.after_initialize do
