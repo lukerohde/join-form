@@ -57,13 +57,12 @@ class Subscription < ApplicationRecord
   end
 
   def pay_method_saved?
-    # can have an old stripe_token
-  	errors.empty? && (stripe_token_was.present? || (bsb_was.present? && account_number_was.present?) || pay_method == "-") || @skip_validation
+    #errors.empty? && (stripe_token_was.present? || (bsb_was.present? && account_number_was.present?) || pay_method == "-") || @skip_validation
+    (errors.empty? && has_existing_pay_method?) || @skip_validation
   end
 
   def has_existing_pay_method?
-    # TODO figure out some sane way of telling the difference between invalid new details and good functioning prior details
-    partial_account_number_was.present? || (partial_card_number_was.present? ) # && stripe_token.present?)
+    partial_account_number_was.present? || (partial_card_number_was.present? && stripe_token.present?)
   end
 
   def bsb_valid?
@@ -102,16 +101,16 @@ class Subscription < ApplicationRecord
   def pay_method_must_be_complete
   	return if @skip_validation
     case pay_method
-    when "-"
-      #pay_method = pay_method_was
-  	when "CC"
-  		errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
-  	when "AB"
-      errors.add(:bsb,I18n.translate("subscriptions.errors.bsb") ) unless bsb_valid?
-  		errors.add(:account_number,I18n.translate("subscriptions.errors.account_number") ) unless account_number_valid?
-  	else
-  		errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
-  	end
+      when "-"
+        #pay_method = pay_method_was
+    	when "CC"
+    		errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
+    	when "AB"
+        errors.add(:bsb,I18n.translate("subscriptions.errors.bsb") ) unless bsb_valid?
+    		errors.add(:account_number,I18n.translate("subscriptions.errors.account_number") ) unless account_number_valid?
+    	else
+    		errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
+    	end
     if join_form.signature_required && signature_vector.blank?
       errors.add(:signature_vector, I18n.translate("subscriptions.errors.not_blank"))
     end

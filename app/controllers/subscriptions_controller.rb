@@ -321,7 +321,7 @@ class SubscriptionsController < ApplicationController
       #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later 
       if @subscription.step == :thanks
         JoinNoticeJob.perform_later(@subscription.id)
-        welcome
+        welcome if !@subscription.end_point_put_required || Rails.env.test? # end point mocked in testing, don't want welcome done until membership can calculate what it has to calculate
       else
         IncompleteJoinNoticeJob.perform_in(30 * 60, @subscription.id, @subscription.updated_at.to_i)
       end
