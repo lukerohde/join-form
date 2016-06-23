@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       resource :preview, only: [:new, :create], controller: 'email_templates/preview' do
         member do
           get 'pdf', as: :pdf
+          get 'download_pdf', as: :download_pdf
         end
       end
     end

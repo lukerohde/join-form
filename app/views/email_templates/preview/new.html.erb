@@ -39,11 +39,12 @@
 		</div>
 	<% end %> 
 
-	<% if @pdf_html_css.present? %> 
+	<% if @pdf_html.present? %> 
 		<h2 class="text-center">Attached PDF Body</h2>
-		<%= link_to "View just PDF", pdf_email_template_preview_path(@email_template, subscription_id: @subscription.token) %>
+		<%= link_to "View PDF", pdf_email_template_preview_path(@email_template, subscription_id: @subscription.token), class: "btn btn-default" %>
+		<%= link_to "Download PDF", download_pdf_email_template_preview_path(@email_template, subscription_id: @subscription.token), class: "btn btn-default" %>
 		<div class="email-preview">
-			<%= @pdf_html_css.html_safe %>
+			<%= @pdf_html.html_safe %>
 		</div>
 	<% end %>
 

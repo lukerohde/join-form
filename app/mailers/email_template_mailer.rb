@@ -19,6 +19,16 @@ class EmailTemplateMailer < ApplicationMailer
     @body_html_css.url_options = {host: ENV['mailgun_host'], protocol: "https"}
     @body_html_css = @body_html_css.transform
 
+    if @email_template.pdf_html.present?
+      @pdf_url = pdf_email_template_preview_url(@email_template, subscription_id: @subscription.token, locale: locale) 
+      begin
+        attachments["#{@subscription.external_id || @subscription.token}.pdf"] = WickedPdf.new.pdf_from_url(@pdf_url)
+      rescue
+        @subject += " - PDF FAILED TO ATTACH"
+      end
+      
+    end
+
     mail to: email, from: "noreply@#{ENV['mailgun_host']}", subject: @subject 
   end
 end
