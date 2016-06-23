@@ -1,5 +1,7 @@
 
 Rails.application.routes.draw do
+  mount Bootsy::Engine => '/bootsy', as: 'bootsy'
+
   scope "(:locale)", locale: /en|en-AU|zh-TW/ do
     
     resources :subscriptions

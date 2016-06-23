@@ -4,15 +4,21 @@
  
 <% set_title(@join_form.page_title) %>
 <div id="step" data-step="<%=@subscription.step%>"></div>
-<style>
-  <%=@join_form.css.html_safe %>
-</style>
-
 <%= render partial: "shared/lang_picker", locals: { display_class: "pull-right" } %>
 
-<div class="subscription_header">
-  <%=@join_form.header.html_safe if @join_form.header %>
-</div>
+<div class="clearfix"></div>
+<% if @join_form.advanced_designer %> 
+  <style>
+    <%=@join_form.css.html_safe %>
+  </style>
+  <div class="subscription_header clearfix">
+    <%=@join_form.header.html_safe if @join_form.header.present? %>
+  </div>
+<% else %> 
+  <div class="subscription_header clearfix">
+    <%=@join_form.wysiwyg_header.html_safe if @join_form.wysiwyg_header.present? %>
+  </div>
+<% end %> 
 
 <%= form_for(subscription, url: subscription_form_path(subscription)) do |f| %>
   
@@ -53,3 +59,12 @@
     <%= f.submit submit_label, class: "btn btn-success", id: "subscription_submit", data: { label: t(".submit_processing")} %>
   </div>
 <% end %>
+
+<div class="clearfix"></div>
+<div class="subscription_footer clearfix">
+<% if @join_form.advanced_designer %> 
+    <%=@join_form.wysiwyg_header.html_safe if @join_form.wysiwyg_header.present? %>
+<% else %> 
+    <%=@join_form.wysiwyg_footer.html_safe if @join_form.wysiwyg_footer.present? %>
+<% end %> 
+</div>

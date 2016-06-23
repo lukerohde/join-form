@@ -16,6 +16,8 @@ class JoinForm < ApplicationRecord
 
 	after_initialize :set_defaults
 
+	include Bootsy::Container
+
 	def max_frequency
 		case
 			when self.base_rate_weekly||0 > 0

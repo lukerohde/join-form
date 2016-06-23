@@ -122,21 +122,11 @@
   </div>
   
 
-  <h2> Appearance </h2>
+  <h2> Customization </h2>
 
   <div class="form-group">
     <%= f.label :page_title %><br>
     <%= f.text_area :page_title, class: "form-control", placeholder: t('helpers.label.join_form.page_title_placeholder') %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :header %><br>
-    <%= f.text_area :header, class: "form-control", placeholder: t('helpers.label.join_form.header_placeholder'), rows: 10 %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :css %><br>
-    <%= f.text_area :css, class: "form-control", placeholder: t('helpers.label.join_form.css_placeholder'), rows: 20 %>
   </div>
 
   <div class="form-group">
@@ -147,10 +137,67 @@
   <div class="form-group">
     <%= f.label :signature_required %><br>
     <%= f.check_box :signature_required, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
+  </div> 
+
+  <h2> Design </h2>
+
+
+  <div class="form-group">
+    <%= f.label :advanced_designer %><br>
+    <%= f.check_box :advanced_designer, :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
   </div>  
+
+  <div id="advanced_designer_fields" style="display:none;">
+    <div class="form-group">
+      <%= f.label :header %><br>
+      <%= f.text_area :header, class: "form-control", placeholder: t('helpers.label.join_form.header_placeholder'), rows: 10 %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :footer %><br>
+      <%= f.text_area :footer, class: "form-control", placeholder: t('helpers.label.join_form.footer_placeholder'), rows: 10 %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :css %><br>
+      <%= f.text_area :css, class: "form-control", placeholder: t('helpers.label.join_form.css_placeholder'), rows: 20 %>
+    </div>
+  </div>
+
+  <div id="wysiwyg_designer_fields" style="display:none;">
+    <div class="form-group">
+      <%= f.label :wysiwyg_header %><br>
+      <%= f.bootsy_area :wysiwyg_header, class: "form-control", placeholder: t('helpers.label.join_form.wysiwyg_header_placeholder'), rows: 10 %>
+    </div>
+    <hr/>
+    <div class="form-group">
+      <%= f.label :wysiwyg_footer %><br>
+      <%= f.bootsy_area :wysiwyg_footer, class: "form-control", placeholder: t('helpers.label.join_form.wysiwyg_footer_placeholder'), rows: 10 %>
+    </div>
+  </div>
 
   
   <div class="actions">
     <%= f.submit value: "Save Join Form", class: "btn btn-default"%>
   </div>
 <% end %>
+
+<script type="text/javascript">
+  function set_designer() {
+    if ($('#join_form_advanced_designer').bootstrapSwitch('state'))
+    {
+      $('#advanced_designer_fields').slideDown();
+      $('#wysiwyg_designer_fields').slideUp();
+    }
+    else
+    {
+      $('#advanced_designer_fields').slideUp();
+      $('#wysiwyg_designer_fields').slideDown();
+    }
+  }
+
+  $('#join_form_advanced_designer').bootstrapSwitch({
+    onSwitchChange: set_designer
+  });
+  set_designer();
+</script>
