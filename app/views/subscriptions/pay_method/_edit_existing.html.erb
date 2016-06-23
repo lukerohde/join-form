@@ -1,0 +1,50 @@
+<div id="edit_existing" style="<%= "display:none" unless  pay_method_default(@subscription) == "-" %>">
+
+	<% if @subscription.pay_method == "CC" %> 
+	
+		<div class="form-group">
+	    <%= f.label :partial_card_number %><br/>
+	    <span class="form-control readonly"><%=@subscription.partial_card_number%></span>
+	  </div>
+
+	  <div class="form-group">
+	    <%= f.label :expiry %><br/>
+	    <div class="row">
+	      <div class="col-xs-4">
+	        <span class="form-control readonly"><%=@subscription.expiry_month%></span>
+	      </div>
+	      <div class="col-xs-4">
+	        <span class="form-control readonly"><%=@subscription.expiry_year%></span>
+	      </div>
+	    </div>
+	  </div>
+
+	<% elsif @subscription.pay_method == "AB" %>
+
+		<div class="form-group">
+		  <%= f.label :partial_bsb %><br/>
+		  <span class="form-control readonly"><%=@subscription.partial_bsb%></span>
+	  </div>
+
+		<div class="form-group">
+		  <%= f.label :partial_account_number %><br/>
+		  <span class="form-control readonly"><%=@subscription.partial_account_number%></span>
+	  </div>
+
+	<% end %> 
+
+	<div>
+    <small>
+      <!-- TODO get translation -->
+      <!-- TODO Refactor to share with credit card --> 
+      By submitting this form, I authorize the <%=@join_form.union.name %> to deduct from my account <%= @subscription.total > 0 ? "an advanced payment of #{number_to_currency(@subscription.total, locale: locale)} in dues then " : "" %> <%= @subscription.reoccurring_fee > 0 ? "a reoccurring fee of #{number_to_currency(@subscription.reoccurring_fee, locale: locale)}" : "a reoccurring fee" %> which is subject to occasional variation.
+    </small>
+  </div>
+	<!-- 
+	<strong> 
+    Initial Payment: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
+    <br/><small> Deductions will usually commence within 3 business days.  </small>
+  </strong>
+  -->
+
+</div>

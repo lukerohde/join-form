@@ -4,22 +4,25 @@
 
   <%= render 'errors' if @subscription.step == :pay_method %>
     
-  <div class="detail">
-    <div class="row">
-      <div class="col-xs-6"><%=t(".application_fee")%></div> 
-      <div class="col-xs-6"><%=number_to_currency(@subscription.establishment_fee, locale: locale) %> </div>
+  <% if @subscription.establishment_fee > 0 %> 
+    <div class="detail">
+
+      <div class="row">
+        <div class="col-xs-6"><%=t(".application_fee")%></div> 
+        <div class="col-xs-6"><%=number_to_currency(@subscription.establishment_fee, locale: locale) %> </div>
+      </div>
+      <% if @subscription.discount > 0 %>
+        <div class="row">
+          <div class="col-xs-6"><%=t(".member_discount")%></div> 
+          <div class="col-xs-6"><%=number_to_currency(@subscription.discount, locale: locale) %> </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6"><strong><%=t(".total")%></strong></div> 
+          <div class="col-xs-6"><strong><u><%=number_to_currency(@subscription.total, locale: locale) %></u></strong> </div>
+        </div>
+      <% end %>
     </div>
-    <% if @subscription.discount > 0 %>
-      <div class="row">
-        <div class="col-xs-6"><%=t(".member_discount")%></div> 
-        <div class="col-xs-6"><%=number_to_currency(@subscription.discount, locale: locale) %> </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-6"><strong><%=t(".total")%></strong></div> 
-        <div class="col-xs-6"><strong><u><%=number_to_currency(@subscription.total, locale: locale) %></u></strong> </div>
-      </div>
-    <% end %>
-  </div>
+  <% end %> 
   <br/>
   <div class="form-group">
     <%= f.label :pay_method %><br>
@@ -37,14 +40,15 @@
     %>
   </div>
 
-  <%= render 'subscriptions/pay_method/edit_credit_card', f: f %>
-
   <%= render 'subscriptions/pay_method/edit_au_bank_account', f: f %>
 
-  <small>
-    <!-- TODO get translation -->
-    By submitting this form, I authorize the <%=@join_form.union.name %> to deduct from my account <%= @subscription.total > 0 ? "an advanced payment of #{number_to_currency(@subscription.total, locale: locale)} in dues then " : "" %> <%= @subscription.reoccurring_fee > 0 ? "a reoccurring fee of #{number_to_currency(@subscription.reoccurring_fee, locale: locale)}" : "a reoccurring fee" %> which is subject to occasional variation.
-  </small>
+  <%= render 'subscriptions/pay_method/edit_credit_card', f: f %>
+
+  <%= render 'subscriptions/pay_method/edit_direct_debit_release', f: f %>
+  
+  <%= render 'subscriptions/pay_method/edit_payroll_deduction', f: f %>
+
+  <%= render 'subscriptions/pay_method/edit_existing', f: f %>
 
   <% if @subscription.join_form.signature_required %>
     <%= hidden_field_tag "signature_vector", @subscription.signature_vector %>
@@ -59,9 +63,13 @@
         <input type="hidden" name="subscription[signature_vector]" class="output">
       </div>
     </div>
-  <% end %>
 
-  
+    <div class="" style="width: 300px; border-bottom: solid 1px black; padding: 10px;">
+      <strong><%= friendly_signature_date(@subscription) %></strong>
+    </div>
+    <br/>
+  <% end %> 
+
   <div id="stripe_error">
     <noscript>JavaScript is not enabled and is required for this form. First enable it in your web browser settings.</noscript>
   </div>

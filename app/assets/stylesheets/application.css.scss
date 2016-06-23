@@ -129,3 +129,7 @@ $a-tags-hover: 'a:active, a:hover';
   border:1px solid #aaa; 
   box-shadow: 5px 5px 6px 6px #aaa;
 }
+
+.form-control.readonly { 
+  background-color: #eee;
+}

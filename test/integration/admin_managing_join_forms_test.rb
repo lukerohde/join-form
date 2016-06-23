@@ -18,7 +18,7 @@ class AdminManagingJoinFormsTest < ActionDispatch::IntegrationTest
   	assert_response :success
 
   	assert_difference("JoinForm.count") do
-  		post "/join_forms", join_form: { short_name: "test", union_id: @owner.id, person_id: @current_person.id, base_rate_id: "GROUPNVA" }
+  		post "/join_forms", join_form: { short_name: "test", union_id: @owner.id, person_id: @current_person.id, base_rate_id: "GROUPNVA", credit_card_on: true }
   	end
   	assert_redirected_to union_path(@owner)
   	assert "Your new join form was successfully created." == flash[:notice], "Notice not set correctly"

@@ -11,13 +11,22 @@ module SubscriptionsHelper
 	def pay_method_options(subscription)
     result = []
     result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if subscription.has_existing_pay_method?
-    result << [t('subscriptions.pay_method.edit.credit_card'), 'CC']
-    result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB']
+    result << [t('subscriptions.pay_method.edit.credit_card'), 'CC'] if subscription.join_form.credit_card_on
+    result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB'] if subscription.join_form.direct_debit_on
+    result << [t('subscriptions.pay_method.edit.payroll_deduction'), 'PRD'] if subscription.join_form.payroll_deduction_on
+    result << [t('subscriptions.pay_method.edit.direct_debit_release'), 'ABR'] if subscription.join_form.direct_debit_release_on
     
     options_for_select(
       result, 
-      subscription.has_existing_pay_method? ? "-" : (subscription.pay_method || "CC")
+      pay_method_default(subscription) 
     )
+  end
+
+  def pay_method_default(subscription)
+    methods = subscription.join_form.pay_methods << "-"
+    result = subscription.has_existing_pay_method? && ["AB", "CC"].include?(subscription.pay_method) ? "-" : (subscription.pay_method || "AB") # made this the default since more people choose it and it'll work without JS
+    result = methods[0] unless methods.include?(result)
+    result
   end
 
   def frequency_options(subscription)
@@ -36,9 +45,17 @@ module SubscriptionsHelper
       result, 
       current_selection
     )
-
   end
   
+  def friendly_signature_date(subscription)
+    if @subscription.signature_vector.present? 
+      result = @subscription.signature_date.try(:strftime, "%d / %B / %Y")
+      result ||= "Signed but not dated"
+    else
+      result = Date.today.strftime("%d / %B / %Y")
+    end
+  end
+
   def friendly_frequency(freq)
     case freq
       when "W"
@@ -439,6 +456,10 @@ module SubscriptionsHelper
             hash.slice(:pay_method, :card_number, :expiry_month, :expiry_year, :ccv)
           when "AB"
             hash.slice(:pay_method, :bsb, :account_number)
+          when "ABR"
+            hash.slice(:pay_method)
+          when "PRD"
+            hash.slice(:pay_method)
           else 
             { pay_method: "-" } if result[:establishment_fee] >= 0.01 # is including a symbol to indicate existing pm a bad idea? A shared literal seems so.
           end

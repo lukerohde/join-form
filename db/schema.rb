@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160623005602) do
+ActiveRecord::Schema.define(version: 20160623084711) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -85,6 +85,10 @@ ActiveRecord::Schema.define(version: 20160623005602) do
     t.text     "footer"
     t.text     "wysiwyg_header"
     t.text     "wysiwyg_footer"
+    t.boolean  "credit_card_on"
+    t.boolean  "direct_debit_on"
+    t.boolean  "payroll_deduction_on"
+    t.boolean  "direct_debit_release_on"
   end
 
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
@@ -191,6 +195,7 @@ ActiveRecord::Schema.define(version: 20160623005602) do
     t.boolean  "end_point_put_required",                               default: false
     t.decimal  "up_front_payment",             precision: 8, scale: 2
     t.date     "first_recurrent_payment_date"
+    t.date     "signature_date"
   end
 
   add_index "subscriptions", ["data"], name: "index_subscriptions_on_data", using: :gin

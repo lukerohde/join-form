@@ -8,6 +8,29 @@ class JoinForm < ApplicationRecord
 	validates :base_rate_id, presence: true
 	validates :base_rate_weekly, numericality: { allow_blank: true }	
 	validate :is_authorized?
+	validate :has_pay_method
+	validate :signature_for_prd_and_abr
+	validate :no_establishment_fee_for_prd_and_abr
+
+	def signature_for_prd_and_abr
+		if (payroll_deduction_on || direct_debit_release_on) && !signature_required
+			errors.add :base, "Signature must be turned on for forms with direct debit release or payroll deduction"
+		end
+	end
+
+	def no_establishment_fee_for_prd_and_abr
+
+		if (payroll_deduction_on) && base_rate_establishment > 0
+			errors.add :base, "You cannot charge an up front payment when payroll deduction is enabled"
+		end
+
+	end
+
+	def has_pay_method
+		unless self.credit_card_on || self.direct_debit_on || self.payroll_deduction_on || self.direct_debit_release_on
+			errors.add(:base, "You need at lease one pay method enabled")
+		end
+	end
 
 	serialize :schema, HashSerializer
 
@@ -50,6 +73,15 @@ class JoinForm < ApplicationRecord
       when  "Y" 
         self.base_rate_yearly || 0
       end
+	end
+
+	def pay_methods
+		result = []
+		result << "AB" if direct_debit_on
+		result << "CC" if credit_card_on
+		result << "ABR" if direct_debit_release_on
+		result << "PRD" if payroll_deduction_on
+		result
 	end
 	
 	def set_defaults

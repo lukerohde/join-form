@@ -50,6 +50,10 @@ en:
         base_rate_quarterly: Quarterly fee
         base_rate_half_yearly:  Half yearly fee
         base_rate_yearly:  Yearly fee
+        credit_card_on: Credit Card Enabled
+        direct_debit_on: Direct Debit Enabled
+        payroll_deduction_on: Payroll Deduction Enabled
+        direct_debit_release_on: Direct Debit Release Enabled
       subscription:
         description: "Description"
   gender:
@@ -68,6 +72,9 @@ en:
         expiry: "Expiry"
         ccv: "CCV (the 3 digits on the back of the card)"
         signature_vector: Signature
+        partial_bsb: Partial BSB
+        partial_account_number: Partial Account Number
+        partial_card_number: Partial Card Number
       person:
         external_id: "Member ID"
         first_name: "First Name"
@@ -118,8 +125,10 @@ en:
     pay_method:
       edit:
         heading: "Payment Details"
-        credit_card: "Credit Card"
-        au_bank_account: "Australian Bank Account"
+        credit_card: "Credit card"
+        au_bank_account: "Australian bank account"
+        direct_debit_release: "Get my bank account from my employer"
+        payroll_deduction: "Deduct my union dues from my pay"
         use_existing: "Use my existing payment method"
         application_fee: "Application Fee:"
         member_discount: "Member Discount:"

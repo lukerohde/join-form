@@ -177,7 +177,6 @@ class SubscriptionsController < ApplicationController
         @subscription.ccv = ""
         @subscription.account_number = ""
         @subscription.bsb = ""
-        @subscription.stripe_token = "" # TODO I suspect perfectly good stripe tokens are getting lost when the form is reposted (with use my existing payment method)
         if @subscription.person
           @subscription.person.email = "" if temporary_email?(@subscription.person.email)
           @subscription.person.first_name = "" if temporary_first_name?(@subscription.person.first_name)
@@ -205,6 +204,11 @@ class SubscriptionsController < ApplicationController
         end 
       end
 
+      
+      # Reject keys from pay methods that are not being submitted
+      params[:subscription].except!(:stripe_token, :expiry_month, :expiry_year, :card_number, :ccv) unless params[:subscription][:pay_method] == "CC"
+      params[:subscription].except!(:bsb, :account_number) unless params[:subscription][:pay_method] == "AB"
+
       # intercept and save partial card details before encryption
       params[:subscription][:partial_card_number] = params[:subscription][:card_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:card_number].present?
       params[:subscription][:partial_account_number] = params[:subscription][:account_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:account_number].present?
@@ -221,7 +225,7 @@ class SubscriptionsController < ApplicationController
         @join_form = @union.join_forms.find(id)
       else
         # TODO Remove this hack when globalize works with rails 5
-        zh_id = id + '-zh-tw' if locale.to_s.downcase == "zh-tw" && !id.include?("-zh-tw") 
+        zh_id = id + '-zh-tw' if locale.to_s.downcase == "zh_tw" && !id.include?("-zh-tw") 
         @join_form = @union.join_forms.where("short_name ilike ?",zh_id).first
         # END OF HACK
         @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?

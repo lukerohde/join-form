@@ -1,0 +1,9 @@
+<div id="edit_payroll_deduction" style="<%= "display:none" unless pay_method_default(@subscription) == "PRD" %>">
+
+	<h3>Payroll Deduction Authority</h3>
+
+	<small>
+	I authorize my employer to deduct <%= friendly_fee(@subscription.join_form, 'W') %> per week  (being my NUW fees) and forward them to the NUW and release my contact details to the NUW.
+	</small>
+
+</div>
