@@ -177,7 +177,6 @@ class SubscriptionsController < ApplicationController
         @subscription.ccv = ""
         @subscription.account_number = ""
         @subscription.bsb = ""
-        @subscription.stripe_token = "" # TODO I suspect perfectly good stripe tokens are getting lost when the form is reposted (with use my existing payment method)
         if @subscription.person
           @subscription.person.email = "" if temporary_email?(@subscription.person.email)
           @subscription.person.first_name = "" if temporary_first_name?(@subscription.person.first_name)
@@ -204,6 +203,11 @@ class SubscriptionsController < ApplicationController
          params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
         end 
       end
+
+      
+      # Reject keys from pay methods that are not being submitted
+      params[:subscription].except!(:stripe_token, :expiry_month, :expiry_year, :card_number, :ccv) unless params[:subscription][:pay_method] == "CC"
+      params[:subscription].except!(:bsb, :account_number) unless params[:subscription][:pay_method] == "AB"
 
       # intercept and save partial card details before encryption
       params[:subscription][:partial_card_number] = params[:subscription][:card_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:card_number].present?

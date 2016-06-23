@@ -24,7 +24,7 @@ module SubscriptionsHelper
 
   def pay_method_default(subscription)
     methods = subscription.join_form.pay_methods << "-"
-    result = subscription.has_existing_pay_method? ? "-" : (subscription.pay_method || "AB") # made this the default since more people choose it and it'll work without JS
+    result = subscription.has_existing_pay_method? && ["AB", "CC"].include?(subscription.pay_method) ? "-" : (subscription.pay_method || "AB") # made this the default since more people choose it and it'll work without JS
     result = methods[0] unless methods.include?(result)
     result
   end
@@ -45,7 +45,6 @@ module SubscriptionsHelper
       result, 
       current_selection
     )
-
   end
   
   def friendly_signature_date(subscription)
@@ -457,6 +456,10 @@ module SubscriptionsHelper
             hash.slice(:pay_method, :card_number, :expiry_month, :expiry_year, :ccv)
           when "AB"
             hash.slice(:pay_method, :bsb, :account_number)
+          when "ABR"
+            hash.slice(:pay_method)
+          when "PRD"
+            hash.slice(:pay_method)
           else 
             { pay_method: "-" } if result[:establishment_fee] >= 0.01 # is including a symbol to indicate existing pm a bad idea? A shared literal seems so.
           end

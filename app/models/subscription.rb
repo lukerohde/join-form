@@ -58,7 +58,7 @@ class Subscription < ApplicationRecord
 
   def pay_method_saved?
     #errors.empty? && (stripe_token_was.present? || (bsb_was.present? && account_number_was.present?) || pay_method == "-") || @skip_validation
-    (errors.empty? && has_existing_pay_method?) || @skip_validation
+    (errors.empty? && (has_existing_pay_method? || %w[PRD ABR].include?(self.pay_method))) || @skip_validation
   end
 
   def has_existing_pay_method?
@@ -108,7 +108,9 @@ class Subscription < ApplicationRecord
     	when "AB"
         errors.add(:bsb,I18n.translate("subscriptions.errors.bsb") ) unless bsb_valid?
     		errors.add(:account_number,I18n.translate("subscriptions.errors.account_number") ) unless account_number_valid?
-    	else
+  	  when "ABR"
+      when "PRD"
+      else
     		errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
     	end
     if join_form.signature_required && signature_vector.blank?

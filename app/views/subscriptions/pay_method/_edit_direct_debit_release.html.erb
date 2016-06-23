@@ -10,8 +10,16 @@
 		<li>employment type and location, and</li>
 		<li>bank details, including any changes from time to time, so that direct
 debit of union dues can be commenced from my bank account.</li>
+	</ul>
 </small>
 
+<div>
+  <small>
+    <!-- TODO get translation -->
+    <!-- TODO Refactor to share with credit card --> 
+    By submitting this form, I authorize the <%=@join_form.union.name %> to deduct from my account <%= @subscription.total > 0 ? "an advanced payment of #{number_to_currency(@subscription.total, locale: locale)} in dues then " : "" %> <%= @subscription.reoccurring_fee > 0 ? "a reoccurring fee of #{number_to_currency(@subscription.reoccurring_fee, locale: locale)}" : "a reoccurring fee" %> which is subject to occasional variation.
+  </small>
+</div>
 	<!--
 	<strong> 
     Initial Payment: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
