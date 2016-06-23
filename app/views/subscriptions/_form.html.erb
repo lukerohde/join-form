@@ -63,7 +63,7 @@
 <div class="clearfix"></div>
 <div class="subscription_footer clearfix">
 <% if @join_form.advanced_designer %> 
-    <%=@join_form.wysiwyg_header.html_safe if @join_form.wysiwyg_header.present? %>
+    <%=@join_form.footer.html_safe if @join_form.footer.present? %>
 <% else %> 
     <%=@join_form.wysiwyg_footer.html_safe if @join_form.wysiwyg_footer.present? %>
 <% end %> 
