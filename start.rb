@@ -45,7 +45,7 @@ class Application < Sinatra::Base
 			p.MemberID = member_id
 		end
 
-		if payload.dig(:subscription, :pay_method).present?
+		if ["AB", "CC"].include?(payload.dig(:subscription, :pay_method))
 			set_pay_method(p, payload)
 		end
 

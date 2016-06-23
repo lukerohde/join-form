@@ -118,6 +118,8 @@ module NUWDBHelper
 			case api_data[:subscription][:pay_method]
 				when "CC" then result[:MemberPaymentType] = "C"
 				when "AB" then result[:MemberPaymentType] = "D"
+				when "ABR" then result[:MemberPaymentType] = "R"
+				when "PRD" then result[:MemberPaymentType] = "O"
 			end
 
 			if result[:MemberPaymentType]
