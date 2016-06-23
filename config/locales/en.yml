@@ -50,6 +50,10 @@ en:
         base_rate_quarterly: Quarterly fee
         base_rate_half_yearly:  Half yearly fee
         base_rate_yearly:  Yearly fee
+        credit_card_on: Credit Card Enabled
+        direct_debit_on: Direct Debit Enabled
+        payroll_deduction_on: Payroll Deduction Enabled
+        direct_debit_release_on: Direct Debit Release Enabled
       subscription:
         description: "Description"
   gender:

@@ -86,6 +86,25 @@
     <%= f.text_field :base_rate_yearly, class: "form-control" %>
   </div>
 
+  <h2>Payment Types</h2>
+
+  <div class="form-group">
+    <%= f.label :credit_card_on %><br>
+    <%= f.check_box :credit_card_on, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
+  </div>
+  <div class="form-group">
+    <%= f.label :direct_debit_on %><br>
+    <%= f.check_box :direct_debit_on, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
+  </div>
+  <div class="form-group">
+    <%= f.label :payroll_deduction_on %><br>
+    <%= f.check_box :payroll_deduction_on, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
+  </div>
+  <div class="form-group">
+    <%= f.label :direct_debit_release_on %><br>
+    <%= f.check_box :direct_debit_release_on, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
+  </div>
+
   <h2> Notifications </h2>
 
   <div class="form-group">

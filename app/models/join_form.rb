@@ -7,6 +7,7 @@ class JoinForm < ApplicationRecord
 	validates :short_name, :person, :union, presence: true
 	validates :base_rate_id, presence: true
 	validates :base_rate_weekly, numericality: { allow_blank: true }	
+	validate :has_pay_method?
 	validate :is_authorized?
 
 	serialize :schema, HashSerializer
@@ -159,6 +160,12 @@ class JoinForm < ApplicationRecord
 
 	def authorizer=(person)
 		@authorizer = person
+	end
+
+	def has_pay_method?
+		unless self.credit_card_on || self.direct_debit_on || self.payroll_deduction_on || self.direct_debit_release_on
+			errors.add(:base, "You need at lease one paymethod enabled")
+		end
 	end
 
 	def is_authorized?(person = nil)
