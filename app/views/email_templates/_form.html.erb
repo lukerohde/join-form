@@ -42,6 +42,15 @@
     <%= f.text_area :body_html, class: "form-control", rows: 20 %>
     <!--<%= f.bootsy_area :body_html, class: "form-control", rows: 20, editor_options: {html: true} %> -->
   </div>
+
+  <h2 class="text-center"> Attached PDF MESSAGE BODY </h2>
+
+  <div class="form-group">
+    <%= f.label :pdf_html %><br>
+    <%= f.text_area :pdf_html, class: "form-control", rows: 20 %>
+    <!--<%= f.bootsy_area :body_html, class: "form-control", rows: 20, editor_options: {html: true} %> -->
+  </div>
+  
   <div class="form-group">
     <%= f.label :css %><br>
     <%= f.text_area :css, class: "form-control", rows: 20 %>

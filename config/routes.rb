@@ -8,7 +8,11 @@ Rails.application.routes.draw do
     # mount ActionCable.server => '/cable'
     
     resources :email_templates do 
-      resource :preview, only: [:new, :create], controller: 'email_templates/preview'
+      resource :preview, only: [:new, :create], controller: 'email_templates/preview' do
+        member do
+          get 'pdf', as: :pdf
+        end
+      end
     end
   
 

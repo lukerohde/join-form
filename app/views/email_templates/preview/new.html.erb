@@ -31,11 +31,21 @@
 		<%= @body_plain.gsub("\r\n", '<br/>').html_safe %>
 	</div>
 
-	<hr/>
-	<h2 class="text-center">HTML Body</h2>
-	<div class="email-preview">
-		<%= @body_html_css.html_safe %>
-	</div>
+	<% if @body_html_css.present? %> 
+		<hr/>
+		<h2 class="text-center">HTML Body</h2>
+		<div class="email-preview">
+			<%= @body_html_css.html_safe %>
+		</div>
+	<% end %> 
+
+	<% if @pdf_html_css.present? %> 
+		<h2 class="text-center">Attached PDF Body</h2>
+		<%= link_to "View just PDF", pdf_email_template_preview_path(@email_template, subscription_id: @subscription.token) %>
+		<div class="email-preview">
+			<%= @pdf_html_css.html_safe %>
+		</div>
+	<% end %>
 
 	<hr/>
 	<h2 class="text-center">Send Preview</h2>

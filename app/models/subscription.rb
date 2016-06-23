@@ -56,10 +56,6 @@ class Subscription < ApplicationRecord
     frequency.present? && plan.present?
   end
 
-  def pay_method_saved?
-    #errors.empty? && (stripe_token_was.present? || (bsb_was.present? && account_number_was.present?) || pay_method == "-") || @skip_validation
-    (errors.empty? && (has_existing_pay_method? || %w[PRD ABR].include?(self.pay_method))) || @skip_validation
-  end
 
   def has_existing_pay_method?
     partial_account_number_was.present? || (partial_card_number_was.present? && stripe_token.present?)
@@ -97,6 +93,19 @@ class Subscription < ApplicationRecord
   		errors.add(:base,I18n.translate("subscriptions.errors.complete_address")) unless person.address_valid?
   	end
   end
+  
+  def pay_method_saved?
+    #errors.empty? && (stripe_token_was.present? || (bsb_was.present? && account_number_was.present?) || pay_method == "-") || @skip_validation
+    # TODO why am I somethings using _was, prevent welcome message being sent when matching an existing person
+    # When a signature is already saved and I'm OOP
+    (errors.empty? && 
+      (
+        (%w[CC AB].include?(self.pay_method) && has_existing_pay_method?) ||
+        %w[PRD ABR].include?(self.pay_method) 
+      ) && (!self.join_form.signature_required || self.signature_vector.present?)
+    ) || @skip_validation
+  end
+
 
   def pay_method_must_be_complete
   	return if @skip_validation
