@@ -122,8 +122,10 @@ en:
     pay_method:
       edit:
         heading: "Payment Details"
-        credit_card: "Credit Card"
-        au_bank_account: "Australian Bank Account"
+        credit_card: "Credit card"
+        au_bank_account: "Australian bank account"
+        direct_debit_release: "Get my bank account from my employer"
+        payroll_deduction: "Deduct my union dues from my pay"
         use_existing: "Use my existing payment method"
         application_fee: "Application Fee:"
         member_discount: "Member Discount:"

@@ -11,8 +11,10 @@ module SubscriptionsHelper
 	def pay_method_options(subscription)
     result = []
     result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if subscription.has_existing_pay_method?
-    result << [t('subscriptions.pay_method.edit.credit_card'), 'CC']
-    result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB']
+    result << [t('subscriptions.pay_method.edit.credit_card'), 'CC'] if subscription.join_form.credit_card_on
+    result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB'] if subscription.join_form.direct_debit_on
+    result << [t('subscriptions.pay_method.edit.payroll_deduction'), 'CC'] if subscription.join_form.payroll_deduction_on
+    result << [t('subscriptions.pay_method.edit.direct_debit_release'), 'AB'] if subscription.join_form.direct_debit_release_on
     
     options_for_select(
       result, 
