@@ -31,7 +31,9 @@
           <td>
             <%= link_to "<span class=\"glyphicon glyphicon-eye-open\"></span>".html_safe, union_join_form_path(join_form.union, join_form, locale:locale) %>
             <%= link_to "<span class=\"glyphicon glyphicon-cog\"></span>".html_safe, edit_union_join_form_path(join_form.union, join_form, locale:locale) %>
+            <%= link_to "<span class=\"glyphicon glyphicon-duplicate\"></span>".html_safe, new_union_join_form_path(join_form.union, duplicate_join_form_id: join_form) %>
             <%= link_to "<span class=\"glyphicon glyphicon-bell\" style=\"opacity: #{current_person.follows?(join_form) ? "1" : "0.3" };\"></span>".html_safe, union_join_form_follow_path(join_form.union, join_form, locale: locale), method: :patch %>
+
           </td>
         </tr>
       <% end %>

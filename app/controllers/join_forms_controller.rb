@@ -15,7 +15,13 @@ class JoinFormsController < ApplicationController
 
   # GET /join_forms/new
   def new
-    @join_form = JoinForm.new
+    if params[:duplicate_join_form_id].present?
+      @join_form = JoinForm.find(params[:duplicate_join_form_id]).dup
+      @join_form.short_name = "Copy of #{@join_form.short_name}"
+    else
+      @join_form = JoinForm.new
+    end 
+
     @join_form.union = @union
   end
 
