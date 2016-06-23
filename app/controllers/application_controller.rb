@@ -9,7 +9,11 @@ class ApplicationController < ActionController::Base
   before_action :set_locale
 
   def set_locale
-    I18n.locale = params[:locale] if params[:locale].present?
+    l = params[:locale] || "en"
+    l = l.gsub('-', '_').downcase # convert zh-TW to zh_tw, a more sane symbol
+    l = l.to_sym
+
+    I18n.locale = l #if params[:locale].present?
   end
 
   def default_url_options(options={})

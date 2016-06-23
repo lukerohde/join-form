@@ -29,8 +29,7 @@ module ApplicationHelper
 	end
 
 	def other_languages
-		l = locale.to_s
-		l = "en" if l == "en-AU"
+		l = locale
 		Rails.application.config.languages.except(l)
 	end
 

@@ -225,7 +225,7 @@ class SubscriptionsController < ApplicationController
         @join_form = @union.join_forms.find(id)
       else
         # TODO Remove this hack when globalize works with rails 5
-        zh_id = id + '-zh-tw' if locale.to_s.downcase == "zh-tw" && !id.include?("-zh-tw") 
+        zh_id = id + '-zh-tw' if locale.to_s.downcase == "zh_tw" && !id.include?("-zh-tw") 
         @join_form = @union.join_forms.where("short_name ilike ?",zh_id).first
         # END OF HACK
         @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?

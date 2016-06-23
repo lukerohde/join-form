@@ -2,7 +2,7 @@
 Rails.application.routes.draw do
   mount Bootsy::Engine => '/bootsy', as: 'bootsy'
 
-  scope "(:locale)", locale: /en|en-AU|zh-TW/ do
+  scope "(:locale)", locale: /en|zh_tw/ do
     
     resources :subscriptions
     # mount ActionCable.server => '/cable'
