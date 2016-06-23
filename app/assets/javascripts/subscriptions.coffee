@@ -80,6 +80,9 @@ subscription =
 @pay_method_change = (e) ->
   $("#edit_credit_card").toggle (e.value is "CC")
   $("#edit_au_bank_account").toggle (e.value is "AB")
+  $("#edit_existing").toggle (e.value is "-")
+  $("#edit_direct_debit_release").toggle (e.value is "ABR")
+  $("#edit_payroll_deduction").toggle (e.value is "PRD")
 
 pay_method_ready = ->
   if $('#signature_vector').val()?
@@ -89,13 +92,13 @@ pay_method_ready = ->
     else
       $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, lineTop: 68, validateFields: false})
   
-  $('#edit_credit_card').hide()
-  $('#edit_au_bank_account').hide()
-  switch $('#subscription_pay_method').val()
-    when 'CC'
-      $('#edit_credit_card').show()
-    when 'AB'
-      $('#edit_au_bank_account').show()
+  #$('#edit_credit_card').hide()
+  #$('#edit_au_bank_account').hide()
+  #switch $('#subscription_pay_method').val()
+  #  when 'CC'
+  #    $('#edit_credit_card').show()
+  #  when 'AB'
+  #    $('#edit_au_bank_account').show()
   return
      
 subscription_ready = ->

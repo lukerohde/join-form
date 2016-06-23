@@ -72,6 +72,9 @@ en:
         expiry: "Expiry"
         ccv: "CCV (the 3 digits on the back of the card)"
         signature_vector: Signature
+        partial_bsb: Partial BSB
+        partial_account_number: Partial Account Number
+        partial_card_number: Partial Card Number
       person:
         external_id: "Member ID"
         first_name: "First Name"

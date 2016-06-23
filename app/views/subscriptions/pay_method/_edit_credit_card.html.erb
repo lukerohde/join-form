@@ -1,4 +1,4 @@
-<div id="edit_cc">
+<div id="edit_credit_card"  style="<%= "display:none" unless pay_method_default(@subscription)== "CC" %>">
   <!--
   <div class="form-group">
     <%= f.label :account_name, "Name On Card" %><br/>
@@ -35,4 +35,12 @@
   <strong> 
     Amount Payable Now: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
   </strong>
+
+  <div>
+    <small>
+      <!-- TODO get translation -->
+      <!-- TODO Refactor to share with credit card --> 
+      By submitting this form, I authorize the <%=@join_form.union.name %> to deduct from my account <%= @subscription.total > 0 ? "an advanced payment of #{number_to_currency(@subscription.total, locale: locale)} in dues then " : "" %> <%= @subscription.reoccurring_fee > 0 ? "a reoccurring fee of #{number_to_currency(@subscription.reoccurring_fee, locale: locale)}" : "a reoccurring fee" %> which is subject to occasional variation.
+    </small>
+  </div>
 </div>

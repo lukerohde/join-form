@@ -1,26 +1,22 @@
-<div id="edit_abr">
+<div id="edit_direct_debit_release"  style="<%= "display:none" unless pay_method_default(@subscription) == "ABR" %>">
+
+	<h3>Direct Debit and Release of Details Authority</h3>
+
+	<small>
+	By becoming a member of the NUW, I request and authorise my employer to release to the NUW my:
+	<ul>
+		<li>personal details (including my gender and date of birth)</li>
+		<li>contact details (including my address, phone numbers and email)</li>
+		<li>employment type and location, and</li>
+		<li>bank details, including any changes from time to time, so that direct
+debit of union dues can be commenced from my bank account.</li>
+</small>
 
 	<!--
-	<div class="form-group">
-	  <%= f.label :account_name %><br/>
-	  <%= f.text_field :account_name, class: "form-control" %>
-	</div>
-	-->
-
-	<div class="form-group">
-	  <%= f.label :bsb, "BSB" %><br/>
-	  <%= f.text_field :bsb, class: "form-control" %>
-	</div>
-
-	<div class="form-group">
-	  <%= f.label :account_number %><br/>
-	  <%= f.text_field :account_number, class: "form-control" %>
-	</div>
-
-
 	<strong> 
     Initial Payment: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
     <br/><small> Deductions will usually commence within 3 business days.  </small>
   </strong>
+  -->
 
 </div>

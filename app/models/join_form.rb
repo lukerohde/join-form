@@ -52,6 +52,15 @@ class JoinForm < ApplicationRecord
         self.base_rate_yearly || 0
       end
 	end
+
+	def pay_methods
+		result = []
+		result << "AB" if direct_debit_on
+		result << "CC" if credit_card_on
+		result << "ABR" if direct_debit_release_on
+		result << "PRD" if payroll_deduction_on
+		result
+	end
 	
 	def set_defaults
 

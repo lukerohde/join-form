@@ -233,6 +233,7 @@ class Subscription < ApplicationRecord
         input.puts instructions
       end
       self.signature_image = File.open(tempfile)
+      self.signature_date = Date.today
     end
   end
 end
