@@ -74,8 +74,8 @@ class SubscriptionsController < ApplicationController
         result = @subscription.update_with_payment(subscription_params, @union)
       else
         result = @subscription.update(subscription_params)
-        result = @subscription.save if result && @subscription.signature_vector.present?  # workaround possible bug with carrierwave not saving the name of the image uploaded until second save
       end 
+      result = @subscription.save if result && @subscription.signature_vector.present?  # workaround possible bug with carrierwave not saving the name of the image uploaded until second save
     end
 
     if result
