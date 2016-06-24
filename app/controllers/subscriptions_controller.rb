@@ -79,9 +79,9 @@ class SubscriptionsController < ApplicationController
     end
 
     if result
-      notify 
       # TODO Guarentee delivery
       nuw_end_point_person_put(@subscription)
+      notify # I imagine notify can update the time stamp and prevent the delayed message from sending.
     end 
     result
   end
