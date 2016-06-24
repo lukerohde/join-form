@@ -25,7 +25,7 @@ class Subscription < ApplicationRecord
 
   mount_uploader :signature_image, SignatureUploader
   before_save :generate_signature_image
-  
+
   def get_key_pair
     self.join_form.union.key_pair
   end
@@ -111,8 +111,8 @@ class Subscription < ApplicationRecord
   	return if @skip_validation
     case pay_method
       when "-"
-        #pay_method = pay_method_was
-    	when "CC"
+        self.restore_pay_method! # not a super elegant place to put this, but I don't want to save a dash, and I don't want to validate existing details (because they're not persisted).
+      when "CC"
     		errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
     	when "AB"
         errors.add(:bsb,I18n.translate("subscriptions.errors.bsb") ) unless bsb_valid?
@@ -237,14 +237,14 @@ class Subscription < ApplicationRecord
   end
 
   def generate_signature_image 
-    unless self.signature_vector.blank?
+    if self.signature_vector.present? && self.signature_vector != self.signature_vector_was
       instructions = JSON.parse(signature_vector).map { |h| "line #{h['mx'].to_i},#{h['my'].to_i} #{h['lx'].to_i},#{h['ly'].to_i}" } * ' '
       tempfile = Tempfile.new(["signature", '.png'])
       Open3.popen3("convert -size 298x98 xc:transparent -stroke blue -draw @- #{tempfile.path}") do |input, output, error|
         input.puts instructions
       end
+      self.signature_date = Date.today 
       self.signature_image = File.open(tempfile)
-      self.signature_date = Date.today
     end
   end
 end

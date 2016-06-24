@@ -220,11 +220,11 @@ module SubscriptionsHelper
     result.merge!({
         'frequency' => (friendly_frequency(subscription[:frequency])||"").downcase,
         'fee' => friendly_fee(subscription.join_form, subscription[:frequency]),
-        'formatted_up_front_payment' => number_to_currency(subscription[:up_front_payment], locale: locale)
+        'formatted_up_front_payment' => number_to_currency(subscription[:up_front_payment], locale: locale),
+        'url' => "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}",
+        'signature_url' => @subscription.signature_image.url
       })
     result.reject!{|k,v| v.nil? }
-    result["url"] = @subscription_url = "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}"
-    
     result
   end
 
