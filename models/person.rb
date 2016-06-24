@@ -158,6 +158,9 @@ class Application
 								up_front_payment: self.pay_method.FeeOverride||0,
 								first_recurrent_payment_date: get_first_recurrent_payment_date(self.nextpaymentdate, self.FinDate, self.pay_method.FeeOverride||0, self.MemberPayFrequency, self.MemberFeeGroupID, self.DateOfBirth)
 							}
+						else
+							{	
+							}
 						end
 					)
 				else
@@ -170,6 +173,9 @@ class Application
 						when "R" # waiting on bank details
 							{
 								pay_method: "ABR" 
+							}
+						else
+							{
 							}
 						end
 					)
