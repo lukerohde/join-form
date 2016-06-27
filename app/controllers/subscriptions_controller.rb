@@ -94,7 +94,7 @@ class SubscriptionsController < ApplicationController
     JoinForm.all.each do |j|
       subscriptions = j.subscriptions.where(['created_at > ?', Time.parse(params[:since]||'1900-01-01')])
       subscriptions.each do |s|
-        nuw_end_point_reload(s)
+        nuw_end_point_reload(s) rescue nil
       end  
       
       complete = subscriptions.select{|s| ['Paying', 'Awaiting 1st payment'].include?(s.status) }
