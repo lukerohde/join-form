@@ -94,7 +94,7 @@ class SubscriptionsController < ApplicationController
     JoinForm.all.each do |j|
       subscriptions = j.subscriptions.where(['created_at > ? and not person_id is null', Time.parse(params[:since]||'1900-01-01')])
       subscriptions.each do |s|
-        if (s.updated_at < (Time.now - 1.hour) && !s.end_point_put_required)) 
+        if (s.updated_at < (Time.now - 1.hour) && !s.end_point_put_required) 
           nuw_end_point_reload(s) rescue nil
         end
       end  
