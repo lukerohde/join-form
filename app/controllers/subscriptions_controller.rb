@@ -94,7 +94,9 @@ class SubscriptionsController < ApplicationController
     JoinForm.all.each do |j|
       subscriptions = j.subscriptions.where(['created_at > ? and not person_id is null', Time.parse(params[:since]||'1900-01-01')])
       subscriptions.each do |s|
-        nuw_end_point_reload(s) s.updated_at < (Time.now - 1.hour) && !s.end_point_put_required) rescue nil
+        if (s.updated_at < (Time.now - 1.hour) && !s.end_point_put_required)) 
+          nuw_end_point_reload(s) rescue nil
+        end
       end  
       
       complete = subscriptions.select{|s| ['Paying', 'Awaiting 1st payment'].include?(s.status) }
