@@ -31,6 +31,12 @@
 		<%= @body_plain.gsub("\r\n", '<br/>').html_safe %>
 	</div>
 
+	<% if @email_template.css.present? %>
+		<style>
+				<%= @email_template.css.html_safe %>
+		</style>
+	<% end %>
+	
 	<% if @body_html_css.present? %> 
 		<hr/>
 		<h2 class="text-center">HTML Body</h2>
@@ -43,13 +49,13 @@
 		<h2 class="text-center">Attached PDF Body</h2>
 		<%= link_to "View PDF", pdf_email_template_preview_path(@email_template, subscription_id: @subscription.token), class: "btn btn-default" %>
 		<%= link_to "Download PDF", download_pdf_email_template_preview_path(@email_template, subscription_id: @subscription.token), class: "btn btn-default" %>
-		<div class="email-preview">
+		<div class="email-preview clearfix">
 			<%= @pdf_html.html_safe %>
 		</div>
 	<% end %>
 
 	<hr/>
-	<h2 class="text-center">Send Preview</h2>
+	<h2 class="text-center clearfix">Send Preview</h2>
 	<%= form_for @email_template, url: email_template_preview_path(@email_template), method: :post do |f| %>
 		<div class="form-group">
 	    <%= label_tag :preview_email, "To:" %><br/>

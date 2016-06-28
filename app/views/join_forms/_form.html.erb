@@ -123,6 +123,22 @@
     %>
   </div>
 
+  <div class="form-group">
+    <%= f.label :admin_email_template_id %><br>
+    <%= f.select :admin_email_template_id,
+      selected_option(@join_form.admin_email_template),
+      {
+          include_blank: false,
+      },
+      data: { 
+        placeholder: "Please select an email template to be emailed to admin after they join.",
+        url: email_templates_path
+      }, 
+      class: "ac-select2 form-control", 
+      style: "width: 100%;"
+    %>
+  </div>
+
   <!--<%= f.hidden_field :person_id, value: current_person.id %>-->
   <div class="form-group">
     <%= f.label :welcome_email_template_id %><br>
@@ -139,7 +155,7 @@
       style: "width: 100%;"
     %>
   </div>
-  
+
 
   <h2> Customization </h2>
 

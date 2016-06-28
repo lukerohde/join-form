@@ -205,7 +205,6 @@ class SubscriptionsController < ApplicationController
          params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
         end 
       end
-
       
       # Reject keys from pay methods that are not being submitted
       params[:subscription].except!(:stripe_token, :expiry_month, :expiry_year, :card_number, :ccv) unless params[:subscription][:pay_method] == "CC"
@@ -326,15 +325,34 @@ class SubscriptionsController < ApplicationController
     def notify
       #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later 
       if @subscription.step == :thanks
-        JoinNoticeJob.perform_later(@subscription.id)
+        #JoinNoticeJob.perform_later(@subscription.id)
+        admin_notice 
         welcome if !@subscription.end_point_put_required || Rails.env.test? # end point mocked in testing, don't want welcome done until membership can calculate what it has to calculate
       else
         IncompleteJoinNoticeJob.perform_in(30 * 60, @subscription.id, @subscription.updated_at.to_i)
       end
     end
 
+    def admin_notice
+      begin
+        template_id = @subscription.join_form.admin_email_template_id
+        if template_id.present?
+          to = @subscription.join_form.person.email
+          cc = @subscription.join_form.followers(Person).collect(&:email).join(',')
+          pdf_url = "#{edit_join_url(@subscription.join_form.union.short_name, @subscription.join_form.short_name, @subscription.token, locale: 'en', pdf: true)}"
+          EmailTemplateMailer.merge(template_id, @subscription.id, to, cc, pdf_url).deliver_later
+        else
+          JoinNoticeJob.perform_later(@subscription.id)
+        end
+      rescue Exception => exception
+        ExceptionNotifier.notify_exception(exception,
+          :env => request.env, :data => {:message => "failed to send welcome email"})
+      end
+    end
+
     def welcome
       # I'm being really cautious here due to the complexity, but should be required with 'deliver_later' which would ordinarily crash in the background and send an exception
+    
       begin
         template_id = @subscription.join_form.welcome_email_template_id
         EmailTemplateMailer.merge(template_id, @subscription.id, 'lrohde@nuw.org.au').deliver_later if template_id.present?
