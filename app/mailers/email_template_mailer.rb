@@ -13,12 +13,18 @@ class EmailTemplateMailer < ApplicationMailer
     
     @email_template = EmailTemplate.find(email_template_id)
     @subject = Liquid::Template.parse(@email_template.subject).render(data)
-    @body_html = Liquid::Template.parse(@email_template.body_html).render(data)
-    @body_plain = Liquid::Template.parse(@email_template.body_plain).render(data)
-    @body_html_css = Roadie::Document.new(@body_html)
-    @body_html_css.add_css(@email_template.css)
-    @body_html_css.url_options = {host: ENV['mailgun_host'], protocol: "https"}
-    @body_html_css = @body_html_css.transform
+    
+    if @email_template.body_plain.present?
+      @body_plain = Liquid::Template.parse(@email_template.body_plain).render(data)
+    end
+
+    if @email_template.body_html.present?
+      @body_html = Liquid::Template.parse(@email_template.body_html).render(data)
+      @body_html_css = Roadie::Document.new(@body_html)
+      @body_html_css.add_css(@email_template.css)
+      @body_html_css.url_options = {host: ENV['mailgun_host'], protocol: "https"}
+      @body_html_css = @body_html_css.transform
+    end
 
     # Attach pdf from URL passed in as param (probably the subscription join form)
     if pdf_url.present?
