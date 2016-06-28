@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   def set_locale
     l = params[:locale] || "en"
     l = l.gsub('-', '_').downcase # convert zh-TW to zh_tw, a more sane symbol
+    l = "en" if l == "en_au"
     l = l.to_sym
 
     I18n.locale = l #if params[:locale].present?
