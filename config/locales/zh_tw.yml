@@ -108,6 +108,9 @@ zh_tw:
         use_existing: "用我之前所登入的繳費方式"
         application_fee: "申請費用"
         member_discount: "既有會員折扣"
+        direct_debit_release: "從我的雇主那邊提供我的銀行帳戶"
+        direct_debit_release_title: "直接扣繳授權細節"
+        payroll_deduction: "Deduct my union dues from my pay"
         total: "總金額"
     steps:
       done: "歡迎造訪工會網頁"

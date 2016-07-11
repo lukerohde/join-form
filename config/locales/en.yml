@@ -128,6 +128,7 @@ en:
         credit_card: "Credit card"
         au_bank_account: "Australian bank account"
         direct_debit_release: "Get my bank account from my employer"
+        direct_debit_release_title: "Direct Debit and Release of Details Authority"
         payroll_deduction: "Deduct my union dues from my pay"
         use_existing: "Use my existing payment method"
         application_fee: "Application Fee:"
