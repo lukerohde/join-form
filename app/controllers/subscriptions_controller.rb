@@ -216,7 +216,7 @@ class SubscriptionsController < ApplicationController
       params[:subscription][:partial_bsb] = params[:subscription][:bsb].gsub(/\d(?=.{3})/,'X') if params[:subscription][:bsb].present?
       
       params[:subscription][:end_point_put_required] = true
-      result = params.require(:subscription).permit(permitted_params << [data: (@join_form.schema[:columns]||[])])
+      result = params.require(:subscription).permit(permitted_params << [data: (@join_form.schema_data[:columns]||[])])
     end
 
     def set_join_form
@@ -225,10 +225,10 @@ class SubscriptionsController < ApplicationController
       if (Integer(id) rescue nil)
         @join_form = @union.join_forms.find(id)
       else
-        # TODO Remove this hack when globalize works with rails 5
-        zh_id = id + '-zh-tw' if locale.to_s.downcase == "zh_tw" && !id.include?("-zh-tw") 
-        @join_form = @union.join_forms.where("short_name ilike ?",zh_id).first
-        # END OF HACK
+        ## TODO Remove this hack when globalize works with rails 5
+        #zh_id = id + '-zh-tw' if locale.to_s.downcase == "zh_tw" && !id.include?("-zh-tw") 
+        #@join_form = @union.join_forms.where("short_name ilike ?",zh_id).first
+        ## END OF HACK
         @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?
       end
     end

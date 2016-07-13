@@ -107,7 +107,7 @@ gem 'addressable'
 
 gem 'strongbox'
 
-gem 'globalize'#, git: "https://github.com/globalize/globalize", branch: "master"
+gem 'globalize', '~> 5.0.0'#, git: "https://github.com/globalize/globalize", branch: "master"
 
 #gem 'activemodel-serializers-xml'
 

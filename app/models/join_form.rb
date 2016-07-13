@@ -6,6 +6,16 @@ class JoinForm < ApplicationRecord
 	
 	has_many :subscriptions, dependent: :delete_all
 	
+	acts_as_followable
+	
+	after_initialize :set_defaults
+
+	include Bootsy::Container
+
+	translates :description, :page_title, :schema, :header, :footer, :css, :wysiwyg_header, :wysiwyg_footer
+	#translation_class.send :serialize, :schema
+	#serialize :schema, JSONSerializer
+	
 	validates :short_name, :person, :union, presence: true
 	validates :base_rate_id, presence: true
 	validates :base_rate_weekly, numericality: { allow_blank: true }	
@@ -33,15 +43,6 @@ class JoinForm < ApplicationRecord
 			errors.add(:base, "You need at lease one pay method enabled")
 		end
 	end
-
-	serialize :schema, HashSerializer
-
-	acts_as_followable
-	#translates :header, :description
-
-	after_initialize :set_defaults
-
-	include Bootsy::Container
 
 	def max_frequency
 		case
@@ -182,14 +183,26 @@ class JoinForm < ApplicationRecord
 
 	end
 
+	# My plan is to have an advanced schema designer, but for now I've got a simple list of columns
+	# Can't use custom jsonb or custom serializer with globalize - boo
 	def column_list=(cols)
-			self.schema[:columns] = (cols||"").split(',')
+			self.schema	 = schema_data.merge({ 
+				columns: (cols||"").split(',').map{|i| i.strip }
+			}).to_json
 	end
 
 	def column_list
-		(self.schema[:columns]||[]).join(',')
+			(schema_data[:columns]||[]).join(', ')
 	end
 
+	def schema_data
+		JSON.parse(self.schema||"{}").with_indifferent_access
+	end
+
+	#def schema
+	#	# globalize stores it as a string any way, I want it back as a hash
+	#	JSON.parse(self.schema||"{}").with_indifferent_access
+	#end
 
 	def authorizer=(person)
 		@authorizer = person

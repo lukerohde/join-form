@@ -450,7 +450,7 @@ DEPENDENCIES
   exception_notification
   figaro
   fog
-  globalize
+  globalize (~> 5.0.0)
   guard
   guard-minitest
   jbuilder (~> 2.0)

@@ -13,7 +13,7 @@ class Subscription < ApplicationRecord
   validate :pay_method_must_be_complete, if: :subscription_saved?
 
   delegate :external_id, to: :person, allow_nil: true 
-  delegate :schema, to: :join_form, allow_nil: true
+  delegate :schema_data, to: :join_form, allow_nil: true
   
   serialize :data, HashSerializer
 
@@ -77,7 +77,7 @@ class Subscription < ApplicationRecord
     errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank?
     
     # validate presence of custom columns
-    (self.schema[:columns]||[]).each do |column| 
+    (self.schema_data[:columns]||[]).each do |column| 
       errors.add(column,I18n.translate("subscriptions.errors.not_blank")) if data[column].blank?
     end
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160628043301) do
+ActiveRecord::Schema.define(version: 20160713080041) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -59,6 +59,24 @@ ActiveRecord::Schema.define(version: 20160628043301) do
   add_index "follows", ["followable_id", "followable_type"], name: "fk_followables", using: :btree
   add_index "follows", ["follower_id", "follower_type"], name: "fk_follows", using: :btree
 
+  create_table "join_form_translations", force: :cascade do |t|
+    t.integer  "join_form_id",   null: false
+    t.string   "locale",         null: false
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.text     "description"
+    t.text     "page_title"
+    t.text     "schema"
+    t.text     "header"
+    t.text     "footer"
+    t.text     "css"
+    t.text     "wysiwyg_header"
+    t.text     "wysiwyg_footer"
+  end
+
+  add_index "join_form_translations", ["join_form_id"], name: "index_join_form_translations_on_join_form_id", using: :btree
+  add_index "join_form_translations", ["locale"], name: "index_join_form_translations_on_locale", using: :btree
+
   create_table "join_forms", force: :cascade do |t|
     t.string   "short_name"
     t.text     "description"
@@ -79,7 +97,7 @@ ActiveRecord::Schema.define(version: 20160628043301) do
     t.string   "page_title"
     t.json     "fee_schedule"
     t.json     "plans"
-    t.jsonb    "schema",                                            default: {},    null: false
+    t.text     "schema",                                            default: "{}",  null: false
     t.boolean  "signature_required",                                default: false
     t.integer  "welcome_email_template_id"
     t.boolean  "advanced_designer"
@@ -94,7 +112,6 @@ ActiveRecord::Schema.define(version: 20160628043301) do
   end
 
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
-  add_index "join_forms", ["schema"], name: "index_join_forms_on_schema", using: :gin
   add_index "join_forms", ["union_id"], name: "index_join_forms_on_union_id", using: :btree
   add_index "join_forms", ["welcome_email_template_id"], name: "index_join_forms_on_welcome_email_template_id", using: :btree
 

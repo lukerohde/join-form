@@ -62,7 +62,7 @@ class AdminManagingJoinFormsTest < ActionDispatch::IntegrationTest
     assert response.body.include?('name="join_form[column_list]"'), "column list field is missing"  
     patch join_form_path(one.id), join_form: { short_name: "new name", person_id: @current_person.id, column_list: "a,b"} 
     one.reload
-    assert one.column_list == "a,b", "custom columns cannot be set"
+    assert one.column_list == "a, b", "custom columns cannot be set"
   end
 
 end

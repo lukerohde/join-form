@@ -67,8 +67,6 @@ column_list:
   updated_at: <%= Time.now - 2.hours %>
   credit_card_on: true
   direct_debit_on: true
-  schema: 
-    columns:
-      - worksite
-      - employer
+  schema: "{\"columns\":[\"worksite\",\"employer\"]}"
+
 
