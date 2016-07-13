@@ -33,14 +33,8 @@
   </div>
 
   <strong> 
-    Amount Payable Now: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
+    <%=t('subscriptions.pay_method.edit.credit_card_charge', first_payment: number_to_currency(@subscription.first_payment, locale: locale)).html_safe%>
   </strong>
 
-  <div>
-    <small>
-      <!-- TODO get translation -->
-      <!-- TODO Refactor to share with credit card --> 
-      By submitting this form, I authorize the <%=@join_form.union.name %> to deduct from my account <%= @subscription.total > 0 ? "an advanced payment of #{number_to_currency(@subscription.total, locale: locale)} in dues then " : "" %> <%= @subscription.reoccurring_fee > 0 ? "a reoccurring fee of #{number_to_currency(@subscription.reoccurring_fee, locale: locale)}" : "a reoccurring fee" %> which is subject to occasional variation.
-    </small>
-  </div>
+  <%= render 'subscriptions/pay_method/reoccurring_terms' %>
 </div>

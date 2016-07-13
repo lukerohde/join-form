@@ -3,23 +3,10 @@
 	<h3><%=t('subscriptions.pay_method.edit.direct_debit_release_title')%></h3>
 
 	<small>
-	By becoming a member of the NUW, I request and authorise my employer to release to the NUW my:
-	<ul>
-		<li>personal details (including my gender and date of birth)</li>
-		<li>contact details (including my address, phone numbers and email)</li>
-		<li>employment type and location, and</li>
-		<li>bank details, including any changes from time to time, so that direct
-debit of union dues can be commenced from my bank account.</li>
-	</ul>
-</small>
+		<%=t('subscriptions.pay_method.edit.direct_debit_release_terms', union: @join_form.union.name).html_safe %>
+	</small>
 
-<div>
-  <small>
-    <!-- TODO get translation -->
-    <!-- TODO Refactor to share with credit card --> 
-    By submitting this form, I authorize the <%=@join_form.union.name %> to deduct from my account <%= @subscription.total > 0 ? "an advanced payment of #{number_to_currency(@subscription.total, locale: locale)} in dues then " : "" %> <%= @subscription.reoccurring_fee > 0 ? "a reoccurring fee of #{number_to_currency(@subscription.reoccurring_fee, locale: locale)}" : "a reoccurring fee" %> which is subject to occasional variation.
-  </small>
-</div>
+  <%= render 'subscriptions/pay_method/reoccurring_terms' %>
 	<!--
 	<strong> 
     Initial Payment: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
