@@ -95,7 +95,6 @@ ActiveRecord::Schema.define(version: 20160713080041) do
     t.string   "base_rate_id"
     t.text     "header"
     t.string   "page_title"
-    t.json     "fee_schedule"
     t.json     "plans"
     t.text     "schema",                                            default: "{}",  null: false
     t.boolean  "signature_required",                                default: false
@@ -114,17 +113,6 @@ ActiveRecord::Schema.define(version: 20160713080041) do
   add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
   add_index "join_forms", ["union_id"], name: "index_join_forms_on_union_id", using: :btree
   add_index "join_forms", ["welcome_email_template_id"], name: "index_join_forms_on_welcome_email_template_id", using: :btree
-
-  create_table "mentions", force: :cascade do |t|
-    t.string   "mentioner_type"
-    t.integer  "mentioner_id"
-    t.string   "mentionable_type"
-    t.integer  "mentionable_id"
-    t.datetime "created_at"
-  end
-
-  add_index "mentions", ["mentionable_id", "mentionable_type"], name: "fk_mentionables", using: :btree
-  add_index "mentions", ["mentioner_id", "mentioner_type"], name: "fk_mentions", using: :btree
 
   create_table "payments", force: :cascade do |t|
     t.date     "date"
@@ -168,8 +156,8 @@ ActiveRecord::Schema.define(version: 20160713080041) do
     t.datetime "invitation_sent_at"
     t.datetime "invitation_accepted_at"
     t.integer  "invitation_limit"
-    t.integer  "invited_by_id"
     t.string   "invited_by_type"
+    t.integer  "invited_by_id"
     t.integer  "invitations_count",      default: 0
     t.integer  "union_id"
     t.string   "stripe_token"
