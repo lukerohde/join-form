@@ -26,13 +26,13 @@
     <%= render 'subscriptions/person/edit', f: p, person: @subscription.person  %> 
   <% end %>
 
-  <% if @subscription.contact_details_saved? || @subscription.address_present? %>
+  <% if (@subscription.contact_details_saved? || @subscription.address_present?) && @subscription.address_required? %>
     <%= f.fields_for :person do |p| %>
       <%= render 'subscriptions/address/edit', f: p, person: @subscription.person  %>
     <% end %>
   <% end %>
 
-  <% if @subscription.address_saved? %>
+  <% if @subscription.address_saved? || !@subscription.address_required? %>
     <%= render 'subscriptions/subscription/edit', f: f %>
   <% end %>
 

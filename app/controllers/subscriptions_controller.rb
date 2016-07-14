@@ -39,7 +39,8 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     @subscription = Subscription.new(subscription_params)
-  
+    @subscription.set_country_code(request.location)
+    
     respond_to do |format|
       if save_step
         format.html { redirect_to next_step, notice: next_step_notice }
@@ -139,7 +140,7 @@ class SubscriptionsController < ApplicationController
   def next_step_notice
     return t('subscriptions.steps.done') if @subscription.pay_method_saved?
     return t('subscriptions.steps.payment') if @subscription.subscription_saved?
-    return t('subscriptions.steps.plan') if @subscription.address_saved?
+    return t('subscriptions.steps.plan') if @subscription.address_saved? || !@subscription.address_required?
     return t('subscriptions.steps.address') if @subscription.contact_details_saved?  
     return t('subscriptions.steps.welcome')
   end

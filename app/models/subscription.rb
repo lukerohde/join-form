@@ -70,9 +70,16 @@ class Subscription < ApplicationRecord
   	account_number.decrypt =~ /^\d+$/ || account_number.decrypt == "*encrypted*"
   end
 
+  def set_country_code(location)
+    self.country_code ||= location.country_code 
+    if self.country_code == nil || ["", "RD"].include?(self.country_code)
+     self.country_code = ENV['ADDRESS_REQUIRED_COUNTRY_CODES'].first # use first as default
+    end
+  end
+
   def subscription_must_be_complete
     return if @skip_validation
-
+      
     errors.add(:plan,I18n.translate("subscriptions.errors.not_blank")) if plan.blank?
     errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank?
     
@@ -82,8 +89,14 @@ class Subscription < ApplicationRecord
     end
   end
 
+  def address_required?
+    #TODO Test wizard when address is not required
+    self.country_code.nil? || ENV['ADDRESS_REQUIRED_COUNTRY_CODES'].include?(self.country_code) # address not required outside of australia, but on by default
+  end
+
   def address_must_be_complete
     return if @skip_validation
+    return unless address_required? 
 
   	if person
   		person.errors.add(:address1,I18n.translate("subscriptions.errors.not_blank")) unless person.address1.present?
@@ -136,8 +149,8 @@ class Subscription < ApplicationRecord
 
   def step
     return :thanks if pay_method_saved?
-  	return :pay_method if subscription_saved?
-  	return :subscription if address_saved?
+  	return :pay_method if subscription_saved? 
+  	return :subscription if address_saved? || !address_required?
   	return :address if contact_details_saved?
   	:contact_details
   end
