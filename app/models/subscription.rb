@@ -73,7 +73,7 @@ class Subscription < ApplicationRecord
   def set_country_code(location)
     self.country_code ||= location.country_code 
     if self.country_code == nil || ["", "RD"].include?(self.country_code)
-     self.country_code = ENV['ADDRESS_REQUIRED_COUNTRY_CODES'].first # use first as default
+     self.country_code = ENV['ADDRESS_REQUIRED_COUNTRY_CODES'].split(',').first # use first as default
     end
   end
 
@@ -91,7 +91,7 @@ class Subscription < ApplicationRecord
 
   def address_required?
     #TODO Test wizard when address is not required
-    self.country_code.nil? || ENV['ADDRESS_REQUIRED_COUNTRY_CODES'].include?(self.country_code) # address not required outside of australia, but on by default
+    self.country_code.nil? || ENV['ADDRESS_REQUIRED_COUNTRY_CODES'].split(',').include?(self.country_code) # address not required outside of australia, but on by default
   end
 
   def address_must_be_complete
