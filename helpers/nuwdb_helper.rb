@@ -114,6 +114,8 @@ module NUWDBHelper
 
 			result[:MemberPayFrequency] = (api_data[:subscription][:frequency]||"W")[0]
 			result[:MemberFeeGroupID] = api_data[:subscription][:plan]
+			result[:CompanyID] = api_data[:subscription][:group_id] if api_data[:subscription][:group_id].present?
+			result[:MemberPayCompanyID] = api_data[:subscription][:group_id] if api_data[:subscription][:group_id].present?
 			
 			case api_data[:subscription][:pay_method]
 				when "CC" then result[:MemberPaymentType] = "C"
