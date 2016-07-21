@@ -9,6 +9,7 @@ class Person < ApplicationRecord
   mount_uploader :attachment, ProfileUploader
   
   belongs_to :union
+  has_many :join_forms
   has_many :subscriptions, dependent: :destroy
   has_many :payments, dependent: :destroy
 
