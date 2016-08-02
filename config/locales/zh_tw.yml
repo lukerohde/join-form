@@ -43,6 +43,9 @@ zh_tw:
         expiry: "效期"
         ccv: "信用卡驗證码（英文 Card Verification Value)"
         signature_vector: Signature
+        partial_bsb: BSB
+        partial_account_number: "帳號名稱"
+        partial_card_number: "信用卡號碼"
       person:
         external_id: "會員號碼"
         first_name: "名"
