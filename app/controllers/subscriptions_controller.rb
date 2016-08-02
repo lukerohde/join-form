@@ -39,7 +39,11 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     @subscription = Subscription.new(subscription_params)
-    @subscription.set_country_code(request.location)
+
+    # this is a crude hack to hide address, and probably should be a part of the address model on person
+    #   - country_code can be provided by the underpayment calculator as a query param for prefilling
+    #   - alternatively the system will geolocate the IP address
+    @subscription.set_country_code(params["country_code"] || request.location)
     
     respond_to do |format|
       if save_step

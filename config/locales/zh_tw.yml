@@ -39,7 +39,7 @@ zh_tw:
         account_name: "銀行帳戶持有人/卡片上名稱/"
         bsb: "BSB"
         account_number: "帳號名稱"
-        card_number: "信用卡持有人"
+        card_number: "信用卡號碼"
         expiry: "效期"
         ccv: "信用卡驗證码（英文 Card Verification Value)"
         signature_vector: Signature
