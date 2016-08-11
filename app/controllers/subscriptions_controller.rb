@@ -1,9 +1,11 @@
 class SubscriptionsController < ApplicationController
-  before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
+  before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :renew]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy]
   before_action :set_join_form, except: [:index, :temp_report]
+  skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create, :renew]
+  before_filter :verify_hmac, if: :api_request?, only: [:create, :renew]
   before_action :resubscribe?, only: [:create]
-
+  
 #  layout 'subscription', except: [:index]
 
   include SubscriptionsHelper
@@ -55,6 +57,17 @@ class SubscriptionsController < ApplicationController
       end
     end
   end
+
+  def renew
+    @subscription = nuw_end_point_receive(JSON.parse(request.body.read), @join_form)
+    respond_to do |format|
+      if @subscription.save
+        format.json { render :show }
+      else
+        format.json { render json: @subscription.errors, status: :unprocessable_entity }
+      end
+    end
+  end 
 
   # PATCH/PUT /subscriptions/1
   # PATCH/PUT /subscriptions/1.json
@@ -193,37 +206,6 @@ class SubscriptionsController < ApplicationController
       end
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def subscription_params
-      if params[:subscription][:person_attributes].present?
-        params[:subscription][:person_attributes][:union_id] = @join_form.union.id
-        if current_person
-          params[:subscription][:person_attributes][:authorizer_id] = current_person.id
-        else
-          params[:subscription][:person_attributes][:authorizer_id] = @join_form.person.id
-        end
-
-        # Hack date back to a regular format (for my API) TODO something better
-        dob_array = params[:subscription][:person_attributes].slice('dob(1i)', 'dob(2i)', 'dob(3i)').values.map(&:to_i) - [0]
-        if (dob_array.length == 3 && dob = Date.new(*dob_array).iso8601 rescue nil)
-         params[:subscription][:person_attributes][:dob] = dob
-         params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
-        end 
-      end
-      
-      # Reject keys from pay methods that are not being submitted
-      params[:subscription].except!(:stripe_token, :expiry_month, :expiry_year, :card_number, :ccv) unless params[:subscription][:pay_method] == "CC"
-      params[:subscription].except!(:bsb, :account_number) unless params[:subscription][:pay_method] == "AB"
-
-      # intercept and save partial card details before encryption
-      params[:subscription][:partial_card_number] = params[:subscription][:card_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:card_number].present?
-      params[:subscription][:partial_account_number] = params[:subscription][:account_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:account_number].present?
-      params[:subscription][:partial_bsb] = params[:subscription][:bsb].gsub(/\d(?=.{3})/,'X') if params[:subscription][:bsb].present?
-      
-      params[:subscription][:end_point_put_required] = true
-      result = params.require(:subscription).permit(permitted_params << [data: (@join_form.schema_data[:columns]||[])])
-    end
-
     def set_join_form
       id = params[:join_form_id] || params.dig(:subscription, :join_form_id) || @subscription.join_form.id
       
@@ -244,7 +226,7 @@ class SubscriptionsController < ApplicationController
       params = subscription_params
       pparams = params[:person_attributes]
 
-      # don't check resubscribe if the person is invalid, but do allow duplicate email. TODO dry up valiation logic - Subscription.new(params).valid? has a problem with duplicate email 
+      # don't check resubscribe if the person is invalid, but do allow duplicate email. TODO dry up valiation logic - Subscription.new(params).valid? has a problem with duplicate email unfortunately so I can't use that.
       return if pparams[:first_name].blank? || !Person.email_valid?(pparams[:email]) 
       
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
@@ -365,5 +347,47 @@ class SubscriptionsController < ApplicationController
         ExceptionNotifier.notify_exception(exception,
           :env => request.env, :data => {:message => "failed to send welcome email"})
       end
+    end
+
+
+    def api_request?
+      request.format.json? || request.format.xml?
+    end 
+
+    def verify_hmac
+      puts 'checking hmac'
+      check_signature(JSON.parse(request.body.read))
+    end
+
+
+    # Never trust parameters from the scary internet, only allow the white list through.
+    def subscription_params
+      if params[:subscription][:person_attributes].present?
+        params[:subscription][:person_attributes][:union_id] = @join_form.union.id
+        if current_person
+          params[:subscription][:person_attributes][:authorizer_id] = current_person.id
+        else
+          params[:subscription][:person_attributes][:authorizer_id] = @join_form.person.id
+        end
+
+        # Hack date back to a regular format (for my API) TODO something better
+        dob_array = params[:subscription][:person_attributes].slice('dob(1i)', 'dob(2i)', 'dob(3i)').values.map(&:to_i) - [0]
+        if (dob_array.length == 3 && dob = Date.new(*dob_array).iso8601 rescue nil)
+         params[:subscription][:person_attributes][:dob] = dob
+         params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
+        end 
+      end
+      
+      # Reject keys from pay methods that are not being submitted
+      params[:subscription].except!(:stripe_token, :expiry_month, :expiry_year, :card_number, :ccv) unless params[:subscription][:pay_method] == "CC"
+      params[:subscription].except!(:bsb, :account_number) unless params[:subscription][:pay_method] == "AB"
+
+      # intercept and save partial card details before encryption
+      params[:subscription][:partial_card_number] = params[:subscription][:card_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:card_number].present?
+      params[:subscription][:partial_account_number] = params[:subscription][:account_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:account_number].present?
+      params[:subscription][:partial_bsb] = params[:subscription][:bsb].gsub(/\d(?=.{3})/,'X') if params[:subscription][:bsb].present?
+      
+      params[:subscription][:end_point_put_required] = true
+      result = params.require(:subscription).permit(permitted_params << [data: (@join_form.schema_data[:columns]||[])])
     end
 end

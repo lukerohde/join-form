@@ -2,6 +2,8 @@ module SubscriptionsHelper
   require 'addressable/uri'
   require 'rest-client'
   require 'openssl'
+  require './lib/signed_request.rb'
+  
   include ActionView::Helpers::NumberHelper
 
   def start_hidden(step)
@@ -255,13 +257,27 @@ module SubscriptionsHelper
   end
 
   def nuw_end_point_load(subscription_params, join_form)
-    subscription = nil
     payload = nuw_end_point_person_get(subscription_params)
+    nuw_end_point_load_subscription(payload, join_form)
+  end
+
+  def nuw_end_point_receive(payload, join_form)
+    payload =   nuw_end_point_transform_from(payload.deep_symbolize_keys)
+    nuw_end_point_load_subscription(payload, join_form)
+  end
+
+  #def nuw_end_point_load(subscription_params, join_form)
+  #  subscription = nil
+  #  payload = nuw_end_point_person_get(subscription_params)
+  #  unless payload.blank? 
+
+  def nuw_end_point_load_subscription(payload, join_form)
+    subscription = nil
     unless payload.blank? 
       # something found via the api, update existing record
       person = Person.find_by_external_id(payload.dig(:person_parameters, :external_id)) if payload.dig(:person_parameters, :external_id)
       person ||= Person.find_by_email(subscription_params.dig(:person_attributes, :email)) if subscription_params.dig(:person_attributes, :email)
-      person ||= Person.find_by_email(payload[:email]) if payload[:email]
+      person ||= Person.find_by_email(payload.dig(:person_attributes, :email)) if payload.dig(:person_attributes, :email)
       person ||= Person.new()
 
       subscription = person.subscriptions.last unless person.new_record?
@@ -292,7 +308,6 @@ module SubscriptionsHelper
     
     payload = person_params(subscription_params[:person_attributes])
     payload = nuw_end_point_sign(url.to_s, payload)
-    
     url.query_values = (url.query_values || {}).merge(payload)
     
     begin
@@ -373,14 +388,9 @@ module SubscriptionsHelper
   end
 
   def nuw_end_point_sign(url, payload)
-    # convert to json and back to fix date formats
-    # sort to make sure param order is consistent (only json payloads have nested params and these dont need to be sorted)
     secret = ENV['NUW_END_POINT_SECRET']
     raise "NUW_END_POINT_SECRET not configured" unless secret
-    data = url + JSON.parse(payload.sort.to_json).to_s
-    hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',secret, data)}")
-    payload.merge!(hmac: hmac)
-    payload
+    SignedRequest::sign(secret, payload, url)
   end
 
   ## Transform from NUW end point format
@@ -495,4 +505,34 @@ module SubscriptionsHelper
     (number||"").gsub(/[^0-9]/, '') # remove non-numeric characters
   end
 
+  #def check_signature(payload)
+  #  # build message for signing
+  #  data = payload.reject { |k,v| k == "hmac" }
+
+  #  data = JSON.parse(data.sort.to_json).to_s
+  #  data = data.gsub(/\\u([0-9A-Za-z]{4})/) {|s| [$1.to_i(16)].pack("U")} # repack unicode
+  #  data = request.original_url + data
+
+        # sign message
+  #  hmac_received = payload['hmac'].to_s
+  #  hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['NUW_END_POINT_SECRET'], data)}")
+  #  binding.pry
+      
+    # halt if signatures differ
+  #  unless hmac == hmac_received
+  #    puts "HMAC MISMATCH!"
+  #    puts "HMAC_CALCULATED: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
+  #    puts "PROCESSED PAYLOAD: " + data
+  #    
+  #    forbidden
+  #  end
+  #end
+
+  def check_signature(payload)
+    begin 
+      SignedRequest.check_signature(ENV['NUW_END_POINT_SECRET'], payload, request.original_url)
+    rescue SignedRequest::SignatureMismatch
+      forbidden
+    end
+  end
 end
