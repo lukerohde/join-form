@@ -2,3 +2,4 @@
 log/*
 pids/*
 config/private.key
+config/end_points.yaml

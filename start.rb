@@ -6,6 +6,8 @@ require 'pry-byebug'
 require 'bundler'
 require 'openssl'
 require 'date'
+require 'rest-client'
+require './lib/signed_request.rb'
 
 Bundler.require
 
@@ -30,7 +32,7 @@ class Application < Sinatra::Base
 		payload = JSON.parse(request.body.read)
 		logger.info "PUT Received: #{payload.to_json}"
 		check_signature(payload)
-
+ 
 		payload.symbolize_keys!
 		payload[:subscription].symbolize_keys! if payload[:subscription]
 		
@@ -61,6 +63,38 @@ class Application < Sinatra::Base
 		response
 	end
 
+	get '/renew' do 
+		p = Person.search(params)
+		join_form_id = params[:join_form_id]
+		locale = params[:locale] || 'en'
+    
+    end_points = YAML.load_file(File.join('config', 'end_points.yaml'))
+		
+		results = []
+		end_points.each do |e|
+			e = e.gsub('join_form_id', join_form_id)
+			e = e.gsub('locale', locale)
+			puts e
+			payload = JSON.parse(p.to_json)
+			puts payload
+			signed_payload = SignedRequest::sign(ENV['nuw_end_point_secret'], payload||{}, e)
+		  response = RestClient::Request.execute ({
+		  	url: e, 
+		  	method: :post, 
+		  	#payload: { first_name: 'luke', last_name: 'rohde', email: 'lrohde@nuw.org.au', external_id: 'NV391215'}.to_json, 
+		  	payload: signed_payload.to_json,
+		  	#payload: payload.to_json,
+		  	headers: {
+		  		content_type: :json,
+		  		accept: :json
+	  		},
+		  	verify_ssl: false
+	  	})
+      result = JSON.parse(response.body)
+      results << result
+		end
+		results.to_json
+	end
 
 	def decrypt(value)
 		value = Base64.decode64(value) rescue nil
@@ -70,27 +104,13 @@ class Application < Sinatra::Base
 		end
 	end
 
-	def check_signature(payload)
-		# build message for signing
-		data = payload.reject { |k,v| k == "hmac" }
-
-		data = JSON.parse(data.sort.to_json).to_s
-    data = data.gsub(/\\u([0-9A-Za-z]{4})/) {|s| [$1.to_i(16)].pack("U")} # repack unicode
-    data = ENV['nuw_end_point_url'] + request.path_info + data
-
-    		# sign message
-		hmac_received = payload['hmac'].to_s
-		hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['nuw_end_point_secret'], data)}")
-    
-    # halt if signatures differ
-    unless hmac == hmac_received
- 	    logger.debug "HMAC MISMATCH!"
- 	    logger.debug "HMAC_CALCULATED: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
-			logger.debug "PROCESSED PAYLOAD: " + data
-      
-    	halt 401, "Not Authorized\n"
-    end
-  end
+ 	def check_signature(payload)
+ 		begin 
+ 			SignedRequest::check_signature(ENV['nuw_end_point_secret'], payload, ENV['nuw_end_point_url'] + request.path_info )
+ 		rescue SignedRequest::SignatureMismatch
+ 			halt 401, "Not Authorized\n"
+ 		end
+ 	end
 
   run! if app_file == $0
 end
