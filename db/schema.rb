@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160714053738) do
+ActiveRecord::Schema.define(version: 20160811085200) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -205,6 +205,8 @@ ActiveRecord::Schema.define(version: 20160714053738) do
     t.date     "first_recurrent_payment_date"
     t.date     "signature_date"
     t.string   "country_code"
+    t.string   "source"
+    t.boolean  "renewal"
   end
 
   add_index "subscriptions", ["data"], name: "index_subscriptions_on_data", using: :gin

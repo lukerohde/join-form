@@ -22,7 +22,7 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
         person_attributes: 
         { 
           email: 'lrohde@nuw.org.au', 
-          first_name: 'mr luke' 
+          first_name: 'luke welcome' 
         } 
 
       } 
@@ -48,8 +48,28 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     assert_response :redirect
 
     assert ActionMailer::Base.deliveries.count == starting_email_count + 2, "was expecting two emails to be sent"
-    assert ActionMailer::Base.deliveries.last.subject.starts_with?("welcome mr luke"), "was expecting a welcome email"
+    assert ActionMailer::Base.deliveries.last.subject.starts_with?("welcome luke welcome"), "was expecting a welcome email"
     assert ActionMailer::Base.deliveries.last.to.include?("lrohde@nuw.org.au"), "was expecting a welcome email to send to lrohde@nuw.org.au"
+  end
+
+  test "post step 4 - success - australian bank - don't send if user other than subscriber" do 
+    sign_in people(:admin)
+
+    @union = @join_form.union
+    @union.update( passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
+    
+    params = form_params
+    
+    api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    
+    starting_email_count = ActionMailer::Base.deliveries.count
+    patch edit_join_path(:en, @union, @join_form, @with_subscription.token), params
+    assert_response :redirect
+
+    assert ActionMailer::Base.deliveries.count == starting_email_count, "was expecting no emails to be sent"
+    #assert ActionMailer::Base.deliveries.last.subject.starts_with?("welcome luke welcome"), "was expecting a welcome email"
+    #assert ActionMailer::Base.deliveries.last.to.include?("lrohde@nuw.org.au"), "was expecting a welcome email to send to lrohde@nuw.org.au"
   end
 
   

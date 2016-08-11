@@ -17,8 +17,9 @@ module SignedRequest
 		else
 			payload = [hmac, payload]
 		end
-		puts "PROCESSED PAYLOAD: #{data}"
-		puts "hmac: #{hmac}"
+		#puts "PROCESSED PAYLOAD: #{data}"
+		#puts "hmac: #{hmac}"
+		
 		payload
 	end 
 
@@ -46,9 +47,9 @@ module SignedRequest
 		hmac = get_hmac(secret_key, data)
 
 		unless hmac == hmac_received
-			puts "HMAC MISMATCH!"
-      puts "HMAC_CALCULATED: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
-      puts "PROCESSED PAYLOAD: " + data
+			#puts "HMAC MISMATCH!"
+      #puts "HMAC_CALCULATED: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
+      #puts "PROCESSED PAYLOAD: " + data
      
 			raise SignedRequest::SignatureMismatch
 		end

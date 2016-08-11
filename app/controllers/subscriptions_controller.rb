@@ -4,8 +4,9 @@ class SubscriptionsController < ApplicationController
   before_action :set_join_form, except: [:index, :temp_report]
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create, :renew]
   before_filter :verify_hmac, if: :api_request?, only: [:create, :renew]
+  before_action :set_authorizer, only: [:create]
   before_action :resubscribe?, only: [:create]
-  
+
 #  layout 'subscription', except: [:index]
 
   include SubscriptionsHelper
@@ -41,8 +42,10 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     @subscription = Subscription.new(subscription_params)
-
-    # this is a crude hack to hide address, and probably should be a part of the address model on person
+    @subscription.source = params[:source] || request.referrer
+    @subscription.renewal = false
+    
+     # this is a crude hack to hide address, and probably should be a part of the address model on person
     #   - country_code can be provided by the underpayment calculator as a query param for prefilling
     #   - alternatively the system will geolocate the IP address
     @subscription.set_country_code(params["country_code"] || request.location)
@@ -59,9 +62,13 @@ class SubscriptionsController < ApplicationController
   end
 
   def renew
+    request.body.rewind # needed for integration test
     @subscription = nuw_end_point_receive(JSON.parse(request.body.read), @join_form)
+    @subscription.source = 'nuw-api' if @subscription.new_record? && api_request?
+    @subscription.renewal = true
+
     respond_to do |format|
-      if @subscription.save
+      if @subscription.save_without_validation!
         format.json { render :show }
       else
         format.json { render json: @subscription.errors, status: :unprocessable_entity }
@@ -232,6 +239,9 @@ class SubscriptionsController < ApplicationController
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
       @subscription = nuw_end_point_load(params, @join_form)
       if @subscription
+        @subscription.source = params[:source] || request.referrer
+        @subscription.renewal = true
+        
         # If an existing subcription exists, determine secure and appropriate action
         if current_person && current_person.union.id == @join_form.union.id
           # This is really nasty - TODO I want the logged in user to be able to avoid the verification steps, but have to review the original record first.
@@ -309,12 +319,17 @@ class SubscriptionsController < ApplicationController
       sensitive.blank? # TODO make sure pay methods don't creep in
     end
 
+    def set_authorizer
+      # This is a crude way of one system letting this system know if the user is acting on another's behalf
+      session[:authorizer_id] = params[:authorizer_id] if params[:authorizer_id]
+    end
+
     def notify
       #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later 
       if @subscription.step == :thanks
         #JoinNoticeJob.perform_later(@subscription.id)
-        admin_notice 
-        welcome if !@subscription.end_point_put_required || Rails.env.test? # end point mocked in testing, don't want welcome done until membership can calculate what it has to calculate
+        admin_notice if send_admin_notice?
+        welcome if send_welcome?
       else
         IncompleteJoinNoticeJob.perform_in(30 * 60, @subscription.id, @subscription.updated_at.to_i)
       end
@@ -349,19 +364,42 @@ class SubscriptionsController < ApplicationController
       end
     end
 
+    def user_other_than_subscriber? 
+      (current_person.present? && current_person.email != @subscription.person.email) || 
+        (session[:authorizer_id].present? && session[:authorizer_id] != @subscription.person.email)
+    end
+
+    def send_admin_notice?
+      result = true
+      # don't send welcome if someone is logged in, or the authorizer's email != the subcribers email
+      result = false if user_other_than_subscriber? 
+      result
+    end
+
+    def send_welcome?
+      result = true
+      # end point mocked in testing, don't want welcome done until membership can calculate what it has to calculate
+      result = false if @subscription.end_point_put_required && !Rails.env.test? 
+      # don't send welcome if someone is logged in, or the authorizer's email != the subcribers email
+      result = false if user_other_than_subscriber? 
+      result
+    end
+
 
     def api_request?
       request.format.json? || request.format.xml?
     end 
 
     def verify_hmac
-      puts 'checking hmac'
+      #puts 'checking hmac'
       check_signature(JSON.parse(request.body.read))
     end
 
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def subscription_params
+      return {} unless params[:subscription].present? # needed for api testing
+
       if params[:subscription][:person_attributes].present?
         params[:subscription][:person_attributes][:union_id] = @join_form.union.id
         if current_person
