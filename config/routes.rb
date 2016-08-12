@@ -30,10 +30,13 @@ Rails.application.routes.draw do
       resource :key, only: [:show, :new, :edit, :update], controller: 'unions/key'
     end
     
+    post '/people/receive_sms', to: 'people#receive_sms'
     resources :people, except: [:new] do # people can only be invited
       member do 
         get 'compose_email'
         patch 'send_email'
+        get 'compose_sms'
+        patch 'send_sms'
       end
     end 
 

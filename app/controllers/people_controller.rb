@@ -1,6 +1,8 @@
 class PeopleController < ApplicationController
-  before_action :set_person, only: [:show, :edit, :update, :destroy, :compose_email, :send_email]
+  before_action :set_person, only: [:show, :edit, :update, :destroy, :compose_email, :send_email, :compose_sms, :send_sms]
   before_action :forbid, only: [:show, :edit, :update, :destroy]
+  skip_before_filter :verify_authenticity_token, :only => "receive_sms"
+  skip_before_filter :authenticate_person!, :only => "receive_sms"
 
   # GET /people
   # GET /people.json
@@ -66,6 +68,25 @@ class PeopleController < ApplicationController
       PersonMailer.private_email(@person, current_person, params[:subject], params[:body], request).deliver_now     
       redirect_to people_url, notice: "Email sent..."  
   end  
+
+  def compose_sms
+    @body = "hi #{@person.first_name}, please update your union membership details here #{root_url}#{subscription_form_path(@person.subscriptions.last)}, #{current_person.first_name}, #{current_person.union.short_name}"
+  end
+
+  def send_sms
+    @client = Twilio::REST::Client.new ENV["twilio_sid"], ENV["twilio_token"]
+    sms = @client.messages.create(
+      from: ENV["twilio_number"],
+      to: @person.mobile,
+      body: params[:body]
+    )
+    redirect_to subscriptions_url, notice: "SMS sent..."  
+  end
+
+  def receive_sms
+    from = Person.find_by_mobile(params['From'].gsub('+61', '0'))
+    PersonMailer.private_email(current_person, from, 'SMS Reply from #{from.first_name} #{from.last_name}', params[:body], request).deliver_now     
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

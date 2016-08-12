@@ -122,3 +122,6 @@ gem 'roadie', '~> 3.1.1'
 gem 'bootsy'
 
 gem 'geocoder'
+
+gem 'twilio-ruby'
+

@@ -1,0 +1,28 @@
+
+<div class="col-sm-8 col-sm-offset-2"/>
+	<h1 class="no-left-margin">
+		Send SMS
+	</h1>
+
+	<div id="compose_email">
+		<%= form_for @person, :url => url_for(:action => 'send_sms') do |f| %>
+			<div class="form-group">
+    		<%= f.label :from %><br>
+    		<%= content_tag :from, ENV["twilio_number"], class: "form-control" %>
+    	</div>
+			<div class="form-group">
+    		<%= f.label :to %><br>
+    		<%= content_tag :to, "#{@person.display_name} #{@person.mobile}", class: "form-control" %>
+    	</div>
+			<div>
+		  	<%= f.label :body %><br>
+    		<%= text_area_tag :body, @body, class: 'form-control', style: 'border: 1px solid #aaa; width: 100%' %>
+			</div>
+		  <div>
+		  	<%= f.hidden_field :id %>
+		  	<%= f.submit "Send", id: 'sms_submit', class: 'btn btn-default', style: 'margin-top:5px;' %>
+		  	<small>You will be BCC'd</small>
+		  </div>
+		<% end %> 
+	</div>
+</div>
