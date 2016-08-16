@@ -1,0 +1,2 @@
+class SMS < Record
+end

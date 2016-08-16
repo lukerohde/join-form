@@ -1,0 +1,52 @@
+<%= form_for([@subscription, @sms.becomes(Record)], :html => { class: "form"}) do |f| %>
+    <% if @sms.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@sms.errors.count, "error") %> prohibited this record from being saved:</h2>
+
+        <ul>
+        <% @sms.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+    <%= f.label :join_form %><br>
+    <%= content_tag :join_form, "<a href=\"#{edit_join_url(@subscription.join_form.union.short_name, @subscription.join_form.short_name, @subscription.token, locale: 'en')}\">#{edit_join_url(@subscription.join_form.union.short_name, @subscription.join_form.short_name, @subscription.token, locale: 'en')}</a>".html_safe, class: "form-control" %>
+  </div>
+    
+  <div class="form-group">
+    <%= f.label :from %><br>
+    <%= content_tag :from, ENV["twilio_number"], class: "form-control" %>
+  </div>    
+  <div class="form-group">
+    <%= f.label :to %><br>
+    <%= content_tag :to, "#{@person.display_name} #{format_mobile(@person.mobile)}", class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :body_plain %><br>
+    <%= f.text_area :body_plain, rows: 5, class: "form-control" %>
+  </div>
+  <%= f.hidden_field :type %>
+  <div class="actions">
+    <%= f.submit "Send SMS" %>
+  </div>
+<% end %>
+
+<h1>History</h1>
+<div style="margin: 15px;">
+<% @history.order('created_at desc').each do |i| %>
+  <div class="<%= i.sender == @person ? 'text-right' : '' %>">
+  <%= i.sender.try(:display_name) %> -> 
+  <%=i.recipient.try(:display_name) %><br/>
+  <small><%= (i.delivery_status||"").titlecase %> <%= local_time_tag(i.updated_at) %></small><br/>
+  </div>
+  <%= "Subject: #{i.subject}" if i.subject %>
+  <pre>
+<%=i.body_plain %>
+  </pre>  
+  <hr/>
+<% end %> 
+</div>
+

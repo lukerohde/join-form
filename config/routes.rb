@@ -4,7 +4,12 @@ Rails.application.routes.draw do
 
   scope "(:locale)", locale: /en|en-AU|zh_tw|zh-TW/ do
     
-    resources :subscriptions
+    post '/records/receive_sms', to: 'records#receive_sms'
+    post '/records/update_sms', to: 'records#update_sms'
+    resources :subscriptions do 
+      resources :records, except: [:edit]
+    end
+
     # mount ActionCable.server => '/cable'
     
     resources :email_templates do 
@@ -35,8 +40,6 @@ Rails.application.routes.draw do
       member do 
         get 'compose_email'
         patch 'send_email'
-        get 'compose_sms'
-        patch 'send_sms'
       end
     end 
 

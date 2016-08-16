@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  type: 
+  subject: MyString
+  body_plain: MyText
+  body_html: MyText
+  delivery_status: MyString
+  sender_id: 
+  recipient_id: 
+  recipient: MyString
+  sender: MyString
+  template_id: 
+  parent_id: 
+
+two:
+  type: 
+  subject: MyString
+  body_plain: MyText
+  body_html: MyText
+  delivery_status: MyString
+  sender_id: 
+  recipient_id: 
+  recipient: MyString
+  sender: MyString
+  template_id: 
+  parent_id: 
