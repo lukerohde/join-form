@@ -93,7 +93,7 @@ class Application < Sinatra::Base
       result = JSON.parse(response.body)
       results << result
 		end
-		results.to_json
+		redirect results[0]['url']
 	end
 
 	def decrypt(value)
