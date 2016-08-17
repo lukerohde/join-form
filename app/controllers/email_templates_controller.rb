@@ -1,6 +1,9 @@
 class EmailTemplatesController < ApplicationController
   before_action :set_email_template, only: [:show, :edit, :update, :destroy]
+  before_action :set_subscription, only: [:new, :edit]
 
+  include SubscriptionsHelper
+  
   # GET /email_templates
   # GET /email_templates.json
   def index
@@ -72,6 +75,15 @@ class EmailTemplatesController < ApplicationController
     def set_email_template
       @email_template = EmailTemplate.find(params[:id])
     end
+
+    def set_subscription
+      @subscription = Subscription.find_by_id(params[:subscription_id])
+      @subscription ||= Subscription.last
+      nuw_end_point_reload(@subscription)
+      @data = merge_data(@subscription)
+      @prev = Subscription.where(['id < ?', @subscription.id]).last
+      @next = Subscription.where(['id > ?', @subscription.id]).first
+    end 
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def email_template_params

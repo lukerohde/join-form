@@ -11,6 +11,20 @@
     </div>
   <% end %>
 
+  <hr/>
+  <h2 class="text-center">Sample Data</h2>
+  <div class="row"> 
+      <%=link_to "prev", new_or_edit_email_template_path(@email_template, subscription_id: @prev.id), class: 'btn btn-default' if @prev.present? %>
+
+      <%=link_to "next", new_or_edit_email_template_path(@email_template, subscription_id: @next.id), class: 'btn btn-default' if @next.present? %>
+  </div>
+      
+  <pre>
+<%= JSON.pretty_generate(@data) %>
+  </pre>
+  
+  <br/><hr/>
+
   <div class="form-group">
     <%= f.label :short_name %><br>
     <%= f.text_field :short_name, class: "form-control" %>

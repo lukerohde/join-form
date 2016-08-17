@@ -11,12 +11,13 @@
     </div>
   <% end %>
 
+  <hr/>
   <h2 class="text-center">Sample Data</h2>
 
-  <div class="row" style="margin-left: 0px; margin-right: 0px"> 
-    <%=link_to "prev", new_sms_template_path(@sms_template, subscription_id: @prev.id), class: 'btn btn-default' if @prev.present? %>
+  <div class="row" style="margin-left: 0px; margin-right: 0px;"> 
+    <%=link_to "prev", new_or_edit_sms_template_path(@sms_template, subscription_id: @prev.id), class: 'btn btn-default' if @prev.present? %>
 
-    <%=link_to "next", new_sms_template_path(@sms_template, subscription_id: @next.id), class: 'btn btn-default pull-right' if @next.present? %>
+    <%=link_to "next", new_or_edit_sms_template_path(@sms_template, subscription_id: @next.id), class: 'btn btn-default pull-right' if @next.present? %>
   </div>
       
   <pre>
