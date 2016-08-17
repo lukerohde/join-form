@@ -25,6 +25,22 @@
     <%= content_tag :to, "#{@person.display_name} #{format_mobile(@person.mobile)}", class: "form-control" %>
   </div>
   <div class="form-group">
+    <%= f.label :template_id %><br>
+    <%= f.select :template_id,
+      selected_option(nil),
+      {
+          include_blank: false,
+      },
+      data: { 
+        placeholder: "Choose an sms template.",
+        url: sms_templates_path
+      }, 
+      class: "ac-select2 form-control", 
+      style: "width: 100%;", 
+      onchange: "window.location.href = '#{new_subscription_record_path(@subscription)}?template_id=' + $('#record_template_id').val()"
+    %>
+  </div>
+  <div class="form-group">
     <%= f.label :body_plain %><br>
     <%= f.text_area :body_plain, rows: 5, class: "form-control" %>
   </div>

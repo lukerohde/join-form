@@ -8,6 +8,7 @@ class RecordsController < ApplicationController
   skip_before_filter :authenticate_person!, :only => [:receive_sms, :update_sms]
 
   include RecordsHelper
+  include SubscriptionsHelper
 
   # GET /records
   # GET /records.json
@@ -22,9 +23,15 @@ class RecordsController < ApplicationController
 
   # GET /records/new
   def new
+    body = ""
+    if params['template_id'].present?
+      template = SmsTemplate.find(params['template_id'])
+      body = Liquid::Template.parse(template.body).render(merge_data(@subscription))
+    end
+
     @sms = Record.new({
       type: "SMS",
-      body_plain: "Hi #{@person.first_name}, Please update your union membership details here #{root_url}#{subscription_form_path(@person.subscriptions.last)} - #{current_person.first_name}, #{current_person.union.short_name}"
+      body_plain: body
     })
 
     @history = Record.where(["sender_id = ? or recipient_id = ?", @person.id, @person.id])
@@ -71,12 +78,15 @@ class RecordsController < ApplicationController
   # POST /records
   # POST /records.json
   def create
+    # parse message incase there is some liquid directive pasted in
     @record = Record.new(record_params)
+    @record.body_plain = Liquid::Template.parse(@record.body_plain).render(merge_data(@subscription))
     @record.sender = current_person
     @record.sender_address = format_mobile(ENV['twilio_number'])
     @record.recipient = @person
     @record.recipient_address = format_mobile(@person.mobile)
     @record.delivery_status = "not sent"
+
     #if @record.valid? && @record.type == "SMS"
     #  unless send_sms(@record)
     #    @record.errors.add(:base, "SMS failed to send")
