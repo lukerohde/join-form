@@ -1,0 +1,42 @@
+<% if notice.present? %>
+  <p id="notice" class="alert alert-info"><%= notice %></p>
+<% end %>
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-2">
+
+<h1>SMS Templates</h1>
+
+<%= link_to 'New SMS Template', new_sms_template_path, class: "btn btn-default pull-right" %>
+
+<div class="xtable-responsive">
+  <table class="table table-condensed table-striped">
+    <thead>
+      <tr>
+        <th>Short Name</th>
+        <th>Body</th>
+        <th class="hidden-sm">Created At</th>
+        <th class="hidden-sm">Updated At</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @sms_templates.each do |sms_template| %>
+        <tr>
+          <td><%= sms_template.short_name %></td>
+          <td><%= sms_template.body %></td>
+          <td class="hidden-sm hidden-xs"><%=local_time_tag(sms_template.created_at)%></td>
+          <td class="hidden-sm hidden-xs"><%=local_time_tag(sms_template.updated_at)%></td>
+            <td>
+              <%= link_to "<span class=\"glyphicon glyphicon-eye-open\"></span>".html_safe, new_sms_template_preview_path(sms_template) %>
+              <%= link_to "<span class=\"glyphicon glyphicon-cog\"></span>".html_safe, edit_sms_template_path(sms_template) %>
+              <%= link_to "<span class=\"glyphicon glyphicon-duplicate\"></span>".html_safe, new_sms_template_path(duplicate_sms_template_id: sms_template) %>
+              <%= link_to "<span class=\"glyphicon glyphicon-trash\"></span>".html_safe, sms_template, method: :delete, data: { confirm: 'Are you sure?' } %>
+            </td>
+        </tr>
+      <% end %>
+    </tbody>
+</table>
+
+<br>
+

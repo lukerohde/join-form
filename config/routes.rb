@@ -21,6 +21,10 @@ Rails.application.routes.draw do
       end
     end
   
+    resources :sms_templates do 
+      resource :preview, only: [:new, :create], controller: 'sms_templates/preview'
+    end
+  
 
     #get 'stripe/index'
     resources :stripe, only: [:index, :destroy]

@@ -1,0 +1,49 @@
+<%= form_for(@sms_template) do |f| %>
+  <% if @sms_template.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@sms_template.errors.count, "error") %> prohibited this sms_template from being saved:</h2>
+
+      <ul>
+      <% @sms_template.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <h2 class="text-center">Sample Data</h2>
+
+  <div class="row" style="margin-left: 0px; margin-right: 0px"> 
+    <%=link_to "prev", new_sms_template_path(@sms_template, subscription_id: @prev.id), class: 'btn btn-default' if @prev.present? %>
+
+    <%=link_to "next", new_sms_template_path(@sms_template, subscription_id: @next.id), class: 'btn btn-default pull-right' if @next.present? %>
+  </div>
+      
+  <pre>
+<%= JSON.pretty_generate(@data) %>
+  </pre>
+
+  <hr/>
+
+
+  <div class="form-group">
+    <%= f.label :short_name %><br>
+    <%= f.text_field :short_name, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :body %><br>
+    <%= f.text_area :body, class: "form-control" %>
+  </div>
+  <div class="actions">
+    <%= f.submit class: "btn btn-default"%>
+  </div>
+
+  <hr/>
+  <h2 class="text-center"> HELP </h2>
+
+  <p>
+    Email templates use the the Liquid markup language for templating.  A summary of the of the API can be found here <a href="https://github.com/Shopify/liquid/wiki/liquid-for-designers">https://github.com/Shopify/liquid/wiki/liquid-for-designers</a>.  Available data fields can be viewed when previewing.  
+  </p>
+
+
+<% end %>

@@ -1,0 +1,43 @@
+<% if notice.present? %>
+	<p id="notice" class="alert alert-info"><%= notice %></p>
+<% end %>
+
+<div class="col-sm-8 col-sm-offset-2"/>
+	<h1>Previewing SMS Template</h1>
+	<%=link_to "Edit", edit_sms_template_path(@sms_template), class: "btn btn-default pull-right" %>
+
+	<hr/>
+	<h2 class="text-center">Data</h2>
+	<div class="row"> 
+			<%=link_to "prev", new_sms_template_preview_path(@sms_template, subscription_id: @prev.id), class: 'btn btn-default' if @prev.present? %>
+
+			<%=link_to "next", new_sms_template_preview_path(@sms_template, subscription_id: @next.id), class: 'btn btn-default' if @next.present? %>
+
+			
+	<pre>
+<%= JSON.pretty_generate(@data) %>
+	</pre>
+	
+	<br/><hr/>
+	
+	<hr/>
+	<h2 class="text-center">Body</h2>
+	<div class="sms-preview">
+		<pre>
+<%= @body %>
+		</pre>
+	</div>
+
+	<hr/>
+	<h2 class="text-center clearfix">Send Preview</h2>
+	<%= form_for @sms_template, url: sms_template_preview_path(@sms_template), method: :post do |f| %>
+		<div class="form-group">
+	    <%= label_tag :preview_sms, "To:" %><br/>
+	    <%= text_field_tag :preview_sms, @sms, class: "form-control" %>
+	  </div>
+	  <%= f.submit "Send", class: "btn btn-default"%> 
+	<% end %>
+
+</div>
+
+
