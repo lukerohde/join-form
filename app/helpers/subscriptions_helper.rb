@@ -226,14 +226,14 @@ module SubscriptionsHelper
         'formatted_up_front_payment' => number_to_currency(subscription[:up_front_payment], locale: locale),
         'url' => "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}",
         'edit_url' => "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}",
-        'signature_url' => @subscription.signature_image.url
+        'signature_url' => subscription.signature_image.url
       })
 
-    admin = defined?(current_person) ? current_person : subscription.join_form.person
-    result.merge!({
-      'admin' => admin.slice(:id, :first_name, :last_name, :email, :mobile).reject{|k,v| v.nil? },
-      'union' => subscription.join_form.union.slice(:id, :name, :short_name ).reject{|k,v| v.nil? }
-    })
+    admin = defined?(current_person) && current_person.present? ? current_person : subscription.join_form.person
+    union = subscription.join_form.union
+    
+    result['admin'] = admin.slice(:id, :first_name, :last_name, :email, :mobile).reject{|k,v| v.nil? } if admin.present?
+    result['union'] = union.slice(:id, :name, :short_name ).reject{|k,v| v.nil? } if union.present?
 
     result = result.reject{|k,v| v.nil? }
     result
