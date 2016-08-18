@@ -3,10 +3,12 @@ admin:
   email: admin@nuw.org.au
   encrypted_password: <%= Devise::Encryptor.digest(Person, 'password') %>
   union: owner
+  mobile: "+61439541888"
 one:
   first_name: one
   email: one@nuw.org.au
   union: owner
+  mobile: "0439541888"
 contact_details_only_person:
   first_name: luke
   email: contact_details_only@nuw.org.au 

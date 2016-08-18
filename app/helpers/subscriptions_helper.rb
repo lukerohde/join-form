@@ -229,7 +229,7 @@ module SubscriptionsHelper
         'signature_url' => @subscription.signature_image.url
       })
 
-    admin = current_person || subscription.join_form.person
+    admin = defined?(current_person) ? current_person : subscription.join_form.person
     result.merge!({
       'admin' => admin.slice(:id, :first_name, :last_name, :email, :mobile).reject{|k,v| v.nil? },
       'union' => subscription.join_form.union.slice(:id, :name, :short_name ).reject{|k,v| v.nil? }

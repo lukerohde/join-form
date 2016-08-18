@@ -2,8 +2,8 @@
 
 one:
   short_name: MyString
-  body: MyText
+  body: Hi {{ first_name }}
 
 two:
   short_name: MyString
-  body: MyText
+  body: Bye {{ first_name }}

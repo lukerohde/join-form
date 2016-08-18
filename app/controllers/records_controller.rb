@@ -71,10 +71,6 @@ class RecordsController < ApplicationController
     render xml: Twilio::TwiML::Response.new.to_xml
   end
 
-  # GET /records/1/edit
-  def edit
-  end
-
   # POST /records
   # POST /records.json
   def create
@@ -126,7 +122,7 @@ class RecordsController < ApplicationController
   def destroy
     @record.destroy
     respond_to do |format|
-      format.html { redirect_to records_url, notice: 'Record was successfully destroyed.' }
+      format.html { redirect_to new_subscription_record_url(@subscription), notice: 'Record was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

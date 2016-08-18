@@ -1,7 +1,15 @@
 require 'test_helper'
 
 class SmsTemplatesControllerTest < ActionController::TestCase
+  include Devise::TestHelpers
+
+  def sign_in_admin
+    @admin = people(:admin)
+    sign_in @admin
+  end
+
   setup do
+    sign_in_admin
     @sms_template = sms_templates(:one)
   end
 
@@ -26,7 +34,7 @@ class SmsTemplatesControllerTest < ActionController::TestCase
 
   test "should show sms_template" do
     get :show, id: @sms_template
-    assert_response :success
+    assert_redirected_to new_sms_template_preview_path(@sms_template)
   end
 
   test "should get edit" do

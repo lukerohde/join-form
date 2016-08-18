@@ -27,7 +27,7 @@
   <div class="form-group">
     <%= f.label :template_id %><br>
     <%= f.select :template_id,
-      selected_option(nil),
+      selected_option(@sms.template_id),
       {
           include_blank: false,
       },

@@ -1,6 +1,6 @@
 class SubscriptionsController < ApplicationController
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :renew]
-  before_action :set_subscription, only: [:show, :edit, :update, :destroy]
+  before_action :set_subscription, only: [:show, :edit, :update, :destroy, :end_point_put]
   before_action :set_join_form, except: [:index, :temp_report]
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create, :renew]
   before_filter :verify_hmac, if: :api_request?, only: [:create, :renew]
@@ -88,6 +88,14 @@ class SubscriptionsController < ApplicationController
         format.json { render json: @subscription.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def end_point_put
+    # If saving to the API failed, provide a way for the user to retry
+    nuw_end_point_person_put(@subscription)
+    notify(true) # send notices, even though its admin logged in
+    notice = @subscription.end_point_put_required ? "Subscription failed to save" :  "Subscription saved and message(s) sent" 
+    redirect_to request.referer, notice: notice
   end
 
   def save_step
@@ -219,12 +227,9 @@ class SubscriptionsController < ApplicationController
       if (Integer(id) rescue nil)
         @join_form = @union.join_forms.find(id)
       else
-        ## TODO Remove this hack when globalize works with rails 5
-        #zh_id = id + '-zh-tw' if locale.to_s.downcase == "zh_tw" && !id.include?("-zh-tw") 
-        #@join_form = @union.join_forms.where("short_name ilike ?",zh_id).first
-        ## END OF HACK
         @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?
       end
+      @subscription.join_form = @join_form if @subscription
     end
 
     def resubscribe?
@@ -324,12 +329,12 @@ class SubscriptionsController < ApplicationController
       session[:authorizer_id] = params[:authorizer_id] if params[:authorizer_id]
     end
 
-    def notify
+    def notify(resend = false)
       #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later 
       if @subscription.step == :thanks
         #JoinNoticeJob.perform_later(@subscription.id)
-        admin_notice if send_admin_notice?
-        welcome if send_welcome?
+        admin_notice if send_admin_notice?(resend)
+        welcome if send_welcome?(resend)
       else
         IncompleteJoinNoticeJob.perform_in(30 * 60, @subscription.id, @subscription.updated_at.to_i)
       end
@@ -369,19 +374,19 @@ class SubscriptionsController < ApplicationController
         (session[:authorizer_id].present? && session[:authorizer_id] != @subscription.person.email)
     end
 
-    def send_admin_notice?
+    def send_admin_notice?(resend = false)
       result = true
       # don't send welcome if someone is logged in, or the authorizer's email != the subcribers email
-      result = false if user_other_than_subscriber? 
+      result = false if user_other_than_subscriber? && !resend
       result
     end
 
-    def send_welcome?
+    def send_welcome?(resend = false)
       result = true
       # end point mocked in testing, don't want welcome done until membership can calculate what it has to calculate
       result = false if @subscription.end_point_put_required && !Rails.env.test? 
       # don't send welcome if someone is logged in, or the authorizer's email != the subcribers email
-      result = false if user_other_than_subscriber? 
+      result = false if user_other_than_subscriber? && !resend
       result
     end
 

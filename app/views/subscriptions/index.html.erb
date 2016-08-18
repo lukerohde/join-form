@@ -37,6 +37,7 @@
                 <%= link_to "<span class=\"glyphicon glyphicon-cog\"></span>".html_safe, edit_join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token) %>
                 <%= link_to "<span class=\"glyphicon glyphicon-comment\"></span>".html_safe, new_subscription_record_path(subscription) if subscription.person.try(:mobile) %>
                 <%= link_to "<span class=\"glyphicon glyphicon-trash\"></span>".html_safe, subscription.person.user? ? subscription : subscription.person, method: :delete, data: { confirm: 'Are you sure?' } %>
+                <%= link_to "<span class=\"glyphicon glyphicon-floppy-disk\"></span>".html_safe, end_point_put_union_join_form_subscription_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token), method: :patch, style: "color:red;" if subscription.end_point_put_required && subscription.step == :thanks %>
               </td>
             </tr>
           <% end %>

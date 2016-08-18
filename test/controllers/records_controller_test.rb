@@ -1,49 +1,41 @@
 require 'test_helper'
 
 class RecordsControllerTest < ActionController::TestCase
-  setup do
-    @record = records(:one)
+  include Devise::TestHelpers
+
+  def sign_in_admin
+    @admin = people(:admin)
+    sign_in @admin
   end
 
-  test "should get index" do
-    get :index
-    assert_response :success
-    assert_not_nil assigns(:records)
+  setup do
+    sign_in_admin
+    @record = records(:one)
+    @subscription = subscriptions(:one)
   end
 
   test "should get new" do
-    get :new
+    get :new, subscription_id: @subscription.id
     assert_response :success
   end
 
   test "should create record" do
     assert_difference('Record.count') do
-      post :create, record: { body_html: @record.body_html, body_plain: @record.body_plain, delivery_status: @record.delivery_status, parent_id: @record.parent_id, recipient: @record.recipient, recipient_id: @record.recipient_id, sender: @record.sender, sender_id: @record.sender_id, subject: @record.subject, template_id: @record.template_id, type: @record.type }
+      post :create, subscription_id: @subscription.id, record: { body_plain: @record.body_plain, subject: @record.subject, template_id: @record.template_id, type: 'SMS' }
     end
-
-    assert_redirected_to record_path(assigns(:record))
+    assert_redirected_to new_subscription_record_path(@subscription)
   end
 
   test "should show record" do
-    get :show, id: @record
+    get :show, subscription_id: @subscription.id, id: @record
     assert_response :success
-  end
-
-  test "should get edit" do
-    get :edit, id: @record
-    assert_response :success
-  end
-
-  test "should update record" do
-    patch :update, id: @record, record: { body_html: @record.body_html, body_plain: @record.body_plain, delivery_status: @record.delivery_status, parent_id: @record.parent_id, recipient: @record.recipient, recipient_id: @record.recipient_id, sender: @record.sender, sender_id: @record.sender_id, subject: @record.subject, template_id: @record.template_id, type: @record.type }
-    assert_redirected_to record_path(assigns(:record))
   end
 
   test "should destroy record" do
     assert_difference('Record.count', -1) do
-      delete :destroy, id: @record
+      delete :destroy, subscription_id: @subscription.id, id: @record
     end
 
-    assert_redirected_to records_path
+    assert_redirected_to new_subscription_record_url(@subscription)
   end
 end

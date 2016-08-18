@@ -3,14 +3,14 @@
 one:
   type: 
   subject: MyString
-  body_plain: MyText
+  body_plain: Hi {{first_name}}
   body_html: MyText
   delivery_status: MyString
   sender_id: 
   recipient_id: 
-  recipient: MyString
-  sender: MyString
-  template_id: 
+  recipient: one
+  sender: admin
+  template_id: one
   parent_id: 
 
 two:
@@ -21,7 +21,7 @@ two:
   delivery_status: MyString
   sender_id: 
   recipient_id: 
-  recipient: MyString
-  sender: MyString
+  recipient: one
+  sender: admin
   template_id: 
   parent_id: 
