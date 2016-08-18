@@ -30,7 +30,7 @@ class Application
 		def format
 			# credit card numbers with Xs in them are not valid
 			if credit_card? && self.AccountNo.gsub(/[^\d]/, '').length != 16
-				self.errors.add :base, "credit card number does not contain 16 digits" 
+				#self.errors.add :base, "credit card number does not contain 16 digits" 
 			end
 			if credit_card? && !(self.Expiry =~ /^\d{4}$/ || self.Expiry =~ /^\d{1,2}[\/-]\d{2}$/)
 				self.errors.add :base, "expiry date is poorly formatted" 
