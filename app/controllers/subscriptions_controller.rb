@@ -4,7 +4,7 @@ class SubscriptionsController < ApplicationController
   before_action :set_join_form, except: [:index, :temp_report]
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create, :renew]
   before_filter :verify_hmac, if: :api_request?, only: [:create, :renew]
-  before_action :set_authorizer, only: [:create]
+  before_action :set_authorizer, only: [:new]
   before_action :resubscribe?, only: [:create]
 
 #  layout 'subscription', except: [:index]
@@ -250,7 +250,7 @@ class SubscriptionsController < ApplicationController
         # If an existing subcription exists, determine secure and appropriate action
         if current_person && current_person.union.id == @join_form.union.id
           # This is really nasty - TODO I want the logged in user to be able to avoid the verification steps, but have to review the original record first.
-          patch_and_persist_subscription(params)
+          #patch_and_persist_subscription(params)
           redirect_to subscription_form_path(@subscription), notice: "We've matched a person already in our database!  Because you're logged in, redirected you to review and update this subscription instead."
         elsif nothing_to_expose(params, @subscription)
           # if the subscription from the database exposes no additional information
