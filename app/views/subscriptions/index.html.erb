@@ -24,8 +24,8 @@
             <tr>
               <td>
                 <%= link_to subscription.join_form.short_name, edit_join_form_path(subscription.join_form) %>
-                <%="<BR/><small>RENEWAL</small>" if subscription.renewal %>
-                <%="<BR/><small>#{format_source(subscription.source)}</small>" if subscription.source.present? %>
+                <%="<BR/><small>RENEWAL</small>".html_safe if subscription.renewal %>
+                <%="<BR/><small>#{format_source(subscription.source)}</small>".html_safe if subscription.source.present? %>
               </td>
               <td>
                 <%= subscription.person.display_name %><br/>
