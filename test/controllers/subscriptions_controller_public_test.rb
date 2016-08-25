@@ -160,6 +160,25 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert response.body.include?('data-step="address"'), "wrong step - should be contact_details"
     end
 
+
+
+  test "post step 1 - success, someone matched and identified who already has a pay method" do
+    @subscription = subscriptions(:contact_details_with_subscription_and_pay_method_subscription)
+    @person = @subscription.person
+
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({}))
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns({ external_id: 'NV123456', first_name: 'Luke', email: 'lrohde@nuw.org.au'})
+    
+    # Doesn't send a welcome message
+    assert_difference 'ActionMailer::Base.deliveries.count', 0 do 
+      post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: @person.first_name, mobile: @person.mobile, email: @person.email } }
+      assert_response :redirect
+      #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
+      follow_redirect!
+      assert response.body.include?('data-step="thanks"'), "wrong step - should be thanks"
+    end
+  end
+
   def step2_params
     @with_address = people(:contact_details_with_address_person)   
     params = step1_params
@@ -364,6 +383,13 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert @subscription.data["employer"] == "asdf_e", "custom column employer didn't update"
   end
  
+
+
+
+
+
+
+
 
   # test "post form with column list - success" do 
   #   with_address = subscriptions(:contact_details_with_address_subscription)

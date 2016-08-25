@@ -12,11 +12,26 @@ one:
 contact_details_only_person:
   first_name: luke
   email: contact_details_only@nuw.org.au 
+renewal_person:
+  first_name: luke
+  email: renewal_person@nuw.org.au 
+  union: owner
 contact_details_with_address_person:
   first_name: luke
   email: contact_details_with_address@nuw.org.au 
+  mobile: "0439541888"
   address1: "address1"
   address2: "address2"
   suburb: "subrb"
   state: "state"
   postcode: "postcode"
+contact_details_with_pay_method_person:
+  first_name: luke
+  email: contact_details_with_pay_method@nuw.org.au 
+  mobile: "0439541888"
+  address1: "address1"
+  address2: "address2"
+  suburb: "subrb"
+  state: "state"
+  postcode: "postcode"
+  union: owner

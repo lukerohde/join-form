@@ -10,6 +10,18 @@ one:
   ccv: MyString
   bsb: MyString
   token: one
+renewal:
+  join_form: two
+  person: renewal_person
+  token: renewal_person
+  renewal: true
+  source: nuw-api
+renewal2:
+  join_form: two
+  person: renewal_person
+  token: renewal_person
+  renewal: true
+  source: https://www.facebook.com/
 contact_details_only_subscription:
   join_form: two
   person: contact_details_only_person
@@ -26,8 +38,8 @@ contact_details_with_subscription_subscription:
   frequency: "W"
 contact_details_with_subscription_and_pay_method_subscription:
   join_form: two
-  person: contact_details_with_address_person
-  token: contact_details_with_subscription_token
+  person: contact_details_with_pay_method_person
+  token: contact_details_with_pay_method_token
   plan: asdf
   frequency: "W"
   pay_method: "AB"

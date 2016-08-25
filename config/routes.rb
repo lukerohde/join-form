@@ -57,7 +57,7 @@ Rails.application.routes.draw do
     
     get '/:union_id/:join_form_id/join', to: 'subscriptions#new', as: :new_join
     post '/:union_id/:join_form_id/join', to: 'subscriptions#create' 
-    post '/:union_id/:join_form_id/renew', to: 'subscriptions#renew' 
+    post '/:union_id/:join_form_id/renew', to: 'subscriptions#renew', as: :new_renewal
     get '/:union_id/:join_form_id/join/:id', to: 'subscriptions#edit', as: :edit_join
     get '/:union_id/:join_form_id/renew/:id', to: 'subscriptions#edit', as: :renew_join
     patch '/:union_id/:join_form_id/join/:id', to:  'subscriptions#update'

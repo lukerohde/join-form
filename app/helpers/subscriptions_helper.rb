@@ -5,7 +5,7 @@ module SubscriptionsHelper
   require './lib/signed_request.rb'
   
   include ActionView::Helpers::NumberHelper
-
+ 
   def start_hidden(step)
     @subscription.step == step ? "start_hidden" : ""
   end
@@ -86,6 +86,11 @@ module SubscriptionsHelper
     end
   end
 
+  def format_source(source)
+    match = source.match(/http.*:\/\/(w{3}.)?([a-zA-Z\-_.]*)/)
+    match ? match.captures[1] : source
+  end
+
   def callback_url(url, extra_params = {})
     u = Addressable::URI.parse(url)
     bad_request unless u.scheme
@@ -162,6 +167,7 @@ module SubscriptionsHelper
           :partial_account_number,
           :partial_card_number,
           :end_point_put_required, 
+          :source, 
           person_attributes: [
               :external_id,
               :first_name,
@@ -204,12 +210,20 @@ module SubscriptionsHelper
     patch_subscription(subscription, params)
   end
 
+  # def get_date_from_params(params, date_field)
+  #   result = nil
+  #   date_array = params.slice("#{date_field}(1i)", "#{date_field}(2i)", "#{date_field}(3i)").values.map(&:to_i) - [0]
+  #   raise "Invalid Date" unless [0,3].include?(date_array.length)
+  #   result = Date.new(*date_array).iso8601 if date_array.length = 3 
+  # end
+
   def patch_subscription(subscription, params)
     params.except(:person_attributes).each do |k,v|
       subscription.send("#{k}=", v) unless v.blank?
     end
 
-    params[:person_attributes].each do |k,v|
+    person_attributes = params[:person_attributes]
+    person_attributes.each do |k,v|
       subscription.person.send("#{k}=", v) unless v.blank?
     end
   end
@@ -267,7 +281,7 @@ module SubscriptionsHelper
 
   def nuw_end_point_load(subscription_params, join_form)
     payload = nuw_end_point_person_get(subscription_params)
-    nuw_end_point_load_subscription(payload, join_form)
+    nuw_end_point_load_subscription(payload, join_form, subscription_params)
   end
 
   def nuw_end_point_receive(payload, join_form)
@@ -280,7 +294,7 @@ module SubscriptionsHelper
   #  payload = nuw_end_point_person_get(subscription_params)
   #  unless payload.blank? 
 
-  def nuw_end_point_load_subscription(payload, join_form)
+  def nuw_end_point_load_subscription(payload, join_form, subscription_params = {})
     subscription = nil
     unless payload.blank? 
       # something found via the api, update existing record
@@ -292,6 +306,7 @@ module SubscriptionsHelper
       subscription = person.subscriptions.last unless person.new_record?
       subscription ||= Subscription.new(person: person) # person exists without a subscription (user)
 
+      subscription.source = 'nuw-api' if subscription.new_record? && api_request?
       subscription.join_form_id = join_form.id
       person.authorizer_id = join_form.person.id
       person.union_id = join_form.union.id

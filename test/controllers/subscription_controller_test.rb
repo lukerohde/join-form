@@ -25,6 +25,15 @@ class SubscriptionsControllerTest < ActionController::TestCase
 ), "subscription not listed"
   end
 
+  test "subscriptions list - logged in, renewal and source check" do
+    sign_in_admin
+    get :index
+    assert_response :success
+    assert response.body.include?('RENEWAL'), "renewal not listed"
+    assert response.body.include?('nuw-api'), "nuw-api source not listed"
+    assert response.body.include?('facebook.com'), "facebook source not listed"
+  end
+
   test "subscriptions list - don't show other unions subscriptions" do
   	skip("Not implemented")
   end

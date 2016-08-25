@@ -29,7 +29,8 @@ class SubscriptionsController < ApplicationController
     @subscription = Subscription.new
     @subscription.person = Person.new
     @subscription.join_form = @join_form
-    
+    @subscription.source = params[:source] || request.referer
+
     prefill_form(@subscription, params)
   end
 
@@ -42,7 +43,6 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     @subscription = Subscription.new(subscription_params)
-    @subscription.source = params[:source] || request.referrer
     @subscription.renewal = false
     
      # this is a crude hack to hide address, and probably should be a part of the address model on person
@@ -64,7 +64,6 @@ class SubscriptionsController < ApplicationController
   def renew
     request.body.rewind # needed for integration test
     @subscription = nuw_end_point_receive(JSON.parse(request.body.read), @join_form)
-    @subscription.source = 'nuw-api' if @subscription.new_record? && api_request?
     @subscription.renewal = true
 
     respond_to do |format|
@@ -240,11 +239,9 @@ class SubscriptionsController < ApplicationController
 
       # don't check resubscribe if the person is invalid, but do allow duplicate email. TODO dry up valiation logic - Subscription.new(params).valid? has a problem with duplicate email unfortunately so I can't use that.
       return if pparams[:first_name].blank? || !Person.email_valid?(pparams[:email]) 
-      
       # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
       @subscription = nuw_end_point_load(params, @join_form)
       if @subscription
-        @subscription.source = params[:source] || request.referrer
         @subscription.renewal = true
         
         # If an existing subcription exists, determine secure and appropriate action
@@ -272,20 +269,21 @@ class SubscriptionsController < ApplicationController
       end
     end
 
-    def patch_and_persist_subscription(params)
+    def patch_and_persist_subscription(subscription_params)
       # ActiveRecords update and assign_attributes
       # can't handle overwriting an existing record
       # with a new record. IDs and other data gets 
       # blanked.  This is designed to overwrite
       # attributes with only those params that are 
       # present
-      patch_subscription(@subscription, params)
+      patch_subscription(@subscription, subscription_params)
       result = @subscription.save_without_validation!
       # TODO Guarantee delivery
 
       if result
         nuw_end_point_person_put(@subscription)
-        notify
+        #binding.pry if @subscription.step == 'thanks' && params[:action] == 'create'
+        notify unless params[:action] == 'create' # prevent resubscribers with bank details getting a welcome on the first step
       end 
 
       result
@@ -416,9 +414,9 @@ class SubscriptionsController < ApplicationController
         # Hack date back to a regular format (for my API) TODO something better
         dob_array = params[:subscription][:person_attributes].slice('dob(1i)', 'dob(2i)', 'dob(3i)').values.map(&:to_i) - [0]
         if (dob_array.length == 3 && dob = Date.new(*dob_array).iso8601 rescue nil)
-         params[:subscription][:person_attributes][:dob] = dob
-         params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
+          params[:subscription][:person_attributes][:dob] = dob
         end 
+        params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
       end
       
       # Reject keys from pay methods that are not being submitted

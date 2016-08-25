@@ -44,14 +44,18 @@ class SubscriptionsControllerPublicDateTest < ActionDispatch::IntegrationTest
     assert response.body.include?('data-step="address"'), "wrong step - should be contact_details"
   end
 
-  test "post step 1 - failure - validates partly blank date" do
-    # TODO I don't know how to return a validation message on partial date
+  test "post step 1 - failure - validates partly blank date, when resubscribing and being patched" do
+    # TODO I don't know how to return a validation message on partial date, when being combined in subscription_params
+    # I should find where in the API it was struggling with the date params and fix it there maybe.
+    # blanks the date, so won't be patched
 
-  #   SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns({})
-  #   SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns({ external_id: 'NV123456', first_name: 'Luke', email: 'lrohde@nuw.org.au'})
-  #   post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: "lrohde", email: "lrohde@nuw.org.au", 'dob(1i)' => "" , 'dob(2i)' => "01" , 'dob(3i)' => "01" } }
-  #   assert_response :200
-  #   assert response.body.include?('data-step="address"'), "wrong step - should be contact_details"
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns({})
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns({ external_id: 'NV123456', first_name: 'Luke', email: "contact_details_with_address@nuw.org.au"})
+    post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: "luke", email: "contact_details_with_address@nuw.org.au", mobile: '0439541888', 'dob(1i)' => "" , 'dob(2i)' => "01" , 'dob(3i)' => "01" } }
+    #assert_response 200
+    assert_response :redirect
+    follow_redirect!
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be contact_details"
   end
   
 end
