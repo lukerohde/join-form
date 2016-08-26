@@ -109,7 +109,7 @@ class RecordsController < ApplicationController
     @record.body_plain = Liquid::Template.parse(@record.body_plain).render(merge_data(@subscription))
     @record.sender = current_person
     @record.recipient = @person
-    @record.message_id = SecureRandom.uuid
+    @record.message_id = "#{SecureRandom.uuid}@#{ENV['mailgun_domain']}" 
 
     if @record.type == 'SMS'
       @record.sender_address = format_mobile(ENV['twilio_number'])
