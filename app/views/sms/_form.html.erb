@@ -1,10 +1,18 @@
-<%= form_for([@subscription, @sms.becomes(Record)], :html => { class: "form"}) do |f| %>
-    <% if @sms.errors.any? %>
+
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#">SMS</a></li>
+  <li><a onclick="window.location.href = '<%= new_subscription_record_path(@subscription)%>?join_form_id=' + $('#record_join_form_id').val()+ '&type=email'">Email</a></li>
+</ul>
+<div class="nav-tabs-container">
+<br/>
+
+<%= form_for([@subscription, @record.becomes(Record)], :html => { class: "form"}) do |f| %>
+    <% if @record.errors.any? %>
       <div id="error_explanation">
-        <h2><%= pluralize(@sms.errors.count, "error") %> prohibited this record from being saved:</h2>
+        <h2><%= pluralize(@record.errors.count, "error") %> prohibited this record from being saved:</h2>
 
         <ul>
-        <% @sms.errors.full_messages.each do |message| %>
+        <% @record.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
         </ul>
@@ -25,19 +33,36 @@
     <%= content_tag :to, "#{@person.display_name} #{format_mobile(@person.mobile)}", class: "form-control" %>
   </div>
   <div class="form-group">
-    <%= f.label :template_id %><br>
-    <%= f.select :template_id,
-      selected_option(@sms.template_id),
+    <%= f.label :join_form_id %><br>
+    <%= f.select :join_form_id,
+      selected_option(@record.join_form),
       {
           include_blank: false,
       },
       data: { 
-        placeholder: "Choose an sms template.",
+        placeholder: "Choose a join form.",
+        url: join_forms_path
+      }, 
+      class: "ac-select2 form-control", 
+      style: "width: 100%;", 
+      onchange: "if ($('#record_join_form_id').val() != null) window.location.href = '#{new_subscription_record_path(@subscription)}?' + record_form_params()"
+    %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :template_id %><br>
+    <%= f.select :template_id,
+      selected_option(@record.template),
+      {
+          include_blank: false,
+      },
+      data: { 
+        placeholder: "Choose an SMS template.",
         url: sms_templates_path
       }, 
       class: "ac-select2 form-control", 
       style: "width: 100%;", 
-      onchange: "window.location.href = '#{new_subscription_record_path(@subscription)}?template_id=' + $('#record_template_id').val()"
+      onchange: "if ($('#record_template_id').val() != null) window.location.href = '#{new_subscription_record_path(@subscription)}?' + record_form_params();"
     %>
   </div>
   <div class="form-group">
@@ -49,6 +74,7 @@
     <%= f.submit "Send SMS" %>
   </div>
 <% end %>
+</div>
 
 <h1>History</h1>
 <div style="margin: 15px;">

@@ -8,6 +8,8 @@ Rails.application.routes.draw do
     post '/records/update_sms', to: 'records#update_sms'
     resources :subscriptions do 
       resources :records, except: [:edit]
+      #resources :sms, except: [:edit], type: "SMS"
+      #resources :emails, except: [:edit], type: "Email"
     end
 
     # mount ActionCable.server => '/cable'

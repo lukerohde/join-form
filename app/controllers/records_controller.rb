@@ -23,19 +23,14 @@ class RecordsController < ApplicationController
 
   # GET /records/new
   def new
-    body = ""
-    if params['template_id'].present?
-      template = SmsTemplate.find(params['template_id'])
-      body = Liquid::Template.parse(template.body).render(merge_data(@subscription))
-    end
-
-    @sms = Record.new({
-      type: "SMS",
-      body_plain: body
-    })
+    @record = Record.new_from_params(params)
+    @record.merge(merge_data(@subscription))
 
     @history = Record.where(["sender_id = ? or recipient_id = ?", @person.id, @person.id])
+  
+    render @record.type.pluralize.downcase + '/new'
   end
+
 
   def receive_sms
     replying_to = Record.where(recipient_address: format_mobile(params['From'])).last
@@ -62,7 +57,6 @@ class RecordsController < ApplicationController
     end
     
     render xml: Twilio::TwiML::Response.new.to_xml
-    
   end
 
   def update_sms
@@ -78,20 +72,21 @@ class RecordsController < ApplicationController
     @record = Record.new(record_params)
     @record.body_plain = Liquid::Template.parse(@record.body_plain).render(merge_data(@subscription))
     @record.sender = current_person
-    @record.sender_address = format_mobile(ENV['twilio_number'])
     @record.recipient = @person
-    @record.recipient_address = format_mobile(@person.mobile)
+    
+    if @record.type == 'SMS'
+      @record.sender_address = format_mobile(ENV['twilio_number'])
+      @record.recipient_address = format_mobile(@person.mobile)
+    else
+      @record.sender_address = reply_to(@record.sender.email)
+      @record.recipient_address = @person.email
+    end
+
     @record.delivery_status = "not sent"
-
-    #if @record.valid? && @record.type == "SMS"
-    #  unless send_sms(@record)
-    #    @record.errors.add(:base, "SMS failed to send")
-    #  end
-    #end
-
+    
     respond_to do |format|
       if @record.save
-        send_sms(@record)
+        send_message(@record)
 
         format.html { redirect_to new_subscription_record_path(@subscription), notice: 'Record was successfully created.' }
         format.json { render :show, status: :created, location: @record }
@@ -142,6 +137,12 @@ class RecordsController < ApplicationController
     end
 
     def set_join_form
+      if params['join_form_id'].present?
+        @subscription.join_form_id = params['join_form_id'] 
+      else
+        params['join_form_id'] = @subscription.join_form_id
+      end
+
       @join_form = @subscription.join_form
     end
 

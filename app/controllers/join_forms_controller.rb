@@ -6,7 +6,10 @@ class JoinFormsController < ApplicationController
   # GET /join_forms.json
   def index
     #@join_forms = JoinForm.all
-    redirect_to union_path(@union)
+    respond_to do |format|
+      format.html { redirect_to union_path(@union) }
+      format.json { @join_forms = JoinForm.where(union_id: @union.id).filter(params.slice(:name_like)) }
+    end
   end
 
   def show

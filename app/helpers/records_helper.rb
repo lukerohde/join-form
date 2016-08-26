@@ -9,6 +9,21 @@ module RecordsHelper
   	result
   end
 
+  def reply_to(email)
+    email.gsub(/@.*/, "@#{ENV['mailgun_domain']}")
+  end
+
+  def send_message(record)
+    if record.type == 'SMS'
+      send_sms(record)
+    else
+      send_email(record)
+    end
+  end
+
+  def send_email(email)
+    PersonMailer.subscriber_email(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain).deliver_later
+  end
 
   def send_sms(sms)
   	result = true

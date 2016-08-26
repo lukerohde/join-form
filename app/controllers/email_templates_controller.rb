@@ -7,7 +7,7 @@ class EmailTemplatesController < ApplicationController
   # GET /email_templates
   # GET /email_templates.json
   def index
-    @email_templates = EmailTemplate.all
+    @email_templates = EmailTemplate.filter(params.slice(:name_like))
   end
 
   # GET /email_templates/1

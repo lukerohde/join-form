@@ -1,0 +1,3 @@
+class EmailsController < RecordsController
+
+end

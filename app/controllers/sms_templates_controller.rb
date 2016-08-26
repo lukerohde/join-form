@@ -8,7 +8,7 @@ class SmsTemplatesController < ApplicationController
   # GET /sms_templates
   # GET /sms_templates.json
   def index
-    @sms_templates = SmsTemplate.all
+    @sms_templates = SmsTemplate.filter(params.slice(:name_like))
   end
 
   def show

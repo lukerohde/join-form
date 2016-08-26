@@ -24,6 +24,14 @@ class JoinForm < ApplicationRecord
 	validate :signature_for_prd_and_abr
 	validate :no_establishment_fee_for_prd_and_abr
 
+	include Filterable
+  scope :name_like, -> (name) {where("short_name ilike ?", "%#{name}%")}
+
+  def name
+  	formatted_fee = ActionController::Base.helpers.number_to_currency(fee(max_frequency))
+  	"#{short_name} - #{formatted_fee}/#{max_frequency}"
+  end
+
 	def signature_for_prd_and_abr
 		if (payroll_deduction_on || direct_debit_release_on) && !signature_required
 			errors.add :base, "Signature must be turned on for forms with direct debit release or payroll deduction"

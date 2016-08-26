@@ -17,6 +17,11 @@ class PersonMailer < ApplicationMailer
 		mail(from: from.email, to: to.email, bcc: from.email, subject: subject)
 	end
 
+	def subscriber_email(to, from, reply_to, subject, body)
+		@body = body
+		mail(from: from.email, to: to.email, reply_to: reply_to, subject: subject)
+	end
+
 	def verify_email(subscription, subscription_params, host)
 		@subscription = subscription
 		uri = Addressable::URI.parse("https://#{host}#{subscription_form_path(@subscription)}")

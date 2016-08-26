@@ -1,0 +1,101 @@
+
+<ul class="nav nav-tabs">
+  <li><a onclick="window.location.href = '<%= new_subscription_record_path(@subscription)%>?join_form_id=' + $('#record_join_form_id').val() + '&type=sms'">SMS</a></li>
+  <li class="active"><a href="#">Email</a></li>
+</ul>
+
+<div class='nav-tabs-container'>
+<br/>
+
+<%= form_for([@subscription, @record.becomes(Record)], :html => { class: "form"}) do |f| %>
+    <% if @record.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@record.errors.count, "error") %> prohibited this record from being saved:</h2>
+
+        <ul>
+        <% @record.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+    <%= f.label :join_form %><br>
+    <%= content_tag :join_form, "<a href=\"#{edit_join_url(@subscription.join_form.union.short_name, @subscription.join_form.short_name, @subscription.token, locale: 'en')}\">#{edit_join_url(@subscription.join_form.union.short_name, @subscription.join_form.short_name, @subscription.token, locale: 'en')}</a>".html_safe, class: "form-control" %>
+  </div>
+    
+  <div class="form-group">
+    <%= f.label :from %><br>
+    <%= content_tag :from, "#{current_person.email} (reply-to: #{reply_to(current_person.email)}", class: "form-control" %>
+  </div>    
+  <div class="form-group">
+    <%= f.label :to %><br>
+    <%= content_tag :to, "#{@person.display_name} (#{@person.email})", class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :join_form_id %><br>
+    <%= f.select :join_form_id,
+      selected_option(@record.join_form),
+      {
+          include_blank: false,
+      },
+      data: { 
+        placeholder: "Choose a join form.",
+        url: join_forms_path
+      }, 
+      class: "ac-select2 form-control", 
+      style: "width: 100%;", 
+      onchange: "if ($('#record_join_form_id').val() != null) window.location.href = '#{new_subscription_record_path(@subscription)}?' + record_form_params()"
+    %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :template_id %><br>
+    <%= f.select :template_id,
+      selected_option(@record.template),
+      {
+          include_blank: false,
+      },
+      data: { 
+        placeholder: "Choose an email template.",
+        url: email_templates_path
+      }, 
+      class: "ac-select2 form-control", 
+      style: "width: 100%;", 
+      onchange: "if ($('#record_template_id').val() != null) window.location.href = '#{new_subscription_record_path(@subscription)}?' + record_form_params();"
+    %>
+  </div>
+ 
+  <div class="form-group">
+    <%= f.label :subject %><br>
+    <%= f.text_field :subject, class: "form-control" %>
+  </div>
+  <div class="form-group">
+    <%= f.label :body_plain %><br>
+    <%= f.text_area :body_plain, rows: 5, class: "form-control" %>
+  </div>
+  <%= f.hidden_field :type %>
+  <div class="actions">
+    <%= f.submit "Send Email" %>
+  </div>
+<% end %>
+</div>
+
+<h1>History</h1>
+<div style="margin: 15px;">
+<% @history.order('created_at desc').each do |i| %>
+  <div class="<%= i.sender == @person ? 'text-right' : '' %>">
+  <%= i.sender.try(:display_name) %> -> 
+  <%=i.recipient.try(:display_name) %><br/>
+  <small><%= (i.delivery_status||"").titlecase %> <%= local_time_tag(i.updated_at) %></small><br/>
+  </div>
+  <%= "Subject: #{i.subject}" if i.subject %>
+  <pre>
+<%=i.body_plain %>
+  </pre>  
+  <hr/>
+<% end %> 
+</div>
+
