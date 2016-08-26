@@ -1,11 +1,11 @@
 class RecordsController < ApplicationController
   before_action :set_record, only: [:show, :edit, :update, :destroy]
-  before_action :set_subscription, except: [:receive_sms, :update_sms]
-  before_action :set_person, except: [:receive_sms, :update_sms]
-  before_action :set_join_form, except: [:receive_sms, :update_sms]
+  before_action :set_subscription, except: [:receive_sms, :update_sms, :receive_email, :update_email]
+  before_action :set_person, except: [:receive_sms, :update_sms, :receive_email, :update_email]
+  before_action :set_join_form, except: [:receive_sms, :update_sms, :receive_email, :update_email]
 
-  skip_before_filter :verify_authenticity_token, :only => [:receive_sms, :update_sms]
-  skip_before_filter :authenticate_person!, :only => [:receive_sms, :update_sms]
+  skip_before_filter :verify_authenticity_token, :only => [:receive_sms, :update_sms, :receive_email, :update_email]
+  skip_before_filter :authenticate_person!, :only => [:receive_sms, :update_sms, :receive_email, :update_email]
 
   include RecordsHelper
   include SubscriptionsHelper
@@ -33,7 +33,7 @@ class RecordsController < ApplicationController
 
 
   def receive_sms
-    replying_to = Record.where(recipient_address: format_mobile(params['From'])).last
+    replying_to = Record.where(recipient_address: params['From']).last
     from = replying_to.recipient
     to = replying_to.sender
 
@@ -41,7 +41,7 @@ class RecordsController < ApplicationController
       PersonMailer.private_email(to, from, "SMS Reply from #{from.first_name} #{from.last_name}", params[:Body], request, new_subscription_record_url(from.subscriptions.last)).deliver_now     
   
       # This is crude - maybe I should record the private_email above, or send to NUW Assist and have an API call for all NUW Assist messages!
-      @sms = Record.create({
+      @record = Record.create({
         sender_address: format_mobile(params['From']), 
         recipient_address: ENV['twilio_number'], # should this be to.email
         sender: from,
@@ -59,6 +59,42 @@ class RecordsController < ApplicationController
     render xml: Twilio::TwiML::Response.new.to_xml
   end
 
+  def receive_email
+    binding.pry
+    replying_to = Record.where(message_id: params['Message-Id']).last
+    replying_to ||= Record.where(recipient_address: params['Sender'] || params['sender']).last
+    
+    from = replying_to.recipient
+    to = replying_to.sender
+    
+    begin 
+      PersonMailer.private_email(to, from, params['Subject'] || params['subject'], params['stripped-text'], request, new_subscription_record_url(from.subscriptions.last) + "?type=email", message_id).deliver_now     
+  
+      # This is crude - maybe I should record the private_email above, or send to NUW Assist and have an API call for all NUW Assist messages!
+      @record = Record.create({
+        sender_address: params['Sender'] || params['sender'], 
+        recipient_address: reply_to(to.email), 
+        sender: from,
+        recipient: to, 
+        type: "Email",
+        body_plain: params['stripped-text'], 
+        delivery_status: 'received',
+        message_id: params['Message-Id']
+      })
+
+      render status: :ok, nothing: true
+    rescue Exception => exception
+      ExceptionNotifier.notify_exception(exception,
+        :env => request.env, :data => {:message => "failed to relay or record incoming Email"})
+      
+      render status: :internal_server_error, nothing: true
+    end
+  end
+
+  def update_email
+
+  end
+
   def update_sms
     @sms = Record.find(params[:id])
     @sms.update({delivery_status: params[:MessageStatus]})
@@ -73,7 +109,8 @@ class RecordsController < ApplicationController
     @record.body_plain = Liquid::Template.parse(@record.body_plain).render(merge_data(@subscription))
     @record.sender = current_person
     @record.recipient = @person
-    
+    @record.message_id = SecureRandom.uuid
+
     if @record.type == 'SMS'
       @record.sender_address = format_mobile(ENV['twilio_number'])
       @record.recipient_address = format_mobile(@person.mobile)
@@ -88,7 +125,7 @@ class RecordsController < ApplicationController
       if @record.save
         send_message(@record)
 
-        format.html { redirect_to new_subscription_record_path(@subscription), notice: 'Record was successfully created.' }
+        format.html { redirect_to new_subscription_record_path(@subscription)+"?type=#{@record.type}", notice: 'Record was successfully created.' }
         format.json { render :show, status: :created, location: @record }
       else
         format.html { render :new }

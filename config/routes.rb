@@ -6,6 +6,8 @@ Rails.application.routes.draw do
     
     post '/records/receive_sms', to: 'records#receive_sms'
     post '/records/update_sms', to: 'records#update_sms'
+    post '/records/receive_email', to: 'records#receive_email'
+    post '/records/update_email', to: 'records#update_email'
     resources :subscriptions do 
       resources :records, except: [:edit]
       #resources :sms, except: [:edit], type: "SMS"

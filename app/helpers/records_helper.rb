@@ -22,7 +22,7 @@ module RecordsHelper
   end
 
   def send_email(email)
-    PersonMailer.subscriber_email(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain).deliver_later
+    PersonMailer.subscriber_email(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain, email.message_id).deliver_later
   end
 
   def send_sms(sms)

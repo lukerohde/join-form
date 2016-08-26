@@ -17,8 +17,10 @@ class PersonMailer < ApplicationMailer
 		mail(from: from.email, to: to.email, bcc: from.email, subject: subject)
 	end
 
-	def subscriber_email(to, from, reply_to, subject, body)
+	def subscriber_email(to, from, reply_to, subject, body, message_id)
 		@body = body
+		headers['Message-Id'] = message_id # for reply tracking.
+
 		mail(from: from.email, to: to.email, reply_to: reply_to, subject: subject)
 	end
 
