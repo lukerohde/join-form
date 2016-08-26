@@ -20,8 +20,10 @@ class PersonMailer < ApplicationMailer
 	def subscriber_email(to, from, reply_to, subject, body, message_id)
 		@body = body
 		headers['Message-Id'] = message_id # for reply tracking.
-		
-		mail(from: from.email, to: to.email, reply_to: reply_to, subject: subject)
+
+		mail = mail(from: from.email, to: to.email, reply_to: reply_to, subject: subject)
+		mail.mailgun_headers = {'Message-Id' => message_id}
+		mail
 	end
 
 	def verify_email(subscription, subscription_params, host)
