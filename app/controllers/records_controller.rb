@@ -60,7 +60,6 @@ class RecordsController < ApplicationController
   end
 
   def receive_email
-    binding.pry
     replying_to = Record.where(message_id: params['Message-Id']).last
     replying_to ||= Record.where(recipient_address: params['Sender'] || params['sender']).last
     
@@ -68,7 +67,7 @@ class RecordsController < ApplicationController
     to = replying_to.sender
     
     begin 
-      PersonMailer.private_email(to, from, params['Subject'] || params['subject'], params['stripped-text'], request, new_subscription_record_url(from.subscriptions.last) + "?type=email", message_id).deliver_now     
+      PersonMailer.private_email(to, from, params['Subject'] || params['subject'], params['stripped-text'], request, new_subscription_record_url(from.subscriptions.last) + "?type=email").deliver_now     
   
       # This is crude - maybe I should record the private_email above, or send to NUW Assist and have an API call for all NUW Assist messages!
       @record = Record.create({
