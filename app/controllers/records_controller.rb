@@ -61,7 +61,6 @@ class RecordsController < ApplicationController
 
   def receive_email
     replying_to = Record.where(message_id: params['In-Reply-To']).last
-    binding.pry
     replying_to ||= Record.where(recipient_address: params['Sender'] || params['sender']).last
     
     from = replying_to.recipient
@@ -115,6 +114,7 @@ class RecordsController < ApplicationController
       @record.sender_address = format_mobile(ENV['twilio_number'])
       @record.recipient_address = format_mobile(@person.mobile)
     else
+      @record.subject = Liquid::Template.parse(@record.subject).render(merge_data(@subscription))
       @record.sender_address = reply_to(@record.sender.email)
       @record.recipient_address = @person.email
     end
