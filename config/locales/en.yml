@@ -42,6 +42,8 @@ en:
         wysiwyg_footer_placeholder: Optional footer to appear at the bottom of your join form 
         group_id: Optional Group/Company/Site ID
         group_id_placeholder: "Optionally provide a group/company/site id for members to go into, if left blank, member group allocation will be left to admin"
+        tags: Optional Tags
+        tags_placeholder: "Optionally provide a comma separated list of tags to add to the member"
         base_rate_id: Plan ID
         base_rate_id_placeholder: Please enter an id identify what fee level/plan they member is on
         base_rate_establishment:  Up front payment 

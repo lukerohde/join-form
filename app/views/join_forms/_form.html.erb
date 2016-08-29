@@ -55,6 +55,10 @@
     <%= f.text_field :group_id, class: "form-control", placeholder: t('helpers.label.join_form.group_id_placeholder') %>
   </div>
   <div class="form-group">
+    <%= f.label :tags %><br>
+    <%= f.text_field :tags, class: "form-control", placeholder: t('helpers.label.join_form.tags_placeholder') %>
+  </div>
+  <div class="form-group">
     <%= f.label :base_rate_establishment %><br>
     <small><%=t('helpers.label.join_form.base_rate_establishment_description')%></small><br/>
     <%= f.text_field :base_rate_establishment, class: "form-control" %>

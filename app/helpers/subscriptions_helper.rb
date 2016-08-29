@@ -482,6 +482,7 @@ module SubscriptionsHelper
     result = hash.slice(:frequency, :plan, :data)
     result[:url] = ENV['APPLICATION_ROOT'] + subscription_form_path(subscription)
     result[:group_id] = subscription.join_form.group_id if subscription.join_form.group_id.present?
+    result[:tags] = subscription.join_form.tags if subscription.join_form.tags.present?
     
     if subscription.pay_method_saved?
       result[:establishment_fee] = subscription.total
