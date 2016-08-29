@@ -116,7 +116,15 @@ module NUWDBHelper
 			result[:MemberFeeGroupID] = api_data[:subscription][:plan]
 			result[:CompanyID] = api_data[:subscription][:group_id] if api_data[:subscription][:group_id].present?
 			result[:MemberPayCompanyID] = api_data[:subscription][:group_id] if api_data[:subscription][:group_id].present?
-			
+
+			if api_data[:subscription][:tags].present?
+				tags = person.MemberTags if person
+				tags ||= ""
+				tags = tags.split(',') + (api_data[:subscription][:tags]||"").split(',')
+				tags = tags.uniq.join(",")
+				result[:MemberTags] = tags
+			end
+
 			case api_data[:subscription][:pay_method]
 				when "CC" then result[:MemberPaymentType] = "C"
 				when "AB" then result[:MemberPaymentType] = "D"
@@ -178,7 +186,7 @@ module NUWDBHelper
 					y = (subscription[:expiry_year].to_s)[2..4]
 					result = result.merge({
 						AccountType: cn[0] == '4' ? 'V' : 'M',
-						AccountNo: cn,
+						AccountNo: cn.gsub(/[^0-9]/,""),
 						Expiry: "#{m}/#{y}",
 						RetryPaymentDate: Date.today, 
 						RetryPaymentUser: 'nuw-api', 
