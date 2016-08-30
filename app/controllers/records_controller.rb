@@ -91,7 +91,14 @@ class RecordsController < ApplicationController
   end
 
   def update_email
+    replying_to = Record.where(message_id: params['Message-Id']).last
+    replying_to ||= Record.where(recipient_address: params['recipient'] || params['Recipient']).last
+    
+    if replying_to
+      replying_to.update(delivery_status: params['event'])
+    end
 
+    render status: :ok, nothing: true
   end
 
   def update_sms

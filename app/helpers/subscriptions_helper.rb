@@ -406,7 +406,7 @@ module SubscriptionsHelper
       #subscription[:expiry] = nil
       #subscription.pay_method = "-" # dash indicates that the details are already on the system
     end 
-    
+
     subscription[:end_point_put_required] = false
     subscription.save_without_validation!
   end
