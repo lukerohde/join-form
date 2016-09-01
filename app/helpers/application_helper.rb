@@ -120,4 +120,11 @@ module ApplicationHelper
   def subscription_short_path
     "/#{locale}/#{@union.short_name.downcase}/#{join_form_id(@join_form)}/#{@subscription.token}"
   end  
+
+
+  def send_and_file(msg, person = nil, tags = "")
+  	msg.deliver_later
+  	filing = FilingMailer::file_email(msg.to_s, person.try(:id), tags)
+  	filing.deliver_later
+	end
 end

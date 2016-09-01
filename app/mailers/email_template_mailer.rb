@@ -49,6 +49,6 @@ class EmailTemplateMailer < ApplicationMailer
     end
 
 
-    @mail = mail to: to, cc: cc, from: "noreply@#{ENV['mailgun_host']}", subject: @subject 
+    mail to: to, cc: cc, from: "noreply@#{ENV['mailgun_host']}", subject: @subject 
   end
 end

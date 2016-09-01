@@ -22,9 +22,9 @@ module RecordsHelper
   end
 
   def send_email(email)
-    mail = PersonMailer.subscriber_email(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain, email.message_id)#.deliver_later
+    msg = PersonMailer.subscriber_email(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain, email.message_id)#.deliver_later
     #mail.enforced_message_id = email.message_id
-    mail.deliver_later
+    send_and_file(msg, email.recipient, 'join_email')
   end
 
   def send_sms(sms)
@@ -34,13 +34,13 @@ module RecordsHelper
       @client = Twilio::REST::Client.new ENV["twilio_sid"], ENV["twilio_token"]
     
       cb = records_update_sms_url(id: @record.id)
-        
-      sms = @client.messages.create(
+      msg = @client.messages.create(
 	      from: sms.sender_address,
 	      to: sms.recipient_address,
 	      body: sms.body_plain,
 	      statusCallback: cb =~ /localhost/ ? nil : cb
       )
+      FilingMailer::file_email(sms.body_plain, sms.recipient.try(:id), "join_sms").deliver_later
     rescue StandardError => exception
     	result = false
       ExceptionNotifier.notify_exception(exception,

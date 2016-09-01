@@ -43,11 +43,8 @@ class EmailTemplates::PreviewController < ApplicationController
 	end
 
 	def create
-		msg = EmailTemplateMailer.merge(@email_template.id, @subscription.id, params[:preview_email])
-		msg.deliver_later
-
-		FilingMailer::file(msg.to_s, @subscription.person.id).delivery_later
-
+		EmailTemplateMailer.merge(@email_template.id, @subscription.id, params[:preview_email]).deliver_later
+		
 		redirect_to new_email_template_preview_path(@email_template, subscription_id: @subscription.id), notice: "Preview Email Sent"
 	end
 

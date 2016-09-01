@@ -361,7 +361,7 @@ class SubscriptionsController < ApplicationController
       begin
         if template_id = @subscription.join_form.welcome_email_template_id
           msg = EmailTemplateMailer.merge(template_id, @subscription.id, @subscription.person.email)
-          msg.deliver_later 
+          send_and_file(msg, @subscription.person, "welcome_email")
         end
       rescue Exception => exception
         ExceptionNotifier.notify_exception(exception,

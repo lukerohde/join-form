@@ -1,12 +1,22 @@
 class FilingMailer < ApplicationMailer
 
 
-	def file(msg, person_id)
-		binding.pry
-		msg = Mail.new(msg)
-		person = Person.find(person_id)
-		attachments = msg.attachments
-		@subject = "DONE: #{person.external_id if person} #{msg.subject}"
-		mail to: ENV['filing_email'], from: person.email, body: msg.text_part.body.raw_source, subject: @subject
+	def file_email(msg, person_id = nil, tags = "")
+		if to = ENV['filing_email']
+			msg = Mail.new(msg)
+			person = Person.find_by_id(person_id)
+			attachments = msg.attachments
+			@subject = "DONE: #{tags} #{msg.subject} #{'(' + person.external_id + ')' if person}"
+			@body = (msg.text_part || msg).body.raw_source
+			mail to: to, from: msg.from, body: @body, subject: @subject
+		end 
+	end
+
+	def file_sms(msg, person_id = nil, tags = "")
+		if to = ENV['filing_email']
+			person = Person.find_by_id(person_id)
+			@subject = "DONE: #{tags} SMS from #{person.try(:display_name)} #{'(' + person.external_id + ')' if person}"
+			mail to: to, body: msg, subject: @subject
+		end
 	end
 end
