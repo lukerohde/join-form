@@ -35,15 +35,19 @@ class EmailTemplates::PreviewController < ApplicationController
 
 	def download_pdf
 		@pdf_url = pdf_email_template_preview_url(@email_template, subscription_id: @subscription.token, locale: locale) 
-    t = Thread.new do
+    #t = Thread.new do
    		binary = WickedPdf.new.pdf_from_url(@pdf_url)
-  	end
-  	t.join
+  	#end
+  	#t.join
   	send_data binary, :type => 'application/pdf' #,:disposition => 'inline'
 	end
 
 	def create
-		EmailTemplateMailer.merge(@email_template.id, @subscription.id, params[:preview_email]).deliver_later
+		msg = EmailTemplateMailer.merge(@email_template.id, @subscription.id, params[:preview_email])
+		msg.deliver_later
+
+		FilingMailer::file(msg.to_s, @subscription.person.id).delivery_later
+
 		redirect_to new_email_template_preview_path(@email_template, subscription_id: @subscription.id), notice: "Preview Email Sent"
 	end
 

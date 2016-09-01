@@ -359,8 +359,10 @@ class SubscriptionsController < ApplicationController
       # I'm being cautious here due to the complexity, but should not be required with 'deliver_later' which would ordinarily crash in the background and send an exception
     
       begin
-        template_id = @subscription.join_form.welcome_email_template_id
-        EmailTemplateMailer.merge(template_id, @subscription.id, @subscription.person.email).deliver_later if template_id.present?
+        if template_id = @subscription.join_form.welcome_email_template_id
+          msg = EmailTemplateMailer.merge(template_id, @subscription.id, @subscription.person.email)
+          msg.deliver_later 
+        end
       rescue Exception => exception
         ExceptionNotifier.notify_exception(exception,
           :env => request.env, :data => {:message => "failed to send welcome email"})

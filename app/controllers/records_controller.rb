@@ -60,6 +60,7 @@ class RecordsController < ApplicationController
   end
 
   def receive_email
+
     replying_to = Record.where(message_id: params['In-Reply-To']).last
     replying_to ||= Record.where(recipient_address: params['Sender'] || params['sender']).last
     

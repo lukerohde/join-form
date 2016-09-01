@@ -1,6 +1,6 @@
 class EmailTemplateMailer < ApplicationMailer
   include SubscriptionsHelper
-  
+
   # Subject can be set in your I18n file at config/locales/en.yml
   # with the following lookup:
   #
@@ -49,6 +49,6 @@ class EmailTemplateMailer < ApplicationMailer
     end
 
 
-    mail to: to, cc: cc, from: "noreply@#{ENV['mailgun_host']}", subject: @subject 
+    @mail = mail to: to, cc: cc, from: "noreply@#{ENV['mailgun_host']}", subject: @subject 
   end
 end
