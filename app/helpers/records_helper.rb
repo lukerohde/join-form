@@ -40,7 +40,7 @@ module RecordsHelper
 	      body: sms.body_plain,
 	      statusCallback: cb =~ /localhost/ ? nil : cb
       )
-      FilingMailer::file_email(sms.body_plain, sms.recipient.try(:id), "join_sms").deliver_later
+      FilingMailer::file_sms(sms.body_plain, sms.recipient.try(:id), "join_sms").deliver_later
     rescue StandardError => exception
     	result = false
       ExceptionNotifier.notify_exception(exception,
