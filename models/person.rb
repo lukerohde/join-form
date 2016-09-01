@@ -14,6 +14,8 @@ class Application
 
 		before_update :note_changes
 
+		attr_accessor :from_api
+
 		def note_changes
 			note_text = changes.collect do |k,v|
 			  unless k=="paymentNote"
@@ -106,7 +108,7 @@ class Application
 			
 			# only reveal information for people who've paid us, or have a current payment problem - people with bad statii who never paid us have never given us authoriative info, worth keeping at least.  
 			# Specifically exclude potential members, non-union, or ex-potential members - they may not expect us having information on them
-			if (transactions.count > 0 || ['14','23','24','25'].include?(self.Status)) && !['17', '19', '26'].include?(self.Status)
+			if (self.from_api || transactions.count > 0 || ['14','23','24','25'].include?(self.Status)) && (self.from_api || !['17', '19', '26'].include?(self.Status))
 				# FOR CURRENT MEMBERS
 				result = result.merge({
 					external_id: self.MemberID,

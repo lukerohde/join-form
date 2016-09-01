@@ -65,6 +65,8 @@ class Application < Sinatra::Base
 
 	get '/renew' do 
 		p = Person.search(params)
+		p.from_api = true
+
 		join_form_id = params[:join_form_id]
 		locale = params[:locale] || 'en'
     
