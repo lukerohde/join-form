@@ -65,7 +65,7 @@ class PeopleController < ApplicationController
   end
 
   def send_email
-      PersonMailer.private_email(@person, current_person, params[:subject], params[:body], request).deliver_now     
+      PersonMailer.private_email(@person, current_person, params[:subject], params[:body]).deliver_now     
       redirect_to people_url, notice: "Email sent..."  
   end  
 

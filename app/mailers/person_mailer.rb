@@ -11,7 +11,7 @@ class PersonMailer < ApplicationMailer
 		mail(from: from(request), to: person.email, subject: "#{join_form.person.display_name} has created a join_form.")
 	end
 
-	def private_email(to, from, subject, body, request, reply_url = nil)
+	def private_email(to, from, subject, body, reply_url = nil)
 		@reply_url = reply_url
 		@body = body
 		mail(from: from.email, to: to.email, bcc: from.email, subject: subject)
