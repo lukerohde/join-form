@@ -14,7 +14,7 @@ class PersonMailer < ApplicationMailer
 	def private_email(to, from, subject, body, reply_url = nil)
 		@reply_url = reply_url
 		@body = body
-		mail(from: from.email, to: to.email, bcc: from.email, subject: subject)
+		mail(from: from.email, to: to.email, subject: subject)
 	end
 
 	def subscriber_email(to, from, reply_to, subject, body, message_id)
