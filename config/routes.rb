@@ -2,7 +2,7 @@
 Rails.application.routes.draw do
   mount Bootsy::Engine => '/bootsy', as: 'bootsy'
 
-  scope "(:locale)", locale: /en|en-AU|zh_tw|zh-TW/ do
+  scope "(:locale)", locale: /en|en-AU|zh_tw|zh-TW|vi/ do
     
     post '/records/receive_sms', to: 'records#receive_sms'
     post '/records/update_sms', to: 'records#update_sms'

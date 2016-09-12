@@ -144,6 +144,8 @@ en:
         reoccurring_terms: "By submitting this form, I authorize the %{union} to deduct from my account a reoccurring fee of %{reoccurring} which is subject to occasional variation."
         reoccurring_with_advance_terms:   "By submitting this form, I authorize the %{union} to deduct from my account an advanced payment of %{advance} in dues then a reoccurring fee of %{reoccurring} which is subject to occasional variation."
         payroll_deduction: "Deduct my union dues from my pay"
+        payroll_deduction_title: "Payroll Deduction Authority"
+        payroll_deduction_terms: "I authorize my employer to deduct %{fee} per week (being my %{union} fees) and forward them to the %{union} and release my contact details to the %{union}."
         use_existing: "Use my existing payment method"
         application_fee: "Application Fee:"
         member_discount: "Member Discount:"

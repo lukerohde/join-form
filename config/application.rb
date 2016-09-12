@@ -26,9 +26,8 @@ module JoinAUnion
     config.languages = {
         :en => "english", 
         :zh_tw => "中文版",
+        :vi => "tiếng Việt"
     }
-    config.i18n.default_locale = :en
-    config.i18n.fallbacks = true
 
     config.after_initialize do
         config.owner_union = Union.find_by_short_name(ENV['OWNER_UNION']) rescue nil

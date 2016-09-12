@@ -1,0 +1,340 @@
+---
+vi:
+  helpers:
+    select:
+      prompt: Vui lòng chọn
+    submit:
+      create: Tạo %{model}
+      submit: Lưu %{model}
+      update: Cập nhật %{model}
+    label:
+      join_form:
+        short_name: Slug
+        short_name_placeholder: Please enter an short name for this join form, for the url
+        description: Subscription Description
+        description_placeholder: Please enter a short description of the subscription, to be shown to the user. 
+        page_title: Page Title
+        page_title_placeholder: Specify a web browser title for the page
+        header: Header
+        header_placeholder: Optional header to appear at the top of your join form in raw HTML
+        css: Inline CSS
+        css_placeholder:  Customize how your form looks using CSS
+        base_rate_id: Plan ID
+        base_rate_id_placeholder: Please enter an id identify what fee level/plan they member is on
+        base_rate_establishment:  Up front payment 
+        base_rate_establishment_description: Typically $0 but when joining for a service could be something like $200.00
+        base_rate_weekly: Weekly fee 
+        base_rate_fortnightly: Fortnightly fee
+        base_rate_monthly: Monthly fee
+        base_rate_quarterly: Quarterly fee
+        base_rate_half_yearly:  Half yearly fee
+        base_rate_yearly:  Yearly fee
+      subscription:
+        description: "Miêu tả"
+  activerecord:
+    attributes:
+      subscription:
+        frequency: "Tần số thanh toán"
+        pay_method: "Phương thức thanh toán"
+        account_name: "Tên chủ tài khoản / Tên trên thẻ"
+        bsb: "BSB"
+        account_number: "Số tài khoản"
+        card_number: "Số thẻ tín dụng"
+        expiry: "Hạn sử dụng"
+        ccv: "CCV (3 ký tự nằm phía sau thẻ)"
+        signature_vector: Chữ ký
+        partial_bsb: Phần BSB
+        partial_account_number: Phần số tài khoản
+        partial_card_number: Phần số thẻ
+      person:
+        external_id: "Thành viên ID"
+        first_name: "Tên"
+        last_name: "Họ"
+        email: "Email"
+        mobile: "Điện thoại di động"
+        gender: "Giới tính"
+        dob: "Ngày sinh"
+        address1: "Địa chỉ 1"
+        address2: "Địa chỉ 2"
+        suburb: "Vùng"
+        state: "Tiểu bang"
+        postcode: "Mã vùng"
+    errors:
+      messages:
+        record_invalid: 'Có các lỗi sau: %{errors}'
+        restrict_dependent_destroy:
+          has_one: Không thể xóa do tồn tại đối tượng phụ thuộc %{record}
+          has_many: Không thể xóa do tồn tại một số đối tượng phụ thuộc %{record}
+  gender:
+    male: Nam
+    female: Nữ
+    other: Không cả hai
+  people:
+    errors:
+      not_blank: "không thể để trống"
+  subscriptions:
+    form:
+      submit_join: "Tham gia ngay"
+      submit_renew: "Đổi mới ngay"
+      submit_next: "Tiếp tục"
+      submit_processing: "Đang tiến hành..."
+    verify_email:
+      instruction: "Vui lòng kiểm tra hộp thư email của bạn và làm theo đường dẫn xác nhận để tiếp tục."
+      explanation: " Chúng tôi đã gửi email xác nhận đến địa chỉ email đã nằm trong hệ thống của chúng tôi, cái mà có thể khác với email bạn vừa mới cung cấp."
+      subject: "Vui lòng xác nhận email của bạn để tiếp tục tham gia"
+      follow_link: "Vui lòng làm theo đường dẫn này để tiếp tục..."
+      email_explanation: "Bạn đang nhận thông báo này bởi vì một người nào đó đang cố gắng để cập nhật thành viên công đoàn trực tuyến của bạn."
+    membership_card:
+      heading: Thẻ thành viên trực tuyến
+      bookmark: Bạn có thể đánh dấu trang này
+      edit: Chỉnh sửa
+    person:
+      edit:
+        heading: "Chi tiết liên lạc"
+    address:
+      edit:
+        heading: "Chi tiết địa chỉ"
+    subscription:
+      edit: 
+        heading: "Chi tiết kế hoạch Thành viên"
+        weekly: "Mỗi tuần"
+        fortnightly: "Mỗi hai tuần"
+        monthly: "Mỗi tháng"
+        quarterly: "Mỗi quý"
+        half_yearly: "Mỗi nữa năm"
+        yearly: "Mỗi năm"
+    pay_method:
+      edit:
+        heading: "Chi tiết thanh toán"
+        credit_card: "Thẻ tín dụng"
+        au_bank_account: "Tài khoản ngân hàng Úc"
+        direct_debit_release: "Lấy tài khoản ngân hàng của tôi từ nhà chủ đầu tư của tôi"
+        direct_debit_release_title: "Ghi nợ trực tiếp và chuyển nhượng chi tiết được ủy quyền"
+        direct_debit_release_terms: | 
+          Để trở thành một thành viên %{union}, Tôi yêu cầu và ủy quyền cho người chủ đầu tư của tôi để chuyển đến %{union} của tôi:
+          <ul>
+            <li>chi tiết cá nhân (bao gồm giới tính và ngày sinh của tôi)</li>
+            <li>chi tiết liên lạc (bao gồm địa chỉ, số điện thoại và email)</li>
+            <li>hình thức làm việc và vị trí, và </li>
+            <li>chi tiết ngân hàng, bao gồm bất cứ thay đổi theo thời gian, vì thế trả phí công đoàn trực tiếp có thể bắt đầu từ tài khoản ngân hàng của tôi.</li>
+          </ul>
+        reoccurring_terms: "Bằng việc gửi mẫu đơn này, tôi ủy quyền %{union}  trích từ tài khoản của tôi một khoảng phí định kỳ %{reoccurring} tùy thuộc vào một vài sự thay đổi."
+        reoccurring_with_advance_terms:   "Bằng việc gửi mẫu đơn này, tôi ủy quyền cho %{union} trích từ tài khoản trả trước của tôi %{advance} một khoảng phí định kỳ %{reoccurring} tùy thuộc vào một vài sự thay đổi."
+        payroll_deduction: "Trừ phí công đoàn từ tiền lương của tôi"
+        payroll_deduction_title: "Payroll Deduction Authority"
+        payroll_deduction_terms: "I authorize my employer to deduct %{fee} per week (being my %{union} fees) and forward them to the %{union} and release my contact details to the %{union}."
+        use_existing: "Sử dụng hình thức thanh toán đang tồn tại của tôi"
+        application_fee: "Phí đơn:"
+        member_discount: "Thành viên giảm giá:"
+        total: "Phí trả trước:"
+        credit_card_charge: "Tổng số cần trả ngay bây giờ: %{first_payment}"
+        direct_debit_charge: |
+          Initial Payment: %{first_payment}
+          <br/><small> Khấu trừ sẽ thường bắt đầu trong vòng 3 ngày làm việc.  </small>
+        sign_here: "Ký tên nơi này"
+        clear_signature: "Xóa"
+    steps:
+      done: "Chào mừng bạn đến với công đoàn"
+      payment: "Vui lòng cung cấp hình thức thanh toán"
+      plan: "Vui lòng chọn kế hoạch thành viên của bạn"
+      address: "Vui lòng cho chúng tôi biết địa chỉ của bạn tại Úc"
+      welcome: "Vui lòng cung cấp chi tiết liên lạc của bạn"
+      renewal: "Này, bạn đã là một thành viên! Vui lòng cập nhật chi tiết của bạn với chúng tôi."
+    errors:
+      not_blank: "Không thể để trống"
+      complete_address: "Bạn phải hoàn thành địa chỉ của bạn"
+      credit_card: "Không thể xác nhận bởi cổng thanh toán của chúng tôi. Vui lòng thử lại."
+      bsb: "phải được định dạng đúng BSB e.g. 123-123"
+      account_number: "phải được định dạng đúng e.g. 123456"
+      pay_method: "phải được đặt biệt"
+      payment_gateway_error: "Dịch vụ thanh toán của chúng tôi đã có lỗi trong khi tạo ra hồ sơ khách hàng"
+      payment_gateway_card_error: "Dịch vụ thanh toán của chúng tôi đã có sự cố với thẻ tín dụng của bạn"
+      error_summary: 
+        one:  "1 lổi ngăn chặn đơn thành viên của bạn đã được lưu trữ."
+        other: "%{count} lổi ngăn chặn đơn thành viên của bạn đã được lưu trữ."
+  date:
+    abbr_day_names:
+    - Chủ nhật
+    - Thứ hai
+    - Thứ ba
+    - Thứ tư
+    - Thứ năm
+    - Thứ sáu
+    - Thứ bảy
+    abbr_month_names:
+    -
+    - Tháng một
+    - Tháng hai
+    - Tháng ba
+    - Tháng tư
+    - Tháng năm
+    - Tháng sáu
+    - Tháng bảy
+    - Tháng tám
+    - Tháng chín
+    - Tháng mười
+    - Tháng mười một
+    - Tháng mười hai
+    day_names:
+    - Chủ nhật
+    - Thứ hai
+    - Thứ ba
+    - Thứ tư
+    - Thứ năm
+    - Thứ sáu
+    - Thứ bảy
+    formats:
+      default: "%d-%m-%Y"
+      long: "%d %B, %Y"
+      short: "%d %b"
+    month_names:
+    -
+    - Tháng một
+    - Tháng hai
+    - Tháng ba
+    - Tháng tư
+    - Tháng năm
+    - Tháng sáu
+    - Tháng bảy
+    - Tháng tám
+    - Tháng chín
+    - Tháng mười
+    - Tháng mười một
+    - Tháng mười hai
+    order:
+    - :day
+    - :month
+    - :year
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: khoảng 1 giờ
+        other: khoảng %{count} giờ
+      about_x_months:
+        one: khoảng 1 tháng
+        other: khoảng %{count} tháng
+      about_x_years:
+        one: khoảng 1 năm
+        other: khoảng %{count} năm
+      almost_x_years:
+        one: gần 1 năm
+        other: gần %{count} năm
+      half_a_minute: 30 giây
+      less_than_x_minutes:
+        one: chưa tới 1 phút
+        other: chưa tới %{count} phút
+      less_than_x_seconds:
+        one: chưa tới 1 giây
+        other: chưa tới %{count} giây
+      over_x_years:
+        one: hơn 1 năm
+        other: hơn %{count} năm
+      x_days:
+        one: 1 ngày
+        other: "%{count} ngày"
+      x_minutes:
+        one: 1 phút
+        other: "%{count} phút"
+      x_months:
+        one: 1 tháng
+        other: "%{count} tháng"
+      x_seconds:
+        one: 1 giây
+        other: "%{count} giây"
+    prompts:
+      day: Ngày
+      hour: Giờ
+      minute: Phút
+      month: Tháng
+      second: Giây
+      year: Năm
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      accepted: phải được đồng ý
+      blank: không thể để trắng
+      present: cần phải để trắng
+      confirmation: không khớp với xác nhận
+      empty: không thể rỗng
+      equal_to: phải bằng %{count}
+      even: phải là số chẵn
+      exclusion: đã được giành trước
+      greater_than: phải lớn hơn %{count}
+      greater_than_or_equal_to: phải lớn hơn hoặc bằng %{count}
+      inclusion: không có trong danh sách
+      invalid: không hợp lệ
+      less_than: phải nhỏ hơn %{count}
+      less_than_or_equal_to: phải nhỏ hơn hoặc bằng %{count}
+      not_a_number: không phải là số
+      not_an_integer: phải là một số nguyên
+      odd: phải là số lẻ
+      taken: đã có
+      too_long: quá dài (tối đa %{count} ký tự)
+      too_short: quá ngắn (tối thiểu %{count} ký tự)
+      wrong_length: độ dài không đúng (phải là %{count} ký tự)
+      other_than: cần phải khác %{count}
+    template:
+      body: 'Có lỗi với các mục sau:'
+      header:
+        one: 1 lỗi ngăn không cho lưu %{model} này
+        other: "%{count} lỗi ngăn không cho lưu %{model} này"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        format: "%u%n"
+        precision: 2
+        separator: ","
+        significant: false
+        strip_insignificant_zeros: false
+        unit: AUD$
+    format:
+      delimiter: "."
+      precision: 3
+      separator: ","
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: "%n %u"
+        units:
+          unit: ''
+          billion: Tỷ
+          million: Triệu
+          quadrillion: Triệu tỷ
+          thousand: Nghìn
+          trillion: Nghìn tỷ
+      format:
+        delimiter: ''
+        precision: 1
+        significant: true
+        strip_insignificant_zeros: true
+      storage_units:
+        format: "%n %u"
+        units:
+          byte:
+            one: Byte
+            other: Byte
+          gb: GB
+          kb: KB
+          mb: MB
+          tb: TB
+    percentage:
+      format:
+        delimiter: ''
+        format: "%n%"
+    precision:
+      format:
+        delimiter: ''
+  support:
+    array:
+      last_word_connector: ", và "
+      two_words_connector: " và "
+      words_connector: ", "
+  time:
+    am: sáng
+    formats:
+      default: "%a, %d %b %Y %H:%M:%S %z"
+      long: "%d %B, %Y %H:%M"
+      short: "%d %b %H:%M"
+    pm: chiều
