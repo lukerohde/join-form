@@ -14,7 +14,7 @@
     <div class="form-group">
       <%= f.label :description, t('helpers.label.subscription.description') %><br>
       <p class="detail">
-        <%= @subscription.join_form.description %>
+        <%= @subscription.join_form.description.html_safe %>
       </p>
     </div>
   <% end %>
