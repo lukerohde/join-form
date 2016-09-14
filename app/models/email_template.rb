@@ -1,6 +1,6 @@
 class EmailTemplate < ActiveRecord::Base
 	include Bootsy::Container
-	validates :short_name, :body_plain, :css, :subject, presence: true
+	validates :short_name, :body_plain, :subject, presence: true
 	has_many :join_forms
 
 	include Filterable

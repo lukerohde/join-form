@@ -40,6 +40,7 @@ class EmailTemplatesController < ApplicationController
         format.html { redirect_to @email_template, notice: 'Email template was successfully created.' }
         format.json { render :show, status: :created, location: @email_template }
       else
+        set_subscription
         format.html { render :new }
         format.json { render json: @email_template.errors, status: :unprocessable_entity }
       end
