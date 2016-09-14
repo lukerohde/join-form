@@ -22,9 +22,7 @@ module RecordsHelper
   end
 
   def send_email(email)
-    msg = PersonMailer.subscriber_email(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain, email.message_id)#.deliver_later
-    #mail.enforced_message_id = email.message_id
-    send_and_file(msg, email.recipient, 'join_email')
+    PersonMailer.follow_up_email(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain, email.message_id, "join_email").deliver_later
   end
 
   def send_sms(sms)

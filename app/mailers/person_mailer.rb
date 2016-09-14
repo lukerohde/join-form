@@ -14,14 +14,23 @@ class PersonMailer < ApplicationMailer
 	def private_email(to, from, subject, body, reply_url = nil)
 		@reply_url = reply_url
 		@body = body
+		mail(from: from.email, bcc: from.email, to: to.email, subject: subject)
+	end
+
+	def reply_email(to, from, subject, body, reply_url = nil, tags = "")
+		@reply_url = reply_url
+		@body = body
+		headers['filing_subject'] = "DONE: #{tags} #{subject} (#{from.external_id})"
+		
 		mail(from: from.email, to: to.email, subject: subject)
 	end
 
-	def subscriber_email(to, from, reply_to, subject, body, message_id)
+	def follow_up_email(to, from, reply_to, subject, body, message_id, tags = "")
 		@body = body
-		headers['Message-Id'] = message_id # for reply tracking.
-
+		headers['filing_subject'] = "DONE: #{tags} #{subject} (#{to.external_id})"
+		
 		mail = mail(from: from.email, to: to.email, reply_to: reply_to, subject: subject)
+		#headers['Message-Id'] = message_id # for reply tracking.
 		mail.mailgun_headers = {'Message-Id' => message_id}
 		mail
 	end

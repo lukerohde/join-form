@@ -12,6 +12,8 @@ one:
   sender: admin
   template_id: one
   parent_id: 
+  message_id: '1234@1234'
+  recipient_address: '+61439541888'
 
 two:
   type: 

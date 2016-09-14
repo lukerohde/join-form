@@ -6,8 +6,7 @@ class EmailTemplateMailer < ApplicationMailer
   #
   #   en.email_template_mailer.merge.subject
   #
-  def merge(email_template_id, subscription_id, to, cc = "", pdf_url = "")
-    
+  def merge(email_template_id, subscription_id, to, cc = "", pdf_url = "", tags = "")
     @subscription = Subscription.find(subscription_id)
     data = merge_data(@subscription)
     
@@ -48,7 +47,8 @@ class EmailTemplateMailer < ApplicationMailer
       end
     end
 
-
+    headers['filing_subject'] = "DONE: #{tags} #{@subject} (#{@subscription.person.try(:external_id)})" if tags.present?
+    
     mail to: to, cc: cc, from: "noreply@#{ENV['mailgun_host']}", subject: @subject 
   end
 end

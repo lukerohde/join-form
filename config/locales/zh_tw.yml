@@ -48,8 +48,8 @@ zh_tw:
         partial_card_number: "信用卡號碼"
       person:
         external_id: "會員號碼"
-        first_name: "名"
-        last_name: "姓氏"
+        first_name: "護照英文名字"
+        last_name: "護照英文姓氏"
         email: "電子信箱"
         mobile: "手機號碼"
         gender: "性別"

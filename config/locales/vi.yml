@@ -121,15 +121,15 @@ vi:
         reoccurring_terms: "Bằng việc gửi mẫu đơn này, tôi ủy quyền %{union}  trích từ tài khoản của tôi một khoảng phí định kỳ %{reoccurring} tùy thuộc vào một vài sự thay đổi."
         reoccurring_with_advance_terms:   "Bằng việc gửi mẫu đơn này, tôi ủy quyền cho %{union} trích từ tài khoản trả trước của tôi %{advance} một khoảng phí định kỳ %{reoccurring} tùy thuộc vào một vài sự thay đổi."
         payroll_deduction: "Trừ phí công đoàn từ tiền lương của tôi"
-        payroll_deduction_title: "Payroll Deduction Authority"
-        payroll_deduction_terms: "I authorize my employer to deduct %{fee} per week (being my %{union} fees) and forward them to the %{union} and release my contact details to the %{union}."
+        payroll_deduction_title: "Ủy quyền khấu trừ tiền lương"
+        payroll_deduction_terms: "Tôi ủy quyền cho người chủ của tôi để trích %{fee} mỗi tuần (being my %{union} fees) và chuyển đến %{union} và đưa chi tiết liên lạc của tôi cho %{union}."
         use_existing: "Sử dụng hình thức thanh toán đang tồn tại của tôi"
         application_fee: "Phí đơn:"
         member_discount: "Thành viên giảm giá:"
         total: "Phí trả trước:"
         credit_card_charge: "Tổng số cần trả ngay bây giờ: %{first_payment}"
         direct_debit_charge: |
-          Initial Payment: %{first_payment}
+          Thanh toán ban đầu: %{first_payment}
           <br/><small> Khấu trừ sẽ thường bắt đầu trong vòng 3 ngày làm việc.  </small>
         sign_here: "Ký tên nơi này"
         clear_signature: "Xóa"

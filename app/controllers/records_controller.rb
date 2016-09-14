@@ -38,9 +38,8 @@ class RecordsController < ApplicationController
     to = replying_to.sender
 
     begin 
-      msg = PersonMailer.private_email(to, from, "SMS Reply from #{from.first_name} #{from.last_name}", params[:Body], new_subscription_record_url(from.subscriptions.last))
-      send_and_file(msg, from, 'join_sms')    
-  
+      PersonMailer.reply_email(to, from, "SMS Reply from #{from.first_name} #{from.last_name}", params[:Body], new_subscription_record_url(from.subscriptions.last)).deliver_now
+      
       # This is crude - maybe I should record the private_email above, or send to NUW Assist and have an API call for all NUW Assist messages!
       @record = Record.create({
         sender_address: format_mobile(params['From']), 
@@ -69,9 +68,8 @@ class RecordsController < ApplicationController
     to = replying_to.sender
     
     begin 
-      msg = PersonMailer.private_email(to, from, params['Subject'] || params['subject'], params['stripped-text'], new_subscription_record_url(from.subscriptions.last) + "?type=email")    
-      send_and_file(msg, from, 'join_email')    
-  
+      PersonMailer.reply_email(to, from, params['Subject'] || params['subject'], params['stripped-text'], new_subscription_record_url(from.subscriptions.last) + "?type=email", "join_email").deliver_now    
+      
       # This is crude - maybe I should record the private_email above, or send to NUW Assist and have an API call for all NUW Assist messages!
       @record = Record.create({
         sender_address: params['Sender'] || params['sender'], 

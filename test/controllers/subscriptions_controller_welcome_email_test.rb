@@ -47,8 +47,10 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     patch edit_join_path(:en, @union, @join_form, @with_subscription.token), params
     assert_response :redirect
 
-    assert ActionMailer::Base.deliveries.count == starting_email_count + 2, "was expecting two emails to be sent"
-    assert ActionMailer::Base.deliveries.last.subject.starts_with?("welcome luke welcome"), "was expecting a welcome email"
+    # One message for admin, one message to welcome user and one message for filing the welcome
+    assert ActionMailer::Base.deliveries.count == starting_email_count + 3, "was expecting two emails to be sent"
+    # The last message is the filing (and, the second last message is mutated by the filing)
+    assert ActionMailer::Base.deliveries.last.subject.starts_with?("DONE: welcome_email welcome luke welcome"), "was expecting a welcome email"
     assert ActionMailer::Base.deliveries.last.to.include?("lrohde@nuw.org.au"), "was expecting a welcome email to send to lrohde@nuw.org.au"
   end
 

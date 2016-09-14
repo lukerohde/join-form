@@ -24,9 +24,9 @@ module JoinAUnion
     config.active_record.raise_in_transactional_callbacks = true
     
     config.languages = {
-        :en => "english", 
+        :en => "English", 
         :zh_tw => "中文版",
-        :vi => "tiếng Việt"
+        :vi => "Tiếng việt"
     }
 
     config.after_initialize do
