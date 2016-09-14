@@ -219,7 +219,7 @@ module NUWDBHelper
 				end
 			end
 
-		#result = result.reject {|k,v| v.nil?} # removed this because system couldn't remove invalidation
+		result = result.reject {|k,v| v.nil?} # removed this because system couldn't remove invalidation
 		result
 	end
 end
