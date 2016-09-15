@@ -12,5 +12,18 @@ class MailLoggerObserver
   end
 end
 
+class MailDevelopmentInterceptor
+  def self.delivering_email(mail)
+    if Rails.env.development?
+      mail.subject = "#{mail.subject} [#{(mail.to||[]).join(',')} #{(mail.cc||[]).join(',')}] "
+			mail.to = ENV['developer_email']
+      mail.cc = nil
+      mail.bcc = nil
+    end
+  end
+end
+
 ActionMailer::Base.register_observer(MailLoggerObserver)
+ActionMailer::Base.register_interceptor(MailDevelopmentInterceptor)
+
 

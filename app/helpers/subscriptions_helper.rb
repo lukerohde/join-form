@@ -339,9 +339,8 @@ module SubscriptionsHelper
       nuw_end_point_transform_from(JSON.parse(response).deep_symbolize_keys)
     rescue Exception => exception
       # TODO A catch all like this is pretty nasty.
-      ExceptionNotifier.notify_exception(exception,
-        :env => request.env, :data => {:message => "nuw_end_point_person_get failed but was caught"})
-      
+      error_data = JSON.parse(exception.response) rescue exception
+      ExceptionNotifier.notify_exception(exception,:env => request.env, :data => error_data)
       nil 
     end
   end
@@ -357,9 +356,8 @@ module SubscriptionsHelper
       result
     rescue Exception => exception
       # TODO A catch all like this is pretty nasty.
-      ExceptionNotifier.notify_exception(exception,
-        :env => request.env, :data => {:message => "nuw_end_point_person_put failed but was caught"})
-      
+      error_data = JSON.parse(exception.response) rescue exception
+      ExceptionNotifier.notify_exception(exception, :env => request.env, :data => error_data)
       nil 
     end
   end
