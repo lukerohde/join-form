@@ -1,13 +1,13 @@
 class SubscriptionsController < ApplicationController
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :renew]
+  before_action :intercept_facebook, only: [:create]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy, :end_point_put]
   before_action :set_join_form, except: [:index, :temp_report]
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create, :renew]
   before_filter :verify_hmac, if: :api_request?, only: [:create, :renew]
   before_action :set_authorizer, only: [:new]
   before_action :resubscribe?, only: [:create]
-
-#  layout 'subscription', except: [:index]
+  #layout 'subscription', except: [:index]
 
   include SubscriptionsHelper
 
@@ -397,6 +397,12 @@ class SubscriptionsController < ApplicationController
     def verify_hmac
       #puts 'checking hmac'
       check_signature(JSON.parse(request.body.read))
+    end
+
+    def intercept_facebook
+      if request.referer =~ /facebook/ && params['signed_request'].present?
+        redirect_to request.path
+      end
     end
 
 
