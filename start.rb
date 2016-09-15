@@ -15,22 +15,37 @@ class Application < Sinatra::Base
 
 	load 'config/application.rb'
 
+
+	set :show_exceptions, :after_handler # for json errors in development
+	error 500 do
+		content_type :json
+	  status 500 # internal server error
+
+	  e = env['sinatra.error']
+	  
+	  request.body.rewind rescue nil
+	  body = request.body.read rescue nil
+	  url = request.url rescue nil
+
+	  {:result => 'Internal Server Error', :message => e.message, :backtrace => e.backtrace, url: url,  params: params, body: body }.to_json
+	end
+
 	get '/people' do
 		check_signature(params)
 		p = Person.search(params)
 		response = (p||{}).to_json
 		if (params[:external_id]||"") == "" && !p.nil?
 			#fuzzy match
-			logger.info "Fuzzy Matched: #{p.to_json}" rescue nil
+			puts "Fuzzy Matched: #{p.to_json}" rescue nil
 		end
-		logger.info "GET Response: #{response}" rescue nil
+		puts "GET Response: #{response}" rescue nil
 		response
 	end
 
 	put '/people' do
 
 		payload = JSON.parse(request.body.read)
-		logger.info "PUT Received: #{payload.to_json}"
+		puts "PUT Received: #{payload.to_json}"
 		check_signature(payload)
  
 		payload.symbolize_keys!
@@ -59,7 +74,7 @@ class Application < Sinatra::Base
 		if p.save!
 			response = p.to_json 
 		end
-		logger.info "PUT Response: #{response}"
+		puts "PUT Response: #{response}"
 		response
 	end
 

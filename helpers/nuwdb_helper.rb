@@ -32,10 +32,11 @@ module NUWDBHelper
 	end
 
 	def set_pay_method(person, payload)
+		data = tblBank_attributes(payload)
 		if person.pay_method.present?
-			person.pay_method.assign_attributes(tblBank_attributes(payload))
+			person.pay_method.assign_attributes(data)
 		else
-			person.build_pay_method(tblBank_attributes(payload))
+			person.build_pay_method(data)
 		end
 	end
 
@@ -219,7 +220,7 @@ module NUWDBHelper
 				end
 			end
 
-		result = result.reject {|k,v| v.nil?} # removed this because system couldn't remove invalidation
+		#result = result.reject {|k,v| v.nil?} # removed this because system couldn't remove invalidation
 		result
 	end
 end
