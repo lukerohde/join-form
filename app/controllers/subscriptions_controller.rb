@@ -1,8 +1,8 @@
 class SubscriptionsController < ApplicationController
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :renew]
-  before_action :intercept_facebook, only: [:create]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy, :end_point_put]
   before_action :set_join_form, except: [:index, :temp_report]
+  before_action :facebook_new, only: [:create]
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create, :renew]
   before_filter :verify_hmac, if: :api_request?, only: [:create, :renew]
   before_action :set_authorizer, only: [:new]
@@ -24,13 +24,16 @@ class SubscriptionsController < ApplicationController
 
   end
 
-  # GET /subscriptions/new
-  def new
+  def setup_new
     @subscription = Subscription.new
     @subscription.person = Person.new
     @subscription.join_form = @join_form
     @subscription.source = params[:source] || request.referer
+  end
 
+  # GET /subscriptions/new
+  def new
+    setup_new
     prefill_form(@subscription, params)
   end
 
@@ -399,9 +402,13 @@ class SubscriptionsController < ApplicationController
       check_signature(JSON.parse(request.body.read))
     end
 
-    def intercept_facebook
+    def facebook_new
+      # Facebook page tab sends a post request to your url
+      # I'm attempting a redirect to get to make it work
       if request.referer =~ /facebook/ && params['signed_request'].present?
-        redirect_to request.path
+        setup_new
+        #redirect_to request.path
+        render :new
       end
     end
 
