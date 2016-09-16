@@ -1,4 +1,5 @@
 class SubscriptionsController < ApplicationController
+  before_action :allow_iframe
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :renew]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy, :end_point_put]
   before_action :set_join_form, except: [:index, :temp_report]
@@ -8,7 +9,7 @@ class SubscriptionsController < ApplicationController
   before_action :set_authorizer, only: [:new]
   before_action :resubscribe?, only: [:create]
   #layout 'subscription', except: [:index]
-
+  
   include SubscriptionsHelper
 
   # GET /subscriptions
@@ -400,6 +401,12 @@ class SubscriptionsController < ApplicationController
     def verify_hmac
       #puts 'checking hmac'
       check_signature(JSON.parse(request.body.read))
+    end
+
+    def allow_iframe
+      #response.headers.except! 'X-Frame-Options'
+      #response.headers['X-Frame-Options'] = 'ALLOW-FROM https://apps.facebook.com'  
+      response.headers.delete('X-Frame-Options')
     end
 
     def facebook_new
