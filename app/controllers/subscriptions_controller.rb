@@ -405,7 +405,9 @@ class SubscriptionsController < ApplicationController
     def facebook_new
       # Facebook page tab sends a post request to your url
       # I'm attempting a redirect to get to make it work
-      if request.referer =~ /facebook/ && params['signed_request'].present?
+      if 
+        (request.referer =~ /facebook/ && params['signed_request'].present?) ||
+        (request.headers['origin'] =~ /thunderpenny/ && params['proxy'].present?)
         setup_new
         #redirect_to request.path
         render :new

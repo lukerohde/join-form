@@ -20,5 +20,11 @@ class SubscriptionsControllerFacebookPageTab < ActionDispatch::IntegrationTest
    assert_template :new
   end
 
+  test "thunderpenny/facebook page tab, post, render new" do
+   post new_join_path(:en, @union, @join_form), {proxy: "enabled" }, {'HTTP_ORIGIN' => 'https://fbtabs.thunderpenny.com'}
+   assert_response :success
+   assert_template :new
+  end
+
   
 end
