@@ -299,8 +299,8 @@ module SubscriptionsHelper
     unless payload.blank? 
       # something found via the api, update existing record
       person = Person.find_by_external_id(payload.dig(:person_parameters, :external_id)) if payload.dig(:person_parameters, :external_id)
-      person ||= Person.find_by_email(subscription_params.dig(:person_attributes, :email)) if subscription_params.dig(:person_attributes, :email)
-      person ||= Person.find_by_email(payload.dig(:person_attributes, :email)) if payload.dig(:person_attributes, :email)
+      person ||= Person.ci_find_by_email(subscription_params.dig(:person_attributes, :email)) if subscription_params.dig(:person_attributes, :email)
+      person ||= Person.ci_find_by_email(payload.dig(:person_attributes, :email)) if payload.dig(:person_attributes, :email)
       person ||= Person.new()
 
       subscription = person.subscriptions.last unless person.new_record?
@@ -314,7 +314,7 @@ module SubscriptionsHelper
       subscription.update_from_end_point(payload) # this will save
     else
       # nothing found in api, may still be someone already in this database
-      person = Person.find_by_email(subscription_params.dig(:person_attributes, :email))
+      person = Person.ci_find_by_email(subscription_params.dig(:person_attributes, :email))
       if person
         subscription = person.subscriptions.last
         subscription ||= Subscription.new(person: person)

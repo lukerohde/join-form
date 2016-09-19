@@ -22,6 +22,10 @@ class Person < ApplicationRecord
 
   include Filterable
   scope :name_like, -> (name) {where("first_name ilike ? or last_name ilike ? or email ilike ?", "%#{name}%", "%#{name}%", "%#{name}%")}
+  
+  def self.ci_find_by_email(email)
+    where(["email ilike ?", email.to_s.strip]).take
+  end
 
   def contact_detail_must_be_complete
     errors.add(:first_name, I18n.translate('people.errors.not_blank')) if self.first_name.blank? #|| self.first_name.downcase == "unknown"
