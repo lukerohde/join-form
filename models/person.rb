@@ -15,6 +15,7 @@ class Application
 		before_update :note_changes
 
 		attr_accessor :from_api
+		attr_accessor :source
 
 		def note_changes
 			note_text = changes.collect do |k,v|
@@ -130,7 +131,8 @@ class Application
 						next_payment_date: self.nextpaymentdate,
 						financial_date: self.FinDate,  
 						payments: transactions,
-						fetched_at: Time.now
+						fetched_at: Time.now,
+						source: self.source
 					}, 
 				})
 

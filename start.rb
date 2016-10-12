@@ -81,37 +81,62 @@ class Application < Sinatra::Base
 	get '/renew' do 
 		p = Person.search(params)
 		p.from_api = true
+		p.source = params[:source] || ""
+		payload = JSON.parse(p.to_json)
+
+		result = push_subscribers(payload)
+		redirect result['subscriptions'][0]['message_url']
+	end
+
+	post '/renew' do 
+		external_ids = params[:external_ids].split(";")
+		
+		source = "nuw-api-#{params[:source] || "unknown"}"
+
+		payload = []
+		external_ids.each do |id|
+			p = Person.search(external_id: id)
+			if p
+				p.from_api = true
+				p.source = source
+
+		  	payload << JSON.parse(p.to_json)
+		  end
+		end
+		halt "Nothing to send..." if payload.blank?	
+		result = push_subscribers(payload)
+
+		#halt result.to_json #signed_payload.to_json
+		if result['subscriptions'].count == 1
+			redirect result['subscriptions'][0]['message_url']
+		else
+			redirect result['batch_message_url']
+		end
+	end
+
+	def push_subscribers(payload)
 
 		join_form_id = params[:join_form_id]
 		locale = params[:locale] || 'en'
-    
-    end_points = YAML.load_file(File.join('config', 'end_points.yaml'))
+
+		end_point = YAML.load_file(File.join('config', 'end_points.yaml'))[0]
+		e = end_point.gsub('join_form_id', join_form_id)
+		e = e.gsub('locale', locale)
 		
-		results = []
-		end_points.each do |e|
-			e = e.gsub('join_form_id', join_form_id)
-			e = e.gsub('locale', locale)
-			puts e
-			payload = JSON.parse(p.to_json)
-			puts payload
-			signed_payload = SignedRequest::sign(ENV['nuw_end_point_secret'], payload||{}, e)
-		  response = RestClient::Request.execute ({
-		  	url: e, 
-		  	method: :post, 
-		  	#payload: { first_name: 'luke', last_name: 'rohde', email: 'lrohde@nuw.org.au', external_id: 'NV391215'}.to_json, 
-		  	payload: signed_payload.to_json,
-		  	#payload: payload.to_json,
-		  	headers: {
-		  		content_type: :json,
-		  		accept: :json
-	  		},
-		  	verify_ssl: false
-	  	})
-      result = JSON.parse(response.body)
-      results << result
-		end
-		redirect results[0]['url']
-	end
+		signed_payload = SignedRequest::sign(ENV['nuw_end_point_secret'], payload||{}, e)
+		
+	  response = RestClient::Request.execute ({
+	  	url: e, 
+	  	method: :post, 
+	  	payload: signed_payload.to_json,
+	  	headers: {
+	  		content_type: :json,
+	  		accept: :json
+  		},
+	  	verify_ssl: false
+  	})
+    result = JSON.parse(response.body)
+  end
 
 	def decrypt(value)
 		value = Base64.decode64(value) rescue nil
