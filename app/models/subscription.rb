@@ -209,6 +209,9 @@ class Subscription < ApplicationRecord
 	  false
 	end
 
+  def source=(val)
+    write_attribute(:source, val) if self.source.blank? # prevent overwriting
+  end
 
   def update_from_end_point(payload)
     @skip_validation = true

@@ -285,15 +285,25 @@ module SubscriptionsHelper
   end
 
   def nuw_end_point_receive(payload, join_form)
-    payload =   nuw_end_point_transform_from(payload.deep_symbolize_keys)
-    nuw_end_point_load_subscription(payload, join_form)
+    payload = [payload] unless payload.is_a?(Array)
+    results = []
+
+    payload.each do |person|
+      sparams = nuw_end_point_transform_from(person.deep_symbolize_keys)
+      
+      s = nuw_end_point_load_subscription(sparams, join_form)
+      s.renewal = true unless s.status == "Potential Member"
+    
+      results << s
+    end
+    results
   end
 
   #def nuw_end_point_load(subscription_params, join_form)
   #  subscription = nil
   #  payload = nuw_end_point_person_get(subscription_params)
   #  unless payload.blank? 
-
+  
   def nuw_end_point_load_subscription(payload, join_form, subscription_params = {})
     subscription = nil
     unless payload.blank? 
@@ -306,7 +316,6 @@ module SubscriptionsHelper
       subscription = person.subscriptions.last unless person.new_record?
       subscription ||= Subscription.new(person: person) # person exists without a subscription (user)
 
-      subscription.source = 'nuw-api' if subscription.new_record? && api_request?
       subscription.join_form_id = join_form.id
       person.authorizer_id = join_form.person.id
       person.union_id = join_form.union.id
@@ -429,7 +438,7 @@ module SubscriptionsHelper
 
   def nuw_end_point_transform_from_subscription(subscription_hash)
     return {} if subscription_hash.nil?
-    result = subscription_hash.slice(:frequency, :plan, :pay_method, :status, :next_payment_date, :financial_date)
+    result = subscription_hash.slice(:frequency, :plan, :pay_method, :status, :next_payment_date, :financial_date, :source)
     pm = 
       case result[:pay_method]
         when "CC"

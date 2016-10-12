@@ -67,14 +67,25 @@ class SubscriptionsController < ApplicationController
 
   def renew
     request.body.rewind # needed for integration test
-    @subscription = nuw_end_point_receive(JSON.parse(request.body.read), @join_form)
-    @subscription.renewal = true
-
+    
+    data = check_signature(JSON.parse(request.body.read)) # check it again only to remove the hmac
+    @subscriptions = nuw_end_point_receive(data, @join_form)
+    
+    # save an array of subscriptions
+    success = [false]
+    begin
+      Subscription.transaction do 
+        success = @subscriptions.map(&:save_without_validation!)
+        raise ActiveRecord::Rollback unless success.all?
+      end 
+    rescue
+    end
+    
     respond_to do |format|
-      if @subscription.save_without_validation!
-        format.json { render :show }
+      if success.all?
+        format.json { render :index }
       else
-        format.json { render json: @subscription.errors, status: :unprocessable_entity }
+        format.json { render json: @subscriptions.select {|s| !s.errors.blank?}, status: :unprocessable_entity }
       end
     end
   end 
