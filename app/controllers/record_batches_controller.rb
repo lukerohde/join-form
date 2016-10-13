@@ -40,6 +40,7 @@ class RecordBatchesController < ApplicationController
       # SMS Message Setup
       body = @record_batch.sms_template.body
       @sms_subscriptions.each do |s|
+        s.join_form = @record_batch.join_form if @record_batch.join_form.present?
         data = merge_data(s)
 
         record = Record.new(
@@ -49,7 +50,8 @@ class RecordBatchesController < ApplicationController
           recipient: s.person, 
           recipient_address: format_mobile(s.person.mobile),
           body_plain: Liquid::Template.parse(body).render(data),
-          message_id: "<#{SecureRandom.uuid}@#{ENV['mailgun_domain']}>" 
+          message_id: "<#{SecureRandom.uuid}@#{ENV['mailgun_domain']}>",
+          join_form: s.join_form
         )
         @record_batch.records << record
       end
@@ -65,6 +67,7 @@ class RecordBatchesController < ApplicationController
       css =  email_template.css
 
       @email_subscriptions.each do |s|
+        s.join_form = @record_batch.join_form if @record_batch.join_form.present?
         data = merge_data(s)
 
         subject = Liquid::Template.parse(subject_template).render(data)
@@ -99,7 +102,8 @@ class RecordBatchesController < ApplicationController
           subject: subject, 
           body_plain: body_plain,
           body_html: body_html_css,
-          message_id: "<#{SecureRandom.uuid}@#{ENV['mailgun_domain']}>" 
+          message_id: "<#{SecureRandom.uuid}@#{ENV['mailgun_domain']}>",
+          join_form: s.join_form
         )
         @record_batch.records << record
       end
@@ -157,6 +161,6 @@ class RecordBatchesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def record_batch_params
-      params.require(:record_batch).permit(:name, :email_template_id, :sms_template_id)
+      params.require(:record_batch).permit(:name, :email_template_id, :sms_template_id, :join_form_id)
     end
 end
