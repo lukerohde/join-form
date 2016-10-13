@@ -2,6 +2,7 @@ class Record < ActiveRecord::Base
 	belongs_to :sender, class_name: "Person"
 	belongs_to :recipient, class_name: "Person"
 	belongs_to :join_form
+	belongs_to :record_batch
 
 	def self.new_from_params(params)
  		result = Email.new if params['type'] && params['type'].downcase == 'email'

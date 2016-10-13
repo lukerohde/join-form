@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160829035608) do
+ActiveRecord::Schema.define(version: 20161013024139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -174,6 +174,18 @@ ActiveRecord::Schema.define(version: 20160829035608) do
   add_index "people", ["reset_password_token"], name: "index_people_on_reset_password_token", unique: true, using: :btree
   add_index "people", ["union_id"], name: "index_people_on_union_id", using: :btree
 
+  create_table "record_batches", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "email_template_id"
+    t.integer  "sms_template_id"
+    t.integer  "join_form_id"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "sender_id"
+    t.string   "sender_sms_address"
+    t.string   "sender_email_address"
+  end
+
   create_table "records", force: :cascade do |t|
     t.string   "type"
     t.string   "subject"
@@ -190,6 +202,7 @@ ActiveRecord::Schema.define(version: 20160829035608) do
     t.datetime "updated_at",        null: false
     t.integer  "join_form_id"
     t.string   "message_id"
+    t.integer  "record_batch_id"
   end
 
   create_table "sms_templates", force: :cascade do |t|

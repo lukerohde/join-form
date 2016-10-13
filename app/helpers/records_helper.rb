@@ -31,19 +31,20 @@ module RecordsHelper
     begin
       @client = Twilio::REST::Client.new ENV["twilio_sid"], ENV["twilio_token"]
     
-      cb = records_update_sms_url(id: @record.id)
+      cb = records_update_sms_url(id: sms.id, host: ENV['APPLICATION_ROOT']) 
       msg = @client.messages.create(
 	      from: sms.sender_address,
-	      to: sms.recipient_address,
+	      to:  Rails.env.development? ? ENV['developer_mobile'] : sms.recipient_address,
 	      body: sms.body_plain,
 	      statusCallback: cb =~ /localhost/ ? nil : cb
       )
       FilingMailer::file_sms(sms.body_plain, sms.recipient.try(:id), "join_sms").deliver_later
     rescue StandardError => exception
     	result = false
-      ExceptionNotifier.notify_exception(exception,
+      if defined?(request)
+        ExceptionNotifier.notify_exception(exception,
           :env => request.env, :data => {:message => "failed to send sms"})
-      
+      end
     end
     
     result
