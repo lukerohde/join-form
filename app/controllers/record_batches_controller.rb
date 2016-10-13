@@ -36,7 +36,7 @@ class RecordBatchesController < ApplicationController
     @record_batch.sender_sms_address = format_mobile(ENV['twilio_number'])
     @record_batch.sender_email_address = reply_to(current_person.email)
 
-    if @record_batch.sms_template_id.present?
+    if @record_batch.sms_template.present?
       # SMS Message Setup
       body = @record_batch.sms_template.body
       @sms_subscriptions.each do |s|
@@ -55,7 +55,7 @@ class RecordBatchesController < ApplicationController
       end
     end
 
-    if @record_batch.email_template_id.present?
+    if @record_batch.email_template.present?
       # EMAIL Message Setup
       # TODO DRY THIS UP WITH EMAIL_TEMPLATE_MAILER & RECORDS CONTROLLER
       email_template = @record_batch.email_template

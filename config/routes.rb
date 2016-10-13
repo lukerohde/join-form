@@ -4,7 +4,7 @@ Rails.application.routes.draw do
 
   scope "(:locale)", locale: /en|en-AU|zh_tw|zh-TW|vi/ do
     
-    resources :record_batches
+    resources :record_batches, except: [:update, :edit]
     
     post '/records/receive_sms', to: 'records#receive_sms'
     post '/records/update_sms', to: 'records#update_sms'

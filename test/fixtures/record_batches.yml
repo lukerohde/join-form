@@ -2,10 +2,6 @@
 
 one:
   name: MyString
-  email_template_id: 
-  sms_template_id: 
-
-two:
-  name: MyString
-  email_template_id: 
-  sms_template_id: 
+  email_template: 
+  sms_template: one
+  email_template: one

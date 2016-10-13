@@ -26,7 +26,7 @@ module RecordsHelper
   end
 
   def send_sms(sms)
-  	result = true
+    result = true
   	
     begin
       @client = Twilio::REST::Client.new ENV["twilio_sid"], ENV["twilio_token"]

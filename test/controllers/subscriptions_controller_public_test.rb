@@ -308,6 +308,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
 
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
+
     assert response.body.include?('Welcome to the union'), "wrong step - should be welcomed"
     #assert ActionMailer::Base.deliveries.last.subject.starts_with?("JOIN:"), "was expecting a join email"
   end

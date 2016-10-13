@@ -35,3 +35,12 @@ contact_details_with_pay_method_person:
   state: "state"
   postcode: "postcode"
   union: owner
+has_mobile:
+  first_name: one
+  email: has_mobile@nuw.org.au
+  union: owner
+  mobile: "0439541888"
+has_email:
+  first_name: one
+  email: has_email@nuw.org.au
+  union: owner

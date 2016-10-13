@@ -50,8 +50,8 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     # One message for admin, one message to welcome user and one message for filing the welcome
     assert ActionMailer::Base.deliveries.count == starting_email_count + 3, "was expecting two emails to be sent"
     # The last message is the filing (and, the second last message is mutated by the filing)
-    assert ActionMailer::Base.deliveries.last.subject.starts_with?("DONE: welcome_email welcome luke welcome"), "was expecting a welcome email"
-    assert ActionMailer::Base.deliveries.last.to.include?("lrohde@nuw.org.au"), "was expecting a welcome email to send to lrohde@nuw.org.au"
+    assert ActionMailer::Base.deliveries.last.subject.starts_with?("DONE: welcome_email welcome luke welcome! (NV123456)"), "was expecting a welcome email"
+    assert ActionMailer::Base.deliveries.last.to.include?("feed@nuw.org.au"), "was expecting a welcome email to send to lrohde@nuw.org.au"
   end
 
   test "post step 4 - success - australian bank - don't send if user other than subscriber" do 

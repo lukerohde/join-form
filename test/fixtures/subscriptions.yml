@@ -52,3 +52,11 @@ column_list:
   data:
     worksite: nuw bourke street
     employer: freechange
+has_mobile:
+  person: has_mobile
+  join_form: one
+  token: has_mobile
+has_email:
+  person: has_email
+  join_form: one
+  token: has_email
