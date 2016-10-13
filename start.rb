@@ -108,9 +108,10 @@ class Application < Sinatra::Base
 
 		#halt result.to_json #signed_payload.to_json
 		if result['subscriptions'].count == 1
-			redirect result['subscriptions'][0]['message_url']
+			redirect result['subscriptions'][0]['record_url']
 		else
-			redirect result['batch_message_url']
+			ids = result['subscriptions'].map{ |s| s['id'] } 
+			redirect result['record_batch_url'] + "?subscription_ids=#{ids.join(',')}"
 		end
 	end
 
@@ -124,8 +125,7 @@ class Application < Sinatra::Base
 		e = e.gsub('locale', locale)
 		
 		signed_payload = SignedRequest::sign(ENV['nuw_end_point_secret'], payload||{}, e)
-		
-	  response = RestClient::Request.execute ({
+		response = RestClient::Request.execute ({
 	  	url: e, 
 	  	method: :post, 
 	  	payload: signed_payload.to_json,

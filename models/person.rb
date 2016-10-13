@@ -110,12 +110,19 @@ class Application
 			# only reveal information for people who've paid us, or have a current payment problem - people with bad statii who never paid us have never given us authoriative info, worth keeping at least.  
 			# Specifically exclude potential members, non-union, or ex-potential members - they may not expect us having information on them
 			if (self.from_api || transactions.count > 0 || ['14','23','24','25'].include?(self.Status)) && (self.from_api || !['17', '19', '26'].include?(self.Status))
-				# FOR CURRENT MEMBERS
+				# FOR CURRENT MEMBERS OR PEOPLE WE ARE SENDING VIA THE API
+
+				# blank bad email addresses
+				email = nil
+				if self.MemberEmailAddress =~ /\A[^@]+@[^@]+\z/ && !%w[bouncing unsubscribed].include?(self.MemberEmailHealth)
+					email = self.MemberEmailAddress 
+				end
+
 				result = result.merge({
 					external_id: self.MemberID,
 					first_name: self.FirstName,
 					last_name: self.LastName,
-					email: self.MemberEmailAddress,
+					email: email,  #self.MemberEmailAddress,
 					mobile: self.MobilePhone,
 					gender: self.Gender,
 					dob: self.DateOfBirth,
@@ -168,21 +175,23 @@ class Application
 						end
 					)
 				else
-					pm.merge!( 
-						case self.MemberPaymentType
-						when "O"
-							{
-								pay_method: "PRD"
-							}
-						when "R" # waiting on bank details
-							{
-								pay_method: "ABR" 
-							}
-						else
-							{
-							}
-						end
-					)
+					if ['1', '11', '14'].include?(self.Status)
+						pm.merge!( 
+							case self.MemberPaymentType
+							when "O"
+								{
+									pay_method: "PRD"
+								}
+							when "R" # waiting on bank details
+								{
+									pay_method: "ABR" 
+								}
+							else
+								{
+								}
+							end
+						)
+					end
 				end
 
 				result[:subscription].merge!(pm) if pm[:pay_method].present?
