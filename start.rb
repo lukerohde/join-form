@@ -87,7 +87,7 @@ class Application < Sinatra::Base
 		payload = JSON.parse(p.to_json)
 
 		result = push_subscribers(payload)
-		destination = result['subscriptions'][0]['message_url'] 
+		destination = result['subscriptions'][0]['record_url'] 
 		halt result.to_json unless destination
 
 		redirect destination
