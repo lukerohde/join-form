@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Record Batches</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email template</th>
+      <th>Sms template</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @record_batches.each do |record_batch| %>
+      <tr>
+        <td><%= record_batch.name %></td>
+        <td><%= record_batch.email_template_id %></td>
+        <td><%= record_batch.sms_template_id %></td>
+        <td><%= link_to 'Show', record_batch %></td>
+        <td><%= link_to 'Edit', edit_record_batch_path(record_batch) %></td>
+        <td><%= link_to 'Destroy', record_batch, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Record batch', new_record_batch_path %>

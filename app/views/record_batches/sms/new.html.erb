@@ -1,0 +1,107 @@
+<div class="col-sm-8 col-sm-offset-2"/>
+  <h1 class="no-left-margin">
+    Send A Message Batch
+  </h1>
+    
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#">SMS</a></li>
+    <li><a onclick="window.location.href = '<%= new_record_batch_path%>?join_form_id=' + $('#record_join_form_id').val()+ '&type=email'">Email</a></li>
+  </ul>
+  <div class="nav-tabs-container">
+  <br/>
+
+  <%= form_for([@record_batch], :html => { class: "form"}) do |f| %>
+      <% if @record.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@record.errors.count, "error") %> prohibited this batch from being saved:</h2>
+
+          <ul>
+          <% @record_batch.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+    <div class="form-group">
+      <%= f.label :name %><br>
+      <%= f.text_field :name, class: "form-control"%>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :join_form_id %><br>
+      <%= f.select :join_form_id,
+        selected_option(@record.join_form),
+        {
+            include_blank: false,
+        },
+        data: { 
+          placeholder: "Optionally choose a join form override.",
+          url: join_forms_path
+        }, 
+        class: "ac-select2 form-control", 
+        style: "width: 100%;", 
+      %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :sms_template_id %><br>
+      <%= f.select :sms_template_id,
+        selected_option(@record.template),
+        {
+            include_blank: false,
+        },
+        data: { 
+          placeholder: "To send an SMS, choose an SMS template.",
+          url: sms_templates_path
+        }, 
+        class: "ac-select2 form-control", 
+        style: "width: 100%;", 
+      %>
+    </div>
+
+    <div class="form-group">
+      <%= label_tag :from %><br>
+      <%= content_tag :from, ENV["twilio_number"], class: "form-control" %>
+    </div>    
+    <div class="form-group">
+      <%= label_tag :to %><br>
+      <%= content_tag :to, "#{@sms_subscriptions.count} people with mobile numbers", class: "form-control" %>
+    </div>
+
+    
+    <div class="form-group">
+      <%= f.label :email_template_id %><br>
+      <%= f.select :email_template_id,
+        selected_option(@record.template),
+        {
+            include_blank: false,
+        },
+        data: { 
+          placeholder: "To send an email, choose an email template.",
+          url: email_templates_path
+        }, 
+        class: "ac-select2 form-control", 
+        style: "width: 100%;", 
+      %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :from %><br>
+      <%= content_tag :from, "#{current_person.email} (reply-to: #{reply_to(current_person.email)}", class: "form-control" %>
+    </div>    
+       
+    <div class="form-group">
+      <%= f.label :to %><br>
+      <%= content_tag :to, "#{@email_subscriptions.count} people with email addresses", class: "form-control" %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Send Batch" %>
+    </div>
+  <% end %>
+  </div>
+</div>
+
+

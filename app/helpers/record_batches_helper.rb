@@ -1,0 +1,2 @@
+module RecordBatchesHelper
+end
