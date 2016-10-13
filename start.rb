@@ -93,7 +93,7 @@ class Application < Sinatra::Base
 		redirect destination
 	end
 
-	post '/renewal' do 
+	post '/renew' do 
 		external_ids = params[:external_ids].split(";")
 		
 		source = "nuw-api-#{params[:source] || "unknown"}"
