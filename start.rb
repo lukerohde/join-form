@@ -80,6 +80,8 @@ class Application < Sinatra::Base
 
 	get '/renew' do 
 		p = Person.search(params)
+		halt 404, "Not Found\n" unless p
+ 		
 		p.from_api = true
 		p.source = params[:source] || ""
 		payload = JSON.parse(p.to_json)
@@ -88,7 +90,7 @@ class Application < Sinatra::Base
 		redirect result['subscriptions'][0]['message_url']
 	end
 
-	post '/renew' do 
+	post '/renewal' do 
 		external_ids = params[:external_ids].split(";")
 		
 		source = "nuw-api-#{params[:source] || "unknown"}"
@@ -103,7 +105,7 @@ class Application < Sinatra::Base
 		  	payload << JSON.parse(p.to_json)
 		  end
 		end
-		halt "Nothing to send..." if payload.blank?	
+		halt 404, "Not Found\n" if payload.blank?	
 		result = push_subscribers(payload)
 
 		#halt result.to_json #signed_payload.to_json
