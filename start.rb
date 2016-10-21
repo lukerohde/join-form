@@ -83,7 +83,7 @@ class Application < Sinatra::Base
 		halt 404, "Not Found\n" unless p
  		
 		p.from_api = true
-		p.source = params[:source] || ""
+		p.source = "nuw-api-#{params[:source] || "unknown"}"
 		payload = JSON.parse(p.to_json)
 
 		result = push_subscribers(payload)
@@ -95,7 +95,6 @@ class Application < Sinatra::Base
 
 	post '/renew' do 
 		external_ids = params[:external_ids].split(";")
-		
 		source = "nuw-api-#{params[:source] || "unknown"}"
 
 		payload = []
