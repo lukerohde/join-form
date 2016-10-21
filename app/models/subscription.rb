@@ -174,7 +174,7 @@ class Subscription < ApplicationRecord
 
   def reoccurring_fee
     result = self.join_form.fee(self.frequency)
-    result = self.join_form.fee(self.join_form.max_frequency) if result == 0 # This is probably stupid - defaults the user to the minimum amount chargeable if they have a different frequency
+    result = self.join_form.fee(self.join_form.max_frequency) if (result||0) == 0 # This is probably stupid - defaults the user to the minimum amount chargeable if they have a different frequency
     # TODO add javascript to update the page, if the user changes the frequency when on the payment method step
     result
   end
