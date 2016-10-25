@@ -30,7 +30,7 @@ zh_tw:
         base_rate_half_yearly:  Half yearly fee
         base_rate_yearly:  Yearly fee
       subscription:
-        description: "基本資料"
+        description: "繳費方式" # Payment Method
   activerecord:
     attributes:
       subscription:
@@ -96,7 +96,7 @@ zh_tw:
         heading: "地址"
     subscription:
       edit: 
-        heading: "繳費方式"
+        heading: "基本資料"
         weekly: "週繳"
         fortnightly: "１４天一次繳費"
         monthly: "月繳"
