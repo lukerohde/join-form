@@ -124,8 +124,8 @@ zh_tw:
             <li>雇傭型態以及我的所在區域<br/><small>employment type and location, and</small></li>
             <li>我的銀行帳戶資料(包含以上資料的隨時變動細項，讓會員費可以直接從我的個人銀行帳戶開始收取)<br/><small>bank details, including any changes from time to time, so that direct debit of union dues can be commenced from my bank account.</small></li>
           </ul>
-        reoccurring_terms: "提交該表格即等同於%{union}授權讓在我的銀行賬戶中每期扣除%{reoccurring}澳元 (該金額偶爾會有調整) <br/><small>By submitting this form, I authorize the %{union} to deduct from my account a reoccurring fee of %{reoccurring} which is subject to occasional variation.</small>"
-        reoccurring_with_advance_terms: "提交該表格即等同於%{union}授權讓在我的銀行賬戶中先扣除%{advance}澳元預付費, 之後每期扣除%{reoccurring}澳元 (該金額偶爾會有調整)<br/><small>By submitting this form, I authorize the %{union} to deduct from my account an advanced payment of %{advance} in dues then a reoccurring fee of %{reoccurring} which is subject to occasional variation.</small>"
+        reoccurring_terms: "提交該表格即等同於我授權並同意%{union}從我的銀行賬戶中每週扣除%{reoccurring}的會費 （金額會隨著財政年度有所改變）<br/><small>By submitting this form, I authorize the %{union} to deduct from my account a reoccurring fee of %{reoccurring} which is subject to occasional variation.</small>"
+        reoccurring_with_advance_terms: "提交該表格即等同於%{union}授權讓在我的銀行賬戶中先扣除%{advance}澳元預付費, 之後每期扣除%{reoccurring}澳元 (金額會隨著財政年度有所改變)<br/><small>By submitting this form, I authorize the %{union} to deduct from my account an advanced payment of %{advance} in dues then a reoccurring fee of %{reoccurring} which is subject to occasional variation.</small>"
         total: "總金額"
         credit_card_charge: "應付款: %{first_payment}"
         direct_debit_charge: |
@@ -145,7 +145,7 @@ zh_tw:
       complete_address: "你必須要填妥你的通訊地址"
       credit_card: "無法認證，請再嘗試一次"
       bsb: "Bsb碼必須以123-123格式提供"
-      account_number: "帳號必須有六碼，例123456"
+      account_number: "帳號必須是號碼"
       pay_method: "請確認"
       payment_gateway_error: "銀行端在登入你的資料時發現錯誤"
       payment_gateway_card_error: "銀行端在確認你的信用卡時發現錯誤"
