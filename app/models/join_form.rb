@@ -1,6 +1,7 @@
 class JoinForm < ApplicationRecord
 	belongs_to :union
-	belongs_to :person
+	belongs_to :admin, class_name: "Person"
+	belongs_to :organiser, class_name: "Person"
 	belongs_to :welcome_email_template, class_name: "EmailTemplate"
 	belongs_to :admin_email_template, class_name: "EmailTemplate"
 	
@@ -16,7 +17,7 @@ class JoinForm < ApplicationRecord
 	#translation_class.send :serialize, :schema
 	#serialize :schema, JSONSerializer
 	
-	validates :short_name, :person, :union, presence: true
+	validates :short_name, :admin, :organiser, :union, presence: true
 	validates :base_rate_id, presence: true
 	validates :base_rate_weekly, numericality: { allow_blank: true }	
 	validate :is_authorized?
@@ -229,8 +230,12 @@ class JoinForm < ApplicationRecord
 				errors.add(:union, "is not your union so this assignment is not authorized.")
 			end 
 
-			if self.person.present? && self.person.union_id != @authorizer.union_id
-				errors.add(:person, "is not a colleague from your union so this assignment is not authorized.")
+			if self.admin.present? && self.admin.union_id != @authorizer.union_id
+				errors.add(:admin, "is not a colleague from your union so this assignment is not authorized.")
+			end
+
+			if self.organiser.present? && self.organiser.union_id != @authorizer.union_id
+				errors.add(:organiser, "is not a organiser from your union so this assignment is not authorized.")
 			end
 		end
 	end

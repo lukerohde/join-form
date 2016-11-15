@@ -1,7 +1,9 @@
 Hi <%=@person.first_name%>
 
-<h1>An join_form has been added for <%= @join_form.union.short_name %></h1>
+<p>
+<%=@creator.display_name %> has started designing the <%= @join_form.union.short_name %> join form
+</p>
 
 <p>
-	<a href="<%=join_form_url(id: @join_form.id)%>">View Online</a>
+	It can be viewed here <a href="<%=join_form_url(id: @join_form.id)%>">join_form_url(id: @join_form.id)</a>
 </p>

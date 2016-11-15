@@ -4,11 +4,12 @@ class PersonMailer < ApplicationMailer
 	include SubscriptionsHelper
   include ApplicationHelper
 
-	def join_form_notice(person, join_form, request)
+	def join_form_notice(person, join_form, request, creator)
 		@person = person
 		@join_form = join_form
 		@request = request
-		mail(from: from(request), to: person.email, subject: "#{join_form.person.display_name} has created a join_form.")
+		@creator = creator
+		mail(from: from(request), to: person.email, subject: "#{creator.display_name} has started designin a new join form.")
 	end
 
 	def private_email(to, from, subject, body, reply_url = nil)

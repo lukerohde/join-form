@@ -11,7 +11,7 @@ class IncompleteJoinNoticeJob #< ActiveJob::Base
       subscription = Subscription.find(subscription_id)
       if subscription.step != :thanks && timestamp_int == subscription.updated_at.to_i
         subject = "JOIN_FOLLOW_UP: Incomplete online join #{ subscription.person.display_name} #{subscription.person.external_id} - stalled on #{subscription.step}"
-        to = subscription.join_form.person.email
+        to = subscription.join_form.organiser.try(:email) ||  subscription.join_form.admin.try(:email)
         cc = subscription.join_form.followers(Person).collect(&:email).join(',')
         unless to.blank? && cc.blank?
           PersonMailer.subscription_pdf(subscription, to, cc, subject).deliver_now

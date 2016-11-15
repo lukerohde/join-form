@@ -15,7 +15,7 @@ class IncompleteJoinNoticeJobTest < ActiveJob::TestCase
   test "notice can send" do
     IncompleteJoinNoticeJob.perform_async(@subscription.id, @subscription.updated_at.to_i)
     assert ActionMailer::Base.deliveries.last.subject.starts_with?("JOIN_FOLLOW_UP:"), "was expecting incomplete online join email"
-    assert ActionMailer::Base.deliveries.last.to.include?(people(:admin).email), "was expecting notice to be sent to admin"
+    assert ActionMailer::Base.deliveries.last.to.include?(people(:organiser).email), "was expecting notice to be sent to organiser"
     assert ActionMailer::Base.deliveries.last.cc.include?(people(:one).email), "was expecting notice to be cc'd to follower one"
   end
 

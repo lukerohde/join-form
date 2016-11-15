@@ -4,6 +4,12 @@ admin:
   encrypted_password: <%= Devise::Encryptor.digest(Person, 'password') %>
   union: owner
   mobile: "+61439541888"
+organiser:
+  first_name: organiser
+  email: organiser@nuw.org.au
+  encrypted_password: <%= Devise::Encryptor.digest(Person, 'password') %>
+  union: owner
+  mobile: "+61439541889"
 one:
   first_name: one
   email: one@nuw.org.au

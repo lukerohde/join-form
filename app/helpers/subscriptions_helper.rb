@@ -243,7 +243,7 @@ module SubscriptionsHelper
         'signature_url' => subscription.signature_image.url
       })
 
-    admin = defined?(current_person) && current_person.present? ? current_person : subscription.join_form.person
+    admin = defined?(current_person) && current_person.present? ? current_person : subscription.join_form.admin
     union = subscription.join_form.union
     
     result['admin'] = admin.slice(:id, :first_name, :last_name, :email, :mobile).reject{|k,v| v.nil? } if admin.present?
@@ -264,7 +264,7 @@ module SubscriptionsHelper
   def nuw_end_point_reload(subscription)
     if subscription.person.present? && subscription.person.external_id.present?
       if payload = nuw_end_point_person_get(person_attributes: {external_id: subscription.person.external_id})
-        subscription.person.authorizer_id = subscription.join_form.person.id
+        subscription.person.authorizer_id = subscription.join_form.admin.id
         
         # My API adds mock values so the subscription can be saved. 
         # Remove them here, because we don't them wanting to be overridden
@@ -318,7 +318,7 @@ module SubscriptionsHelper
       subscription ||= Subscription.new(person: person) # person exists without a subscription (user)
 
       subscription.join_form_id = join_form.id
-      person.authorizer_id = join_form.person.id
+      person.authorizer_id = join_form.admin.id
       person.union_id = join_form.union.id
     
       subscription.update_from_end_point(payload) # this will save
@@ -374,7 +374,7 @@ module SubscriptionsHelper
 
   def nuw_api_process_put_response(subscription, payload)
     subscription.person.external_id = payload[:external_id]
-    subscription.person.authorizer_id = @join_form.person.id
+    subscription.person.authorizer_id = @join_form.admin.id
     subscription.status = payload.dig(:subscription, :status)
     subscription.next_payment_date = payload.dig(:subscription, :next_payment_date)
     subscription.financial_date = payload.dig(:subscription, :financial_date)

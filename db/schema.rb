@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161013024139) do
+ActiveRecord::Schema.define(version: 20161115063204) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -91,7 +91,7 @@ ActiveRecord::Schema.define(version: 20161013024139) do
     t.datetime "created_at",                                                        null: false
     t.datetime "updated_at",                                                        null: false
     t.integer  "union_id"
-    t.integer  "person_id"
+    t.integer  "admin_id"
     t.string   "base_rate_id"
     t.text     "header"
     t.string   "page_title"
@@ -110,9 +110,10 @@ ActiveRecord::Schema.define(version: 20161013024139) do
     t.integer  "admin_email_template_id"
     t.string   "group_id"
     t.string   "tags"
+    t.integer  "organiser_id"
   end
 
-  add_index "join_forms", ["person_id"], name: "index_join_forms_on_person_id", using: :btree
+  add_index "join_forms", ["admin_id"], name: "index_join_forms_on_admin_id", using: :btree
   add_index "join_forms", ["union_id"], name: "index_join_forms_on_union_id", using: :btree
   add_index "join_forms", ["welcome_email_template_id"], name: "index_join_forms_on_welcome_email_template_id", using: :btree
 
@@ -269,7 +270,7 @@ ActiveRecord::Schema.define(version: 20161013024139) do
   end
 
   add_foreign_key "join_forms", "email_templates", column: "welcome_email_template_id"
-  add_foreign_key "join_forms", "people"
+  add_foreign_key "join_forms", "people", column: "admin_id"
   add_foreign_key "join_forms", "supergroups", column: "union_id"
   add_foreign_key "payments", "people"
   add_foreign_key "payments", "subscriptions"

@@ -1,5 +1,5 @@
 Hi <%=@person.first_name%>
 
--- An join_form has been added for <%= @join_form.union.short_name %>  --
+<%=@creator.display_name %> has started designing the <%= @join_form.union.short_name %> join form
 
-<%="#{@request.protocol}#{@request.host}/join_forms/#{@join_form.id}"%>
+It can be viewed here <a href="<%=join_form_url(id: @join_form.id)%>">join_form_url(id: @join_form.id)</a>

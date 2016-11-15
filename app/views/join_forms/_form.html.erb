@@ -116,14 +116,30 @@
   <h2> Notifications </h2>
 
   <div class="form-group">
-    <%= f.label :person_id %> <%=link_to "invite person", new_person_invitation_path, class: "small", :target => "_blank"%><br>
-    <%= f.select :person_id,
-      selected_option(@join_form.person),
+    <%= f.label :admin_id %> <%=link_to "invite person", new_person_invitation_path, class: "small", :target => "_blank"%><br>
+    <%= f.select :admin_id,
+      selected_option(@join_form.admin),
       {
           include_blank: false,
       },
       data: { 
-        placeholder: "Please nominate a responsible admin person for new joins.",
+        placeholder: "Please nominate a admin person for complete joins.",
+        url: people_path
+      }, 
+      class: "ac-select2 form-control", 
+      style: "width: 100%;"
+    %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :organiser_id %> <%=link_to "invite person", new_person_invitation_path, class: "small", :target => "_blank"%><br>
+    <%= f.select :organiser_id,
+      selected_option(@join_form.organiser),
+      {
+          include_blank: false,
+      },
+      data: { 
+        placeholder: "Please nominate a organiser for incomplete joins.",
         url: people_path
       }, 
       class: "ac-select2 form-control", 

@@ -357,7 +357,7 @@ class SubscriptionsController < ApplicationController
       begin
         template_id = @subscription.join_form.admin_email_template_id
         if template_id.present?
-          to = @subscription.join_form.person.email
+          to = @subscription.join_form.admin.email
           cc = @subscription.join_form.followers(Person).collect(&:email).join(',')
           pdf_url = "#{edit_join_url(@subscription.join_form.union.short_name, @subscription.join_form.short_name, @subscription.token, locale: 'en', pdf: true)}"
           EmailTemplateMailer.merge(template_id, @subscription.id, to, cc, pdf_url).deliver_later
@@ -442,7 +442,7 @@ class SubscriptionsController < ApplicationController
         if current_person
           params[:subscription][:person_attributes][:authorizer_id] = current_person.id
         else
-          params[:subscription][:person_attributes][:authorizer_id] = @join_form.person.id
+          params[:subscription][:person_attributes][:authorizer_id] = @join_form.admin.id
         end
 
         # Hack date back to a regular format (for my API) TODO something better
