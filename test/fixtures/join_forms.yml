@@ -1,76 +1,30 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+DEFAULT: &DEFAULT
+  short_name: MyString
+  description: MyText
+  css: MyText
+  base_rate_id: 'groupnva'
+  base_rate_establishment: 100.00
+  base_rate_weekly: 9.99
+  base_rate_fortnightly: 9.99
+  base_rate_monthly: 9.99
+  base_rate_quarterly: 9.99
+  base_rate_half_yearly: 9.99
+  base_rate_yearly: 9.99
+  union: owner
+  admin: admin
+  organiser: admin
+  updated_at: <%= Time.now - 2.hours %>
+  credit_card_on: true
+  direct_debit_on: true
 one:
-  short_name: MyString
-  description: MyText
-  css: MyText
-  base_rate_id: 'groupnva'
-  base_rate_establishment: 100.00
-  base_rate_weekly: 9.99
-  base_rate_fortnightly: 9.99
-  base_rate_monthly: 9.99
-  base_rate_quarterly: 9.99
-  base_rate_half_yearly: 9.99
-  base_rate_yearly: 9.99
-  union: owner
-  admin: admin
-  organiser: admin
-  updated_at: <%= Time.now - 2.hours %>
-  credit_card_on: true
-  direct_debit_on: true
-  # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+  <<: *DEFAULT
 welcome:
-  short_name: MyString
-  description: MyText
-  css: MyText
-  base_rate_id: 'groupnva'
-  base_rate_establishment: 100.00
-  base_rate_weekly: 9.99
-  base_rate_fortnightly: 9.99
-  base_rate_monthly: 9.99
-  base_rate_quarterly: 9.99
-  base_rate_half_yearly: 9.99
-  base_rate_yearly: 9.99
-  union: owner
-  admin: admin
-  organiser: admin
-  updated_at: <%= Time.now - 2.hours %>
+  <<: *DEFAULT
   welcome_email_template: welcome
-  credit_card_on: true
-  direct_debit_on: true
 two:
-  short_name: MyString
-  description: MyText
-  css: MyText
-  base_rate_establishment: 100.00
-  base_rate_weekly: 9.99
-  base_rate_fortnightly: 9.99
-  base_rate_monthly: 9.99
-  base_rate_quarterly: 9.99
-  base_rate_half_yearly: 9.99
-  base_rate_yearly: 9.99
-  union: owner
-  admin: admin
+  <<: *DEFAULT
   organiser: organiser
-  credit_card_on: true
-  direct_debit_on: true
 column_list:
-  short_name: MyString
-  description: MyText
-  css: MyText
-  base_rate_id: 'groupnva'
-  base_rate_establishment: 100.00
-  base_rate_weekly: 9.99
-  base_rate_fortnightly: 9.99
-  base_rate_monthly: 9.99
-  base_rate_quarterly: 9.99
-  base_rate_half_yearly: 9.99
-  base_rate_yearly: 9.99
-  union: owner
-  admin: admin
-  organiser: admin
-  updated_at: <%= Time.now - 2.hours %>
-  credit_card_on: true
-  direct_debit_on: true
+  <<: *DEFAULT
   schema: "{\"columns\":[\"worksite\",\"employer\"]}"
-
-

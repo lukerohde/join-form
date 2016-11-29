@@ -125,3 +125,4 @@ gem 'geocoder'
 
 gem 'twilio-ruby'
 
+gem 'pg_search'

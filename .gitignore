@@ -30,3 +30,5 @@
 test.rb
 public/assets
 backup/*
+.floo
+.flooignore

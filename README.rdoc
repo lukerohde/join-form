@@ -67,6 +67,19 @@ A user can follow a join form
 
 == FEATURE - user can specify their next debit day
 
+== FEATURE - Auto send join forms
+- System shall send R59 members online join sms & email daily
+- System shall send Expired card members online sms & email daily
+- System shall archive contact details of people after 2 weeks
+- The user shall be able to see incomplete subscriptions
+- The user shall be able to see invitations to renew
+- The user shall be able to see completed subscriptions
+- The user shall be able to see subscription renewals 
+- The user shall be able to see fresh subscriptions
+- The user shall be able to search subscribtions by name
+- The user shall be able to search subscriptions by source
+- The user shall be able to search subscriptions by form
+
 
 == TODO Got an email in use error when attempting to match a person which had too few details, but was in the join system?  Also got errors on overjoin join show?  
 

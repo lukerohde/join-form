@@ -1,21 +1,5 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  type: 
-  subject: MyString
-  body_plain: Hi {{first_name}}
-  body_html: MyText
-  delivery_status: MyString
-  sender_id: 
-  recipient_id: 
-  recipient: one
-  sender: admin
-  template_id: one
-  parent_id: 
-  message_id: '1234@1234'
-  recipient_address: '+61439541888'
-
-two:
+DEFAULT: &DEFAULT
   type: 
   subject: MyString
   body_plain: MyText
@@ -27,3 +11,13 @@ two:
   sender: admin
   template_id: 
   parent_id: 
+
+one:
+  <<: *DEFAULT
+  body_plain: Hi {{first_name}}
+  template_id: one
+  message_id: '1234@1234'
+  recipient_address: '+61439541888'
+
+two:
+  <<: *DEFAULT
