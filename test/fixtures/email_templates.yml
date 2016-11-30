@@ -10,3 +10,5 @@ one:
   <<: *DEFAULT
 welcome:
   <<: *DEFAULT
+  subject: 'welcome {{first_name}}!'
+  

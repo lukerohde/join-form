@@ -1,8 +1,5 @@
 class Person < ApplicationRecord
-  include PgSearch
-  multisearchable against: [:display_name, :email, :mobile]
-
-
+  
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :invitable, :database_authenticatable,# :registerable,

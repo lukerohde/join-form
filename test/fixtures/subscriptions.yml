@@ -59,3 +59,32 @@ has_email:
   person: has_email
   join_form: one
   token: has_email
+  
+SEARCH_SUBSCRIPTION: &SEARCH_SUBSCRIPTION
+  person: search_person
+  join_form: search_join_form
+  token: searching searching
+  renewal: false
+  pending: false
+  completed_at: null
+  updated_at: 2016-10-01
+search_subscription_fresh:
+  <<: *SEARCH_SUBSCRIPTION
+  completed_at: 2016-11-01
+  updated_at: 2016-11-01
+  source: fresh_complete
+search_subscription_pending:
+  <<: *SEARCH_SUBSCRIPTION
+  pending: true
+  renewal: true
+  source: renewal_pending
+search_subscription_incomplete:
+  <<: *SEARCH_SUBSCRIPTION
+  renewal: true
+  source: renewal_incomplete
+search_subscription_complete:
+  <<: *SEARCH_SUBSCRIPTION
+  completed_at: 2016-11-01
+  updated_at: 2016-11-01
+  renewal: true
+  source: renewal_complete

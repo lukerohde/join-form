@@ -32,5 +32,7 @@ module JoinAUnion
     config.after_initialize do
         config.owner_union = Union.find_by_short_name(ENV['OWNER_UNION']) rescue nil
     end
+
+    config.action_view.field_error_proc = Proc.new { |html_tag, instance| html_tag }
   end
 end

@@ -8,7 +8,9 @@ subscription_helper_ready = ->
   subscription.autoSubmitOnPrefill()
   if ($('[type="date"]').prop('type') != 'date' )
     $('[type="date"]').datepicker()
+  $('.date-picker').datepicker(dateFormat: 'yy-mm-dd')
   subscription.goToStep()
+  $("#subscription_search_time_zone_offset").val(new Date().getTimezoneOffset())
   
 subscription =
   autoSubmitOnPrefill: ->

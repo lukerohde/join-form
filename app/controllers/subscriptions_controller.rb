@@ -15,7 +15,9 @@ class SubscriptionsController < ApplicationController
   # GET /subscriptions
   # GET /subscriptions.json
   def index
-    @subscriptions = Subscription.eager_load([:person, :join_form]).order('subscriptions.created_at desc').where('not subscriptions.person_id is null')
+    @subscription_search = SubscriptionSearch.new(search_params)
+    
+    @subscriptions = @subscription_search.results.eager_load([:person, :join_form]).order('subscriptions.updated_at desc').where('not subscriptions.person_id is null')
     @subscriptions = @subscriptions.where(['people.union_id = ?', current_person.union_id])
   end
 
@@ -430,6 +432,10 @@ class SubscriptionsController < ApplicationController
         #redirect_to request.path
         render :new
       end
+    end
+
+    def search_params
+      params.fetch(:subscription_search, {}).permit(:keywords, :pending, :incomplete, :complete, :renewal, :fresh, :to, :from, :time_zone_offset)
     end
 
 

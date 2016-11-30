@@ -6,15 +6,87 @@
 
     <h1>Subscriptions</h1>
 
+    <div class="panel panel-default">
+      <div class="panel-body">
+
+        <div id="error_explanation">
+          <ul>
+          <% @subscription_search.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+          </ul>
+        </div>
+
+        <%= form_for(@subscription_search, url: subscriptions_path, method: :get) do |f| %>
+          <div class="form-group">
+            <%= f.label :keywords %><br/>
+            <%= f.text_field :keywords, class: "form-control" %>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <%= f.label :from %><br/>
+                <%= f.text_field :from, class: "form-control date-picker" %>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <%= f.label :to %><br/>
+                <%= f.text_field :to, class: "form-control date-picker" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="checkbox">
+                <%= f.label :pending do %>
+                  <%= f.check_box :pending %>Pending
+                <% end %>
+              </div>
+              <div class="checkbox">
+                <%= f.label :incomplete do %>
+                  <%= f.check_box :incomplete %>Incomplete
+                <% end %>
+              </div>
+              <div class="checkbox">
+                <%= f.label :complete do %>
+                  <%= f.check_box :complete %>Complete
+                <% end %>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="checkbox">
+                <%= f.label :renewal do %>
+                  <%= f.check_box :renewal %>Renewal
+                <% end %>
+              </div>
+              <div class="checkbox">
+                <%= f.label :fresh do %>
+                  <%= f.check_box :fresh %>Fresh
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <%= f.hidden_field :time_zone_offset %>
+
+          <div class="actions">
+            <%= f.submit "Search", class: "btn btn-default pull-right" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
     <div class="xtable-responsive">
       <table class="table table-condensed table-striped">
         <thead>
           <tr>
             <th>Join form</th>
             <th>Contact</th>
-            <th>Step</th>
-            <th class="hidden-sm">Created At</th>
-            <th class="hidden-sm">Updated At</th>
+            <th class="visible-md visible-lg">Step</th>
+            <th class="visible-lg">Updated At</th>
             <th></th>
           </tr>
         </thead>
@@ -33,9 +105,8 @@
                 <%= subscription.person.mobile %></br>
                 <%= subscription.person.external_id %>
               </td>
-              <td><%= subscription.step %></td>
-              <td class="hidden-sm hidden-xs"><%=local_time_tag(subscription.created_at)%></td>
-              <td class="hidden-sm hidden-xs"><%=local_time_tag(subscription.updated_at)%></td>
+              <td class="visible-md visible-lg"><%= subscription.step %></td>
+              <td class="visible-lg"><%=local_time_tag(subscription.updated_at)%></td>
               <td>
                 <%= link_to "<span class=\"glyphicon glyphicon-eye-open\"></span>".html_safe, join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token ) %>
                 <%= link_to "<span class=\"glyphicon glyphicon-cog\"></span>".html_safe, edit_join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token) %>

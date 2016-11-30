@@ -327,10 +327,6 @@ GEM
       shellany (~> 0.0)
     orm_adapter (0.5.0)
     pg (0.18.4)
-    pg_search (1.0.6)
-      activerecord (>= 3.1)
-      activesupport (>= 3.1)
-      arel
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -478,7 +474,6 @@ DEPENDENCIES
   minitest-reporters
   mocha
   pg
-  pg_search
   pry-byebug
   puma
   rails (= 4.2.6)

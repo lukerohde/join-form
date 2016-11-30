@@ -14,11 +14,9 @@ class Subscription < ApplicationRecord
 
   delegate :external_id, to: :person, allow_nil: true 
   delegate :schema_data, to: :join_form, allow_nil: true
-  scope :with_mobile, -> { joins(:person).where.not(people: { mobile: [nil, ''] })
-}
-  scope :with_email, -> { joins(:person).where.not(Person.arel_table[:email].matches('%@unknown.com'))
-}
-
+  scope :with_mobile, -> { joins(:person).where.not(people: { mobile: [nil, ''] })}
+  scope :with_email, -> { joins(:person).where.not(Person.arel_table[:email].matches('%@unknown.com'))}
+ 
   serialize :data, HashSerializer
 
   encrypt_with_public_key :card_number, :ccv, :account_number, :bsb, 
@@ -248,7 +246,7 @@ class Subscription < ApplicationRecord
           p.assign_attributes(payment_payload) # TODO make sure this works
         end
       end
-      unless found 
+      unless found
         self.payments.build(payment_payload)
       end
     end

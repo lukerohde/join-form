@@ -50,3 +50,10 @@ has_email:
   first_name: one
   email: has_email@nuw.org.au
   union: owner
+search_person:
+  first_name: SearchName
+  last_name: SearchSurname
+  email: search_person@nuw.org.au
+  mobile: "0423456789"
+  external_id: NA000000
+  union: owner

@@ -148,44 +148,44 @@ module SubscriptionsHelper
 
 
   def permitted_params
-     [
-          :join_form_id, 
-          :frequency, 
-          :pay_method, 
-          :card_number, 
-          :expiry_month,
-          :expiry_year,
-          :ccv, 
-          :stripe_token, 
-          :account_name, 
-          :account_number, 
-          :bsb, 
-          :plan, 
-          :callback_url,
-          :signature_vector,
-          :partial_bsb, 
-          :partial_account_number,
-          :partial_card_number,
-          :end_point_put_required, 
-          :source, 
-          person_attributes: [
-              :external_id,
-              :first_name,
-              :last_name,
-              :gender,
-              :dob, 
-              :email,
-              :mobile,
-              :address1, 
-              :address2,
-              :suburb,
-              :state,
-              :postcode,
-              :union_id,
-              :authorizer_id,
-              :id
-            ]
-        ]
+    [
+      :join_form_id, 
+      :frequency, 
+      :pay_method, 
+      :card_number, 
+      :expiry_month,
+      :expiry_year,
+      :ccv, 
+      :stripe_token, 
+      :account_name, 
+      :account_number, 
+      :bsb, 
+      :plan, 
+      :callback_url,
+      :signature_vector,
+      :partial_bsb, 
+      :partial_account_number,
+      :partial_card_number,
+      :end_point_put_required, 
+      :source, 
+      person_attributes: [
+        :external_id,
+        :first_name,
+        :last_name,
+        :gender,
+        :dob, 
+        :email,
+        :mobile,
+        :address1, 
+        :address2,
+        :suburb,
+        :state,
+        :postcode,
+        :union_id,
+        :authorizer_id,
+        :id
+      ]
+    ]
   end
 
   def flatten_subscription(subscription)
@@ -261,6 +261,8 @@ module SubscriptionsHelper
     Addressable::URI.parse("#{ENV['NUW_END_POINT']}/people")
   end
 
+  # Attempt to reload a subscription from M'ship API. If unsuccessful, return
+  # the subscription unchanged.
   def nuw_end_point_reload(subscription)
     if subscription.person.present? && subscription.person.external_id.present?
       if payload = nuw_end_point_person_get(person_attributes: {external_id: subscription.person.external_id})
@@ -334,7 +336,6 @@ module SubscriptionsHelper
 
     subscription  # might be nil if nothing found in this system or api
   end
-
 
   def nuw_end_point_person_get(subscription_params)
     # TODO Timeout quickly and quietly

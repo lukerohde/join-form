@@ -28,3 +28,6 @@ two:
 column_list:
   <<: *DEFAULT
   schema: "{\"columns\":[\"worksite\",\"employer\"]}"
+search_join_form:
+  <<: *DEFAULT
+  short_name: SearchString

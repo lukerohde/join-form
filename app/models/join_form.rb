@@ -1,8 +1,5 @@
 class JoinForm < ApplicationRecord
-	include PgSearch
-	multisearchable against: [:short_name]
-
-
+	
 	belongs_to :union
 	belongs_to :admin, class_name: "Person"
 	belongs_to :organiser, class_name: "Person"
