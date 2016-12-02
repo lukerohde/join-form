@@ -64,15 +64,4 @@ class SubscriptionsControllerSourceTest < ActionDispatch::IntegrationTest
     
     assert Subscription.last.renewal == false
   end
-
-  test "post step 2 - api" do
-    payload = [ { external_id: 'NV123456', first_name: 'Luke', email: 'lrohde@nuw.org.au', subscription: {source: 'nuw-api'}} ]
-    SubscriptionsController.any_instance.stubs(:check_signature).returns(payload)
-  
-    post new_renewal_path( :en, @union, @join_form, format: 'json'), payload.to_json
-    
-    assert Subscription.last.renewal == true, "Should be a renewal"
-    assert Subscription.last.source == "nuw-api", "Source should be nuw-api"
-  end
-
 end

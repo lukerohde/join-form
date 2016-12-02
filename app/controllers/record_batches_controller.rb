@@ -1,6 +1,9 @@
 class RecordBatchesController < ApplicationController
   before_action :set_record_batch, only: [:show, :edit, :update, :destroy]
   before_action :set_subscriptions, only: [:new, :create]
+  before_action :set_join_form
+  skip_before_action :verify_authenticity_token, if: :api_request?
+  before_action :verify_hmac, if: :api_request?
 
   include RecordsHelper
   include SubscriptionsHelper
@@ -23,15 +26,12 @@ class RecordBatchesController < ApplicationController
     @record_batch.name = "Messages from #{current_person.display_name} #{Date.today.iso8601}"
   end
 
-  # GET /record_batches/1/edit
-  def edit
-  end
-
   # POST /record_batches
   # POST /record_batches.json
   def create
 
     @record_batch = RecordBatch.new(record_batch_params)
+    @record_batch.join_form ||= @join_form
     @record_batch.sender = current_person
     @record_batch.sender_sms_address = format_mobile(ENV['twilio_number'])
     @record_batch.sender_email_address = reply_to(current_person.email)
@@ -109,28 +109,15 @@ class RecordBatchesController < ApplicationController
       end
     end
 
+    #binding.pry
     respond_to do |format|
       if @record_batch.save
         SendRecordBatchesJob.perform_later(@record_batch.id)
 
-        format.html { redirect_to @record_batch, notice: 'Record batch was successfully created.' }
+        format.html { redirect_to union_join_form_record_batch_path(@record_batch.join_form.union, @record_batch.join_form, @record_batch), notice: 'Record batch was successfully created.' }
         format.json { render :show, status: :created, location: @record_batch }
       else
         format.html { render :new }
-        format.json { render json: @record_batch.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /record_batches/1
-  # PATCH/PUT /record_batches/1.json
-  def update
-    respond_to do |format|
-      if @record_batch.update(record_batch_params)
-        format.html { redirect_to @record_batch, notice: 'Record batch was successfully updated.' }
-        format.json { render :show, status: :ok, location: @record_batch }
-      else
-        format.html { render :edit }
         format.json { render json: @record_batch.errors, status: :unprocessable_entity }
       end
     end
@@ -141,7 +128,7 @@ class RecordBatchesController < ApplicationController
   def destroy
     @record_batch.destroy
     respond_to do |format|
-      format.html { redirect_to record_batches_url, notice: 'Record batch was successfully destroyed.' }
+      format.html { redirect_to union_join_form_record_batches_path(@union, @record_batch.join_form), notice: 'Record batch was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -158,6 +145,17 @@ class RecordBatchesController < ApplicationController
       @sms_subscriptions = @subscriptions.with_mobile
       @email_subscriptions = @subscriptions.with_email
     end
+
+    def set_join_form
+      id = params[:join_form_id] || params.dig(:record_batch, :join_form_id) || @record_batch.join_form.id
+    
+      if (Integer(id) rescue nil)
+        @join_form = @union.join_forms.find(id)
+      else
+        @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?
+      end
+    end
+
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def record_batch_params

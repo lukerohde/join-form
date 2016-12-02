@@ -3,7 +3,7 @@ include ActiveJob::TestHelper
 include ApplicationHelper
 include SubscriptionsHelper
 
-class SubscriptionsControllerAPITest < ActionDispatch::IntegrationTest
+class SubscriptionBatchesControllerAPITest < ActionDispatch::IntegrationTest
   setup do
     @join_form = join_forms(:one)
     @union = @join_form.union
@@ -17,12 +17,13 @@ class SubscriptionsControllerAPITest < ActionDispatch::IntegrationTest
   end
 
   test "forbid unsigned api post" do
-    post "/nuw/#{@join_form.short_name}/renew.json", api_params.to_json
+    #post "/nuw/#{@join_form.short_name}/renew.json", api_params.to_json
+    post "/unions/nuw/join_forms/#{@join_form.short_name}/subscription_batches.json", api_params.to_json
     assert_response :forbidden
   end
 
   test "allow unsigned api post" do
-    path = "/nuw/#{@join_form.short_name}/renew.json"
+    post "/unions/nuw/join_forms/#{@join_form.short_name}/subscription_batches.json", api_params.to_json
     params = SignedRequest::sign(ENV['NUW_END_POINT_SECRET'],api_params, "http://www.example.com#{path}")
     post path, params.to_json
 

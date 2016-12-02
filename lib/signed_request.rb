@@ -25,13 +25,13 @@ module SignedRequest
 
 	def self.check_signature(secret_key, payload, url = "")
 		if payload.is_a?(String)
-			begin 
+			begin
 			  payload = JSON.parse(payload) 
 		  rescue
 		  	raise SignedRequest::UnsupportedPayload
 	  	end
 		end 
-
+	
 		if payload.is_a?(Array)
 			hmac_received = payload[0]
 			payload = payload[1]
@@ -42,10 +42,10 @@ module SignedRequest
 		else
 			raise SignedRequest::UnsupportedPayload
 		end
-
+	
 		data = url + to_comparable_string(payload)
 		hmac = get_hmac(secret_key, data)
-
+	
 		unless hmac == hmac_received
 			#puts "HMAC MISMATCH!"
       #puts "HMAC_CALCULATED: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
@@ -53,7 +53,7 @@ module SignedRequest
      
 			raise SignedRequest::SignatureMismatch
 		end
-
+	
 		payload
 	end
 
@@ -94,4 +94,3 @@ module SignedRequest
 		data
 	end
 end
-

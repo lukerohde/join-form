@@ -1,13 +1,15 @@
 class SubscriptionsController < ApplicationController
   before_action :allow_iframe
-  before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :renew]
+  before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
   before_action :set_subscription, only: [:show, :edit, :update, :destroy, :end_point_put]
   before_action :set_join_form, except: [:index, :temp_report]
   before_action :facebook_new, only: [:create]
-  skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create, :renew]
-  before_filter :verify_hmac, if: :api_request?, only: [:create, :renew]
+  skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create]
+  before_filter :verify_hmac, if: :api_request?, only: [:create]
   before_action :set_authorizer, only: [:new]
   before_action :resubscribe?, only: [:create]
+  before_action :clear_pending, only: [:update]
+
   #layout 'subscription', except: [:index]
   
   include SubscriptionsHelper
@@ -67,30 +69,6 @@ class SubscriptionsController < ApplicationController
     end
   end
 
-  def renew
-    request.body.rewind # needed for integration test
-    
-    data = check_signature(JSON.parse(request.body.read)) # check it again only to remove the hmac
-    @subscriptions = nuw_end_point_receive(data, @join_form)
-    
-    # save an array of subscriptions
-    success = [false]
-    begin
-      Subscription.transaction do 
-        success = @subscriptions.map(&:save_without_validation!)
-        raise ActiveRecord::Rollback unless success.all?
-      end 
-    rescue
-    end
-    
-    respond_to do |format|
-      if success.all?
-        format.json { render :index }
-      else
-        format.json { render json: @subscriptions.select {|s| !s.errors.blank?}, status: :unprocessable_entity }
-      end
-    end
-  end 
 
   # PATCH/PUT /subscriptions/1
   # PATCH/PUT /subscriptions/1.json
@@ -235,17 +213,6 @@ class SubscriptionsController < ApplicationController
         end 
         @subscription.signature_vector = "" unless current_person.present? || params[:pdf] == 'true' # users can't sign, but do see the signature; non-users always have to sign and don't see the sig
       end
-    end
-
-    def set_join_form
-      id = params[:join_form_id] || params.dig(:subscription, :join_form_id) || @subscription.join_form.id
-      
-      if (Integer(id) rescue nil)
-        @join_form = @union.join_forms.find(id)
-      else
-        @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?
-      end
-      @subscription.join_form = @join_form if @subscription
     end
 
     def resubscribe?
@@ -406,16 +373,6 @@ class SubscriptionsController < ApplicationController
       result
     end
 
-
-    def api_request?
-      request.format.json? || request.format.xml?
-    end 
-
-    def verify_hmac
-      #puts 'checking hmac'
-      check_signature(JSON.parse(request.body.read))
-    end
-
     def allow_iframe
       #response.headers.except! 'X-Frame-Options'
       #response.headers['X-Frame-Options'] = 'ALLOW-FROM https://apps.facebook.com'  
@@ -432,6 +389,11 @@ class SubscriptionsController < ApplicationController
         #redirect_to request.path
         render :new
       end
+    end
+
+    def clear_pending 
+      # Called before update, if update succeeds and invitation has been accepted
+      @subscription.pending = false unless current_person # Don't clear pending if a user is amending an invitation
     end
 
     def search_params

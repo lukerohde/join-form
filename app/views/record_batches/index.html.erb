@@ -18,8 +18,8 @@
         <td><%= record_batch.name %></td>
         <td><%= record_batch.email_template_id %></td>
         <td><%= record_batch.sms_template_id %></td>
-        <td><%= link_to 'Show', record_batch %></td>
-        <td><%= link_to 'Destroy', record_batch, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Show', union_join_form_record_batch_path(id: record_batch, join_form_id: record_batch.join_form, union_id: @union) %></td>
+        <td><%= link_to 'Destroy', union_join_form_record_batch_path(id: record_batch, join_form_id: record_batch.join_form, union_id: @union), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
@@ -27,4 +27,4 @@
 
 <br>
 
-<%= link_to 'New Record batch', new_record_batch_path %>
+<%= link_to 'New Record batch', new_union_join_form_record_batch_path(union_id: @union, join_form_id: @union.join_forms.first) %>

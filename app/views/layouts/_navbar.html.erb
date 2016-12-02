@@ -41,7 +41,7 @@
                 <%= link_to "sms templates", sms_templates_path %>
               </li>
               <li>
-                <%= link_to "bulk messaging", record_batches_path %>
+                <%= link_to "bulk messaging", union_join_form_record_batches_path(union_id: @union, join_form_id: @union.join_forms.first) %>
               </li>
             </ul>
           </li>
@@ -70,5 +70,3 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-
-

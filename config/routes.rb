@@ -4,8 +4,6 @@ Rails.application.routes.draw do
 
   scope "(:locale)", locale: /en|en-AU|zh_tw|zh-TW|vi/ do
     
-    resources :record_batches, except: [:update, :edit]
-    
     post '/records/receive_sms', to: 'records#receive_sms'
     post '/records/update_sms', to: 'records#update_sms'
     post '/records/receive_email', to: 'records#receive_email'
@@ -44,6 +42,9 @@ Rails.application.routes.draw do
             patch 'end_point_put'
           end
         end
+        resources :record_batches, except: [:update, :edit]
+        resources :subscription_batches, only: [:create]
+    
         resource :follow, only: [:update], controller: 'join_forms/follow'
       end
       resource :key, only: [:show, :new, :edit, :update], controller: 'unions/key'
@@ -63,7 +64,6 @@ Rails.application.routes.draw do
     
     get '/:union_id/:join_form_id/join', to: 'subscriptions#new', as: :new_join
     post '/:union_id/:join_form_id/join', to: 'subscriptions#create' 
-    post '/:union_id/:join_form_id/renew', to: 'subscriptions#renew', as: :new_renewal
     get '/:union_id/:join_form_id/join/:id', to: 'subscriptions#edit', as: :edit_join
     get '/:union_id/:join_form_id/renew/:id', to: 'subscriptions#edit', as: :renew_join
     patch '/:union_id/:join_form_id/join/:id', to:  'subscriptions#update'

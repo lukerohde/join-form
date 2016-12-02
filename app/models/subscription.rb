@@ -27,7 +27,7 @@ class Subscription < ApplicationRecord
 
   mount_uploader :signature_image, SignatureUploader
   before_save :generate_signature_image
-
+  
   def get_key_pair
     self.join_form.union.key_pair
   end
@@ -137,8 +137,14 @@ class Subscription < ApplicationRecord
       else
     		errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
     	end
+
     if join_form.signature_required && signature_vector.blank?
       errors.add(:signature_vector, I18n.translate("subscriptions.errors.not_blank"))
+    end
+
+    if errors.count == 0
+      pending = false 
+      completed_at = Time.now 
     end
   end
 
@@ -266,4 +272,5 @@ class Subscription < ApplicationRecord
       self.signature_image = File.open(tempfile)
     end
   end
+
 end

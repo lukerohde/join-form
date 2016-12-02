@@ -43,4 +43,21 @@ class ApplicationController < ActionController::Base
       @union = Supergroup.where("short_name ilike ?",id.downcase).first
     end
   end
+  
+  private
+  def api_request?
+    request.format.json? || request.format.xml?
+  end
+  
+  def verify_hmac
+    SignedRequest.check_signature(ENV['NUW_END_POINT_SECRET'], JSON.parse(request.body.read), request.original_url)
+  rescue SignedRequest::SignatureMismatch
+    forbidden
+  end
+
+   def check_signature(payload)
+    SignedRequest.check_signature(ENV['NUW_END_POINT_SECRET'], payload, request.original_url)
+  rescue SignedRequest::SignatureMismatch
+    forbidden
+  end
 end

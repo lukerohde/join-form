@@ -141,7 +141,7 @@ module SubscriptionsHelper
       :callback_url,
       :status, 
       :next_payment_date,
-      :financial_date
+      :financial_date,
       )
     result = result.reject {|k,v| v.blank? }
   end
@@ -251,6 +251,17 @@ module SubscriptionsHelper
 
     result = result.reject{|k,v| v.nil? }
     result
+  end
+
+  def set_join_form
+    id = params[:join_form_id] || params.dig(:subscription, :join_form_id) || @subscription.join_form.id
+    
+    if (Integer(id) rescue nil)
+      @join_form = @union.join_forms.find(id)
+    else
+      @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?
+    end
+    @subscription.join_form = @join_form if @subscription
   end
 
 
@@ -562,11 +573,9 @@ module SubscriptionsHelper
   #  end
   #end
 
-  def check_signature(payload)
-    begin 
-      SignedRequest.check_signature(ENV['NUW_END_POINT_SECRET'], payload, request.original_url)
-    rescue SignedRequest::SignatureMismatch
-      forbidden
-    end
-  end
+  # def check_signature(payload)
+  #   SignedRequest.check_signature(ENV['NUW_END_POINT_SECRET'], payload, request.original_url)
+  # rescue SignedRequest::SignatureMismatch
+  #   forbidden
+  # end
 end

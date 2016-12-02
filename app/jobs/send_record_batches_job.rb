@@ -8,7 +8,6 @@ class SendRecordBatchesJob < ActiveJob::Base
     ActiveRecord::Base.connection_pool.with_connection do
 	  	#ActionMailer::Base.default_url_options => {:host=>ENV["APPLICATION_ROOT"]}
 
-
 	  	@sms_messages = Record.where(type: 'SMS', record_batch_id: record_batch_id) || []
 	  	@email_messages = Record.where(type: 'Email', record_batch_id: record_batch_id) || []
 
