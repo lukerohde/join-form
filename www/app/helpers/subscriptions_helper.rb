@@ -306,7 +306,8 @@ module SubscriptionsHelper
       
       s = nuw_end_point_load_subscription(sparams, join_form)
       s.renewal = true unless s.status == "Potential Member"
-    
+      s.pending = true
+      
       results << s
     end
     results

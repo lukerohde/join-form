@@ -8,27 +8,29 @@
 /.bundle
 
 # Ignore all logfiles and tempfiles.
-/log/*
-!/log/.keep
-/tmp
+/www/log/*
+!/www/log/.keep
+/www/tmp
 
 #/config/database.yml
 #/config/secrets.yml
-/public/uploads
+/www/public/uploads
 .DS_Store
 ._.DS_Store
 
 # Ignore application configuration
-/config/application.yml
+/www/config/application.yml
 *.key
 *.csr
 *.crt
 
-/spec_disabled
-/features_disabled
-/keys
-test.rb
-public/assets
-backup/*
+/www/keys
+/www/test.rb
+/www/public/assets
+/www/backup/*
 .floo
 .flooignore
+
+#/api-membership/config/end_points.yaml
+#/api-membership/config/private.key
+/api-membership/*

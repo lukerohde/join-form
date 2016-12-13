@@ -1,7 +1,7 @@
 require 'test_helper'
 
-class RecordsControllerTest < ActionController::TestCase
-  include Devise::TestHelpers
+class RecordsControllerTest < ActionDispatch::IntegrationTest
+  # include Devise::TestHelpers
 
   def sign_in_admin
     @admin = people(:admin)
@@ -15,13 +15,13 @@ class RecordsControllerTest < ActionController::TestCase
   end
 
   test "should get new" do
-    get :new, subscription_id: @subscription.id
+    get new_subscription_record_url(subscription_id: @subscription.id)
     assert_response :success
   end
 
   test "should create sms record" do
     assert_difference('Record.count') do
-      post :create, subscription_id: @subscription.id, record: { body_plain: @record.body_plain, subject: @record.subject, template_id: @record.template_id, type: 'SMS' }
+      post subscription_records_url(subscription_id: @subscription.id, record: { body_plain: @record.body_plain, subject: @record.subject, template_id: @record.template_id, type: 'SMS' })
     end
     assert_redirected_to new_subscription_record_path(@subscription) + "?type=SMS"
   end
@@ -30,21 +30,19 @@ class RecordsControllerTest < ActionController::TestCase
     
     assert_difference('ActionMailer::Base.deliveries.count', 2) do 
       assert_difference('Record.count') do
-        post :create, subscription_id: @subscription.id, record: { body_plain: @record.body_plain, subject: @record.subject, template_id: @record.template_id, type: 'Email' }
+        post subscription_records_url(subscription_id: @subscription.id, record: { body_plain: @record.body_plain, subject: @record.subject, template_id: @record.template_id, type: 'Email' })
       end
     end
 
     assert_redirected_to new_subscription_record_path(@subscription) + "?type=Email"
   end
 
-
-
   test "should forward reply email" do
     #sign_out
 
     assert_difference('ActionMailer::Base.deliveries.count', 2) do 
       assert_difference('Record.count') do
-        post 'receive_email', { Subject: 'test', Body: 'hi', Sender: 'lrohde@nuw.org.au', 'In-Reply-To': '1234@1234' }
+        post '/records/receive_email', { Subject: 'test', Body: 'hi', Sender: 'lrohde@nuw.org.au', 'In-Reply-To': '1234@1234' }
       end
     end
 
@@ -55,17 +53,16 @@ class RecordsControllerTest < ActionController::TestCase
     #sign_out
     assert_difference('ActionMailer::Base.deliveries.count', 2) do 
       assert_difference('Record.count') do
-        post 'receive_sms', { Body: 'hi', From: '+61439541888' }
+        post '/records/receive_sms', { Body: 'hi', From: '+61439541888' }
       end
     end
 
     assert_response :success
   end
 
-
   test "should update sms delivery status" do
     #sign_out
-    post 'update_sms', { id: @record.id, MessageStatus: "sent" }
+    post '/records/update_sms', { id: @record.id, MessageStatus: "sent" }
     
     @record.reload
     assert @record.delivery_status == "sent", 'sms delivery Status not updated'
@@ -75,7 +72,7 @@ class RecordsControllerTest < ActionController::TestCase
 
   test "should update email delivery status" do
     #sign_out
-    post 'update_email', { 'Message-Id': "1234@1234", event: "sent" }
+    post '/records/update_email', { 'Message-Id': "1234@1234", event: "sent" }
     
     @record.reload
     assert @record.delivery_status == "sent", 'sms delivery Status not updated'
@@ -90,7 +87,7 @@ class RecordsControllerTest < ActionController::TestCase
 
   test "should destroy record" do
     assert_difference('Record.count', -1) do
-      delete :destroy, subscription_id: @subscription.id, id: @record
+      delete subscription_record_url(subscription_id: @subscription.id, id: @record)
     end
 
     assert_redirected_to new_subscription_record_url(@subscription)
