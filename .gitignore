@@ -33,4 +33,6 @@
 
 #/api-membership/config/end_points.yaml
 #/api-membership/config/private.key
+#/api-membership/log/*
+#/api-membership/pids/*
 /api-membership/*
