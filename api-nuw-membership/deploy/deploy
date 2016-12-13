@@ -1,5 +1,0 @@
-#!/bin/bash
-
-git subtree push -prefix=/api-nuw-membership api-nuw-membership master
-
-#TODO
