@@ -1,0 +1,20 @@
+#/bin/bash
+
+echo Downloading scripts
+rm puma.conf puma-manager.conf
+wget https://raw.githubusercontent.com/puma/puma/master/tools/jungle/upstart/puma-manager.conf
+wget https://raw.githubusercontent.com/puma/puma/master/tools/jungle/upstart/puma.conf
+
+echo Setting user
+sed "s/^set\(.*\)apps$/set\1administrator/g" puma.conf > custom_puma.conf
+
+echo Copying upstart scripts
+sudo cp custom_puma.conf /etc/init/puma.conf
+sudo cp puma-manager.conf /etc/init/
+cd ..
+sudo sh -c "echo \"$(pwd)\" > /etc/puma.conf"
+
+echo Starting
+sudo stop puma-manager
+sudo start puma-manager
+
