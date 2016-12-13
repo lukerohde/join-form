@@ -58,15 +58,15 @@ class Application
 		def self.search(api_data)
 			result = self.find_by_MemberID(api_data[:external_id]) if api_data[:external_id].to_s != ""
 			# find by email (except deceased) - husbands and wives share email, but there are more typos and alt spellings, better off just picking the most recent
-			if result.nil? && api_data[:email].to_s != ""
-				result = self.where(["Status <> '6' and MemberEmailAddress = ? OR MemberSecondaryEmailAddress = ?", api_data[:email], api_data[:email]]) 
+			if result.nil? && api_data[:email].to_s != "" && (api_data[:last_name].to_s != "" or api_data[:first_name].to_s != "")
+				result = self.where(["Status <> '6' and (lastname like ? or firstname like ? or preferredname like ?) and (MemberEmailAddress like ? OR MemberSecondaryEmailAddress like ?)", api_data[:last_name], api_data[:first_name], api_data[:first_name], api_data[:email], api_data[:email]]) 
 				result = result.order("findate DESC")
 				result = result.first
 			end
 
 			# find by mobile (except deceased) - mobile phones change hands, but there are more typos and alt spellings, better off just picking the most recent
-			if result.nil? && api_data[:mobile].to_s != ""
-				result = self.where(["Status <> '6' and replace(replace(replace(replace(mobilephone,' ', ''), '(', ''), ')', ''), '-', '') = ?", api_data[:mobile].gsub(/[^0-9]/,'')]) 
+			if result.nil? && api_data[:mobile].to_s != "" && (api_data[:last_name].to_s != "" or api_data[:first_name].to_s != "")
+				result = self.where(["Status <> '6' and (lastname like ? or firstname like ? or preferredname like ?) and replace(replace(replace(replace(mobilephone,' ', ''), '(', ''), ')', ''), '-', '') = ?", api_data[:last_name], api_data[:first_name], api_data[:first_name], api_data[:mobile].gsub(/[^0-9]/,'')]) 
 				result = result.order("FinDate DESC")
 				result = result.first
 			end

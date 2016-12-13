@@ -94,20 +94,7 @@ class Application < Sinatra::Base
 	end
 
 	post '/renew' do 
-		external_ids = params[:external_ids].split(";")
-		source = "nuw-api-#{params[:source] || "unknown"}"
-
-		payload = []
-		external_ids.each do |id|
-			p = Person.search(external_id: id)
-			if p
-				p.from_api = true
-				p.source = source
-
-		  	payload << JSON.parse(p.to_json)
-		  end
-		end
-		halt 404, "Not Found\n" if payload.blank?	
+		payload = get_subscribers
 		result = push_subscribers(payload)
 
 		#halt result.to_json #signed_payload.to_json
@@ -119,44 +106,49 @@ class Application < Sinatra::Base
 		end
 	end
 
+	post '/auto_renew' do
+		payload = get_subscribers
+		subscriber_response = push_subscribers(payload)
+		subscriber_ids = subscriber_response['subscriptions'].map{ |s| s['id'] }
+	end
+
+	def get_subscribers
+		external_ids = params[:external_ids].split(";")
+		source = "nuw-api-#{params[:source] || "unknown"}"
+
+		payload = []
+		people = Person.where(MemberID: external_ids)
+		people.each do |p|
+				p.from_api = true
+				p.source = source
+
+		  	payload << JSON.parse(p.to_json)
+		end
+		halt 404, "Not Found\n" if payload.blank?	
+	end
+
 	def push_subscribers(payload)
 
 		join_form_id = params[:join_form_id]
 		locale = params[:locale] || 'en'
 
-		end_point = YAML.load_file(File.join('config', 'end_points.yaml'))[0]
+		end_point = end_point_url(:subscription_batches)
 		e = end_point.gsub('join_form_id', join_form_id)
 		e = e.gsub('locale', locale)
 		
-		signed_payload = SignedRequest::sign(ENV['nuw_end_point_secret'], payload||{}, e)
-		response = RestClient::Request.execute ({
-	  	url: e, 
-	  	method: :post, 
-	  	payload: signed_payload.to_json,
-	  	headers: {
-	  		content_type: :json,
-	  		accept: :json
-  		},
-	  	verify_ssl: false
-  	})
-    result = JSON.parse(response.body)
+		signed_post(e, payload)
   end
 
-	def decrypt(value)
-		value = Base64.decode64(value) rescue nil
-		if value
-			@key ||= OpenSSL::PKey::RSA.new(File.read(File.join('config','private.key')))
-			@key.private_decrypt(value, OpenSSL::PKey::RSA::PKCS1_PADDING)
-		end
-	end
-
- 	def check_signature(payload)
- 		begin 
- 			SignedRequest::check_signature(ENV['nuw_end_point_secret'], payload, ENV['nuw_end_point_url'] + request.path_info )
- 		rescue SignedRequest::SignatureMismatch
- 			halt 401, "Not Authorized\n"
- 		end
- 	end
+  def push_record_batch(ids)
+		response = JOIN::RecordBatches.post(
+  		locale: params[:locale] || 'en', 
+  		name: params[:name],
+  		sms_template_id: params[:sms_template_id],
+  		email_template_id: params[:email_template_id],
+  		join_form_id: params[:join_form_id],
+  		subscription_ids: ids
+  	)
+  end
 
   run! if app_file == $0
 end
