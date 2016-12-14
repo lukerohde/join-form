@@ -7,7 +7,6 @@ require 'bundler'
 require 'openssl'
 require 'date'
 require 'rest-client'
-require './lib/signed_request.rb'
 
 Bundler.require
 
@@ -128,24 +127,20 @@ class Application < Sinatra::Base
 	end
 
 	def push_subscribers(payload)
-
-		join_form_id = params[:join_form_id]
-		locale = params[:locale] || 'en'
-
-		end_point = end_point_url(:subscription_batches)
-		e = end_point.gsub('join_form_id', join_form_id)
-		e = e.gsub('locale', locale)
-		
-		signed_post(e, payload)
+		response = JOIN::SubscriptionBatches.post(
+			locale: params[:locale] || 'en',,
+			join_form_id: params[:join_form_id],
+			subscribers: payload
+		)
   end
 
   def push_record_batch(ids)
 		response = JOIN::RecordBatches.post(
   		locale: params[:locale] || 'en', 
   		name: params[:name],
+  		join_form_id: params[:join_form_id],
   		sms_template_id: params[:sms_template_id],
   		email_template_id: params[:email_template_id],
-  		join_form_id: params[:join_form_id],
   		subscription_ids: ids
   	)
   end

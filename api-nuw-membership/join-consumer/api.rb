@@ -1,9 +1,12 @@
+require './lib/signed_request.rb'
+require 'rest-client'
+
 module JOIN
 	module API
 	  def signed_post(end_point, payload)
-			signed_payload = SignedRequest::sign(ENV['nuw_end_point_secret'], payload||{}, end_point)
+			signed_payload = ::SignedRequest::sign(ENV['nuw_end_point_secret'], payload||{}, end_point)
 			response = RestClient::Request.execute ({
-		  	url: e, 
+		  	url: end_point, 
 		  	method: :post, 
 		  	payload: signed_payload.to_json,
 		  	headers: {
@@ -32,7 +35,7 @@ module JOIN
 	 	end
 
 	 	def end_point_url(end_point)
-	 		YAML.load_file(File.join('config', 'end_points.yaml'))[end_point]
+	 		YAML.load_file(File.join('config', 'end_points.yaml'))[end_point.to_s]
 	 	end
 	end
 end

@@ -1,10 +1,13 @@
 class RecordBatchesController < ApplicationController
+  
+  skip_before_action :authenticate_person!, if: :api_request?
+  skip_before_action :verify_authenticity_token, if: :api_request?
+  before_action :verify_hmac, if: :api_request?
+  
   before_action :set_record_batch, only: [:show, :edit, :update, :destroy]
   before_action :set_subscriptions, only: [:new, :create]
   before_action :set_join_form
-  skip_before_action :verify_authenticity_token, if: :api_request?
-  before_action :verify_hmac, if: :api_request?
-
+  
   include RecordsHelper
   include SubscriptionsHelper
 
@@ -32,9 +35,9 @@ class RecordBatchesController < ApplicationController
 
     @record_batch = RecordBatch.new(record_batch_params)
     @record_batch.join_form ||= @join_form
-    @record_batch.sender = current_person
+    @record_batch.sender = current_person || @join_form.admin
     @record_batch.sender_sms_address = format_mobile(ENV['twilio_number'])
-    @record_batch.sender_email_address = reply_to(current_person.email)
+    @record_batch.sender_email_address = reply_to(@record_batch.sender.email)
 
     if @record_batch.sms_template.present?
       # SMS Message Setup
@@ -115,7 +118,7 @@ class RecordBatchesController < ApplicationController
         SendRecordBatchesJob.perform_later(@record_batch.id)
 
         format.html { redirect_to union_join_form_record_batch_path(@record_batch.join_form.union, @record_batch.join_form, @record_batch), notice: 'Record batch was successfully created.' }
-        format.json { render :show, status: :created, location: @record_batch }
+        format.json { render :show, status: :created, location: union_join_form_record_batch_path(@record_batch.join_form.union, @record_batch.join_form, @record_batch) }
       else
         format.html { render :new }
         format.json { render json: @record_batch.errors, status: :unprocessable_entity }

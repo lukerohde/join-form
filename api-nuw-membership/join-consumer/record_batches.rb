@@ -1,14 +1,18 @@
+require_relative "./api.rb"
+
 module JOIN
 	module RecordBatches
-		extend API
+		extend JOIN::API
 
-		def self.post(locale:, name:, join_for_id:, sms_template_id:, email_template_id:, subscriber_ids:)
-			end_point = end_point_url(:subscription_batches)
+		# http://localhost:3000/locale/unions/nuw/join_forms/join_form_id/record_batches
+
+		def self.post(locale:, name:, join_form_id:, sms_template_id:, email_template_id:, subscription_ids:)
+			e = end_point_url(:record_batches)
 			e = e.gsub('locale', locale)
 			e = e.gsub('join_form_id', join_form_id)
 		
 			payload = {
-			subscriber_ids: subscriber_ids, 
+			subscription_ids: subscription_ids, 
 			record_batch: {
 					name: name, 
 					sms_template_id: sms_template_id, 

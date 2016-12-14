@@ -1,8 +1,11 @@
 class SubscriptionBatchesController < ApplicationController
   
-  before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :renew]
+  #before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :renew]
+  
+  skip_before_action :authenticate_person!, if: :api_request?
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create]
   before_filter :verify_hmac, if: :api_request?, only: [:create]
+  
   before_action :set_join_form, only: [:create]
   
   include SubscriptionsHelper
