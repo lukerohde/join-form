@@ -1,16 +1,62 @@
 <p id="notice"><%= notice %></p>
+<div class="col-sm-8 col-sm-offset-2"/>
+  <h1 class="no-left-margin">
+    Batch of Sent Messages
+  </h1>
+    
 
-<p>
-  <strong>Name:</strong>
-  <%= @record_batch.name %>
-</p>
+  <div class="form"> 
+    <div class="form-group">
+      <%= label_tag :name %><br>
+      <div class="form-control">
+      	<%= @record_batch.name %>
+      </div>
+    </div>
 
-<p>
-  <strong>Email template:</strong>
-  <%= @record_batch.email_template_id %>
-</p>
+    <div class="form-group">
+    	<%= label_tag :join_form %>
+    	<div class="form-control">
+    		<%= "#{@record_batch.join_form.name} - #{@record_batch.join_form.base_rate_weekly} " %>
+    	</div>
+    </div>
 
-<p>
-  <strong>Sms template:</strong>
-  <%= @record_batch.sms_template_id %>
-</p>
+    <hr/>
+    <h2>SMS</h2>
+    <div class="form-group">
+      <%= label_tag :from %><br>
+      <%= content_tag :from, ENV["twilio_number"], class: "form-control" %>
+    </div>    
+    <div class="form-group">
+      <%= label_tag :to %><br>
+      <%= content_tag :to, "#{@sms_subscriptions.count} people with mobile numbers", class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+    	<%= label_tag :sms_template_id %>
+    	<%= content_tag :sms_template_id, @record_batch.sms_template.try(:name), class: "form-control" %>
+    </div>
+   
+    <hr/>
+
+    <h2>Email</h2>
+
+    <div class="form-group">
+      <%= label_tag :from %><br>
+      <%= content_tag :from, "#{current_person.email} (reply-to: #{reply_to(current_person.email)}", class: "form-control" %>
+    </div>    
+       
+    <div class="form-group">
+      <%= label_tag :to %><br>
+      <%= content_tag :to, "#{@email_subscriptions.count} people with email addresses", class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+    	<%= label_tag :email_template_id %>
+    	<%= content_tag :email_template_id, @record_batch.email_template.try(:name), class: "form-control" %>
+    </div>
+   
+    <hr/>
+  </div>
+
+	<%= render partial: "shared/subscriptions" %>
+</div>

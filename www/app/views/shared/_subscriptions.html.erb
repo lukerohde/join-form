@@ -1,0 +1,41 @@
+
+    <div class="xtable-responsive">
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th>Join form</th>
+            <th>Contact</th>
+            <th class="visible-md visible-lg">Step</th>
+            <th class="visible-lg">Updated At</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @subscriptions.each do |subscription| %>
+            <tr>
+              <td>
+                <%= link_to subscription.join_form.short_name, edit_join_form_path(subscription.join_form) %>
+                <%="<BR/><small>RENEWAL</small>".html_safe if subscription.renewal %>
+                <%="<BR/><small>#{format_source(subscription.source)}</small>".html_safe if subscription.source.present? %>
+              </td>
+              <td>
+                <%= subscription.person.display_name %><br/>
+                <%= subscription.person.email %> </br>
+                <%= subscription.person.mobile %></br>
+                <%= subscription.person.external_id %>
+              </td>
+              <td class="visible-md visible-lg"><%= subscription.step %></td>
+              <td class="visible-lg"><%=local_time_tag(subscription.updated_at)%></td>
+              <td>
+                <%= link_to "<span class=\"glyphicon glyphicon-eye-open\"></span>".html_safe, join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token ) %>
+                <%= link_to "<span class=\"glyphicon glyphicon-cog\"></span>".html_safe, edit_join_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token) %>
+                <%= link_to "<span class=\"glyphicon glyphicon-comment\"></span>".html_safe, new_subscription_record_path(subscription) if subscription.person.try(:mobile) %>
+                <%= link_to "<span class=\"glyphicon glyphicon-trash\"></span>".html_safe, subscription.person.user? ? subscription : subscription.person, method: :delete, data: { confirm: 'Are you sure?' } %>
+                <%= link_to "<span class=\"glyphicon glyphicon-floppy-disk\"></span>".html_safe, end_point_put_union_join_form_subscription_path(union_id: subscription.join_form.union.short_name, join_form_id: subscription.join_form.short_name, id: subscription.token), method: :patch, style: "color:red;" if subscription.end_point_put_required && subscription.step == :thanks %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>

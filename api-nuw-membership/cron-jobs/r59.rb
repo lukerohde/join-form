@@ -2,6 +2,7 @@ load 'config/application.rb'
 Bundler.require
 
 
+# select Rule59 Members from the past week, and stopped paying members that are one week old and not older than two weeks
 people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 14, Date.today() - 7])
 	(
 		( 
@@ -16,6 +17,7 @@ people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 1
 			)
 			and
 				statuschangedate >= ?
+				# TODO prevent people that were selected as stopped, being selected again as R59
 		)
 		OR (
 			status in (
@@ -56,6 +58,7 @@ people.reject! do |p|
 	p.MemberEmailAddress.blank? && p.MobilePhone.blank?
 end
 
+# Post subscribers to join system
 response = JOIN::SubscriptionBatches.post(
 	locale: "en",
 	join_form_id: "industrial1",
@@ -71,12 +74,14 @@ unless response.code == 200
 	exit
 end
 
+# Get IDs of subscribers
 ids = JSON.parse(response.body)['subscriptions'].map { |s| s['id']}
 
+# Send messages via join system
 response = JOIN::RecordBatches.post(
 	locale: "en", 
 	join_form_id: "industrial1", 
-	name: "r59_mailout_#{Date.today.iso8601}",
+	name: "r59 mailout #{Date.today.iso8601}",
 	sms_template_id: 1,
 	email_template_id: 1,
 	subscription_ids: ids

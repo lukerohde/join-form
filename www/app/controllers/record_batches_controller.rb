@@ -14,12 +14,15 @@ class RecordBatchesController < ApplicationController
   # GET /record_batches
   # GET /record_batches.json
   def index
-    @record_batches = RecordBatch.all
+    @record_batches = RecordBatch.all.with_recipient_counts.desc
   end
 
   # GET /record_batches/1
   # GET /record_batches/1.json
   def show
+    @subscriptions = Subscription.where(["person_id in (select recipient_id from records where record_batch_id = ?)", @record_batch.id]) 
+    @sms_subscriptions = @subscriptions.with_mobile
+    @email_subscriptions = @subscriptions.with_email
   end
 
   # GET /record_batches/new
