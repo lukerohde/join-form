@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd /opt/api-nuw-membership
+git pull origin master
+sudo restart puma-manager
+sudo tailf /var/log/upstart/puma-_opt_api-nuw-membership.log

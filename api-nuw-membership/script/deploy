@@ -1,5 +1,6 @@
 #!/bin/bash
 
 git subtree push --prefix=api-nuw-membership api-nuw-membership master
-
+scp api-nuw-membership/script/deploy_remote_script administrator@actionadapter.nuw.org.au:/opt/api-nuw-membership/script/
+ssh -t administrator@actionadapter.nuw.org.au '/opt/api-nuw-membership/script/deploy_remote_script'
 #TODO

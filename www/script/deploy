@@ -1,6 +1,9 @@
 #!/bin/bash
 #git push heroku master
+#git push heroku `git subtree split --prefix www master`:master --force #used that to get heroku to accept the first push
+
 git subtree push --prefix=www heroku master 
 heroku run rake db:migrate
+cd www
 figaro heroku:set -e production
 heroku restart
