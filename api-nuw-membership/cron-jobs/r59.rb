@@ -2,26 +2,59 @@ load 'config/application.rb'
 Bundler.require
 
 
-people = Application::Person.where([<<~WHERE, Date.today() - 7])
-	status in (
-		select 
-			returnvalue1 
-		from 
-			tblLookup 
-		where 
-			maincriteria = 'tblMember.status' 
-			and returnvalue2 = 'Rule59 Resigned'
+people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 14, Date.today() - 7])
+	(
+		( 
+			status in (
+				select 
+					returnvalue1 
+				from 
+					tblLookup 
+				where 
+					maincriteria = 'tblMember.status' 
+					and returnvalue2 = 'Rule59 Resigned'
+			)
+			and
+				statuschangedate >= ?
+		)
+		OR (
+			status in (
+				select 
+					returnvalue1 
+				from 
+					tblLookup 
+				where 
+					maincriteria = 'tblMember.status' 
+					and returnvalue2 = 'Stopped Paying'
+			)
+			and
+			statuschangedate >= ?	and statuschangedate < ?	
+		)
 	)
 	and
-		statuschangedate >= ?
-	and	
-		not memberid in (select c.otherid from nuwassist.dbo.contact c inner join nuwassist.dbo.grpcontact gc on c.contactid = gc.contactid where gc.deletiondate is null and gc.grpid in (select lookupid from nuwassist.dbo.lookup where systemvalue = 'smsoptoutgrpid'))
-	and
 		(
-			coalesce(memberemailaddress, '') <> '' 
-			or coalesce(mobilephone, '') <> ''
+			( 
+				coalesce(memberemailaddress, '') <> '' 
+			)
+			or ( 
+				coalesce(mobilephone, '') <> ''
+			)
 		)
+	--and memberid = 'NA000067'
 WHERE
+
+# blank out contact details that have bounced or unsubscribed
+people.where("memberemailhealth in ('unsubscribed', 'bouncing')").each do |p|
+	p.MemberEmailAddress = nil
+end
+
+people.where("memberid in (select c.otherid from nuwassist.dbo.contact c inner join nuwassist.dbo.grpcontact gc on c.contactid = gc.contactid where gc.deletiondate is null and gc.grpid in (select lookupid from nuwassist.dbo.lookup where systemvalue = 'smsoptoutgrpid'))").each do |p|
+	p.MobilePhone = nil
+end		
+
+people.reject! do |p|
+	p.MemberEmailAddress.blank? && p.MobilePhone.blank?
+end
 
 response = JOIN::SubscriptionBatches.post(
 	locale: "en",
