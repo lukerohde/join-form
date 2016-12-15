@@ -1,6 +1,6 @@
 #!/bin/bash
 #git push heroku master
-git subtree push --prefix=/www heroku master 
+git subtree push --prefix=www heroku master 
 heroku run rake db:migrate
 figaro heroku:set -e production
 heroku restart
