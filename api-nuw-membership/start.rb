@@ -12,6 +12,7 @@ Bundler.require
 class Application < Sinatra::Base
 
 	load 'config/application.rb'
+	include JOIN::API
 
 
 	set :show_exceptions, :after_handler # for json errors in development

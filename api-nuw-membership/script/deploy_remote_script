@@ -3,4 +3,4 @@
 cd /opt/api-nuw-membership
 git pull origin master
 sudo restart puma-manager
-sudo tailf /var/log/upstart/puma-_opt_api-nuw-membership.log
+sudo tailf /var/log/upstart/puma-_opt_api-nuw-membership.log /opt/api-nuw-membership/log/puma_stderr.log /opt/api-nuw-membership/log/puma_stdout.log
