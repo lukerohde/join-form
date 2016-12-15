@@ -93,7 +93,7 @@ class Application < Sinatra::Base
 
 	post '/renew' do 
 		payload = get_subscribers
-		result = push_subscribers(payload)
+		result = JSON.parse(push_subscribers(payload).body)
 
 		#halt result.to_json #signed_payload.to_json
 		if result['subscriptions'].count == 1
@@ -102,12 +102,6 @@ class Application < Sinatra::Base
 			ids = result['subscriptions'].map{ |s| s['id'] } 
 			redirect result['record_batch_url'] + "?subscription_ids=#{ids.join(',')}"
 		end
-	end
-
-	post '/auto_renew' do
-		payload = get_subscribers
-		subscriber_response = push_subscribers(payload)
-		subscriber_ids = subscriber_response['subscriptions'].map{ |s| s['id'] }
 	end
 
 	def get_subscribers
@@ -127,7 +121,7 @@ class Application < Sinatra::Base
 
 	def push_subscribers(payload)
 		response = JOIN::SubscriptionBatches.post(
-			locale: params[:locale] || 'en',,
+			locale: params[:locale] || 'en',
 			join_form_id: params[:join_form_id],
 			subscribers: payload
 		)
