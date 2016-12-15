@@ -51,4 +51,3 @@ module RecordsHelper
   end
 end
 
-

@@ -15,7 +15,6 @@ module JOIN
 	  		},
 		  	verify_ssl: false
 	  	})
-	    result = JSON.parse(response.body)
 	  end
 
 		def decrypt(value)

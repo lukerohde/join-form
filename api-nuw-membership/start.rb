@@ -6,7 +6,6 @@ require 'pry-byebug'
 require 'bundler'
 require 'openssl'
 require 'date'
-require 'rest-client'
 
 Bundler.require
 
