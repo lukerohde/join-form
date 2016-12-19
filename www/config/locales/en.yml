@@ -119,7 +119,7 @@ en:
         heading: "Address Details"
     subscription:
       edit: 
-        heading: "Membership Plan Details"
+        heading: "Union Membership Detail"
         weekly: "Weekly"
         fortnightly: "Fortnightly"
         monthly: "Monthly"
