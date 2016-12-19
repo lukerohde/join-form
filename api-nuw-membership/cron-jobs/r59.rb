@@ -104,8 +104,9 @@ response = JOIN::RecordBatches.post(
 	subscription_ids: ids
 )
 
-unless response.code == 200
-	puts response.body
+puts response.body
+unless response.code == 201
 	exit
 end
+
 puts "Completed at #{Time.now}"
