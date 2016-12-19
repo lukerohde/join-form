@@ -26,8 +26,21 @@ class PersonMailer < ApplicationMailer
 		mail(from: from.email, to: to.email, subject: subject)
 	end
 
-	def follow_up_email(to, from, reply_to, subject, body, message_id, tags = "")
-		@body = body
+	def follow_up_email_html(to, from, reply_to, subject, body_plain, body_html, message_id, tags = "")
+		@body_plain = body_plain
+		@body_html = body_html
+		
+		headers['filing_subject'] = "DONE: #{tags} #{subject} (#{to.external_id})"
+		
+		mail = mail(from: from.email, to: to.email, reply_to: reply_to, subject: subject)
+		#headers['Message-Id'] = message_id # for reply tracking.
+		mail.mailgun_headers = {'Message-Id' => message_id}
+		mail
+	end
+
+	def follow_up_email_plain(to, from, reply_to, subject, body_plain, message_id, tags = "")
+		@body_plain = body_plain
+		
 		headers['filing_subject'] = "DONE: #{tags} #{subject} (#{to.external_id})"
 		
 		mail = mail(from: from.email, to: to.email, reply_to: reply_to, subject: subject)

@@ -22,7 +22,11 @@ module RecordsHelper
   end
 
   def send_email(email)
-    PersonMailer.follow_up_email(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain, email.message_id, "join_email").deliver_later
+    if email.body_html.present?
+      PersonMailer.follow_up_email_html(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain, email.body_html, email.message_id, "join_email").deliver_later
+    else
+      PersonMailer.follow_up_email_plain(email.recipient, email.sender, email.sender_address, email.subject, email.body_plain, email.message_id, "join_email").deliver_later
+    end
   end
 
   def send_sms(sms)
