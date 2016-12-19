@@ -73,25 +73,32 @@ if people.count == 0
 	exit
 end
 
-# Post subscribers to join system
 puts "Pushing #{people.count} people to join system"
-response = JOIN::SubscriptionBatches.post(
-	locale: config['locale'],
-	join_form_id: config['join_form_id'],
-	subscribers: people.map do |p| 
-		p.from_api = true
-		p.source = 'nuw-api-r59'
-		JSON.parse(p.to_json) 
+i = 0
+ids = []
+people.each_slice(10) do |batch|
+	i++
+	puts "Batch #{i}..."
+
+	# Post subscribers to join system
+	response = JOIN::SubscriptionBatches.post(
+		locale: config['locale'],
+		join_form_id: config['join_form_id'],
+		subscribers: batch.map do |p| 
+			p.from_api = true
+			p.source = 'nuw-api-r59'
+			JSON.parse(p.to_json) 
+		end
+	)
+
+	unless response.code == 200
+		puts response.body
+		exit
 	end
-)
 
-unless response.code == 200
-	puts response.body
-	exit
+	# Get IDs of subscribers
+	ids = ids + JSON.parse(response.body)['subscriptions'].map { |s| s['id']}
 end
-
-# Get IDs of subscribers
-ids = JSON.parse(response.body)['subscriptions'].map { |s| s['id']}
 
 # Send messages via join system
 puts "Sending join form #{config['join_form_id']} to #{ids.count} people"
