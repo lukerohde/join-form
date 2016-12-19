@@ -73,10 +73,10 @@ if people.count == 0
 	exit
 end
 
-puts "Pushing #{people.count} people to join system in batches of #{config[:batch_size]}"
+puts "Pushing #{people.count} people to join system in batches of #{config['batch_size']}"
 i = 0
 ids = []
-people.each_slice(config[:batch_size]) do |batch|
+people.each_slice(config['batch_size']) do |batch|
 	i += 1
 	puts "Batch #{i}..."
 
