@@ -2,5 +2,6 @@ locale: en
 join_form_id: update1
 sms_template_id: 5
 email_template_id: 10
+batch_size: 10
 test_only: true
 test_memberid: NV391215
