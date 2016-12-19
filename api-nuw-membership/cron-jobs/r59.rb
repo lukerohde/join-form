@@ -1,10 +1,18 @@
 load 'config/application.rb'
 Bundler.require
 
+
+puts "\n\nStarting at #{Time.now}"
+
 config = YAML.load_file(File.join('cron-jobs', 'r59.yaml'))
 
 # select Rule59 Members from the past week, and stopped paying members that are one week old and not older than two weeks
-people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 14, Date.today() - 7])
+puts "Finding people"
+
+if config['test_only'] == true
+	people = Application::Person.where('MemberID = ?', config['test_memberid'])
+else
+	people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 14, Date.today() - 7])
 	(
 		( 
 			status in (
@@ -20,7 +28,7 @@ people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 1
 				statuschangedate >= ?
 				# TODO prevent people that were selected as stopped, being selected again as R59
 		)
-		OR (
+		/* OR (
 			status in (
 				select 
 					returnvalue1 
@@ -32,7 +40,7 @@ people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 1
 			)
 			and
 			statuschangedate >= ?	and statuschangedate < ?	
-		)
+		) */
 	)
 	and
 		(
@@ -43,8 +51,9 @@ people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 1
 				coalesce(mobilephone, '') <> ''
 			)
 		)
-	--and memberid = 'NA000067'
-WHERE
+	--and 1=0 --memberid = 'NA000067'
+	WHERE
+end 
 
 # blank out contact details that have bounced or unsubscribed
 people.where("memberemailhealth in ('unsubscribed', 'bouncing')").each do |p|
@@ -59,7 +68,13 @@ people.reject! do |p|
 	p.MemberEmailAddress.blank? && p.MobilePhone.blank?
 end
 
+if people.count == 0 
+	puts "Found no one to send too"
+	exit
+end
+
 # Post subscribers to join system
+puts "Pushing #{people.count} people to join system"
 response = JOIN::SubscriptionBatches.post(
 	locale: config['locale'],
 	join_form_id: config['join_form_id'],
@@ -79,6 +94,7 @@ end
 ids = JSON.parse(response.body)['subscriptions'].map { |s| s['id']}
 
 # Send messages via join system
+puts "Sending join form #{config['join_form_id']} to #{ids.count} people"
 response = JOIN::RecordBatches.post(
 	locale: config['locale'], 
 	join_form_id: config['join_form_id'], 
@@ -92,3 +108,4 @@ unless response.code == 200
 	puts response.body
 	exit
 end
+puts "Completed at #{Time.now}"
