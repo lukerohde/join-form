@@ -1,6 +1,7 @@
 load 'config/application.rb'
 Bundler.require
 
+config = YAML.load_file(File.join('cron-jobs', 'r59.yaml'))
 
 # select Rule59 Members from the past week, and stopped paying members that are one week old and not older than two weeks
 people = Application::Person.where([<<~WHERE, Date.today() - 7, Date.today() - 14, Date.today() - 7])
@@ -60,8 +61,8 @@ end
 
 # Post subscribers to join system
 response = JOIN::SubscriptionBatches.post(
-	locale: "en",
-	join_form_id: "industrial1",
+	locale: config['locale'],
+	join_form_id: config['join_form_id'],
 	subscribers: people.map do |p| 
 		p.from_api = true
 		p.source = 'nuw-api-r59'
@@ -79,11 +80,11 @@ ids = JSON.parse(response.body)['subscriptions'].map { |s| s['id']}
 
 # Send messages via join system
 response = JOIN::RecordBatches.post(
-	locale: "en", 
-	join_form_id: "industrial1", 
+	locale: config['locale'], 
+	join_form_id: config['join_form_id'], 
 	name: "r59 mailout #{Date.today.iso8601}",
-	sms_template_id: 1,
-	email_template_id: 1,
+	sms_template_id: config['sms_template_id'],
+	email_template_id: config['email_template_id'],
 	subscription_ids: ids
 )
 
