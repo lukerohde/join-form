@@ -63,7 +63,7 @@ module NUWDBHelper
 
 	def get_first_recurrent_payment_date(next_payment_date, findate, establishment_fee, freq, feegroup, dob)
 		new_findate = get_new_findate(findate, establishment_fee, freq, feegroup, dob)
-		get_next_payment_date_after(new_findate, next_payment_date, freq)
+		get_next_payment_date_after(new_findate, next_payment_date||Date.today, freq)
 	end
 
 	def tblMember_attributes(api_data, person = nil)
