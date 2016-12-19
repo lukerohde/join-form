@@ -1,8 +1,10 @@
 class HashSerializer
   def self.dump(hash)
-  	if hash.is_a?(String)
+    if hash.is_a?(String)
   		hash
-  	else
+  	elsif hash.nil?
+      "{}"
+    else
   		hash.to_json
   	end
   end

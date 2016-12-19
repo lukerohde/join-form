@@ -27,6 +27,11 @@ class Subscription < ApplicationRecord
 
   mount_uploader :signature_image, SignatureUploader
   before_save :generate_signature_image
+  before_save :set_data_if_blank
+
+  def set_data_if_blank
+    self.data = {} if data.blank? # set a default, when blank, because of a possible AR/jsonb bug
+  end
   
   def get_key_pair
     self.join_form.union.key_pair
@@ -51,7 +56,13 @@ class Subscription < ApplicationRecord
   end
 
   def subscription_saved?
-  	(frequency_was.present? && plan_was.present?)
+
+    custom_columns_saved = true
+    (self.schema_data[:columns]||[]).each do |column| 
+      custom_columns_saved = false if data[column].blank?
+    end
+
+  	(frequency_was.present? && plan_was.present? && custom_columns_saved)
   end
 
   def subscription_present?
