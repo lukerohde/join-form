@@ -36,3 +36,4 @@
 #/api-membership/log/*
 #/api-membership/pids/*
 /api-membership/*
+/api-membership/cron-jobs/r59.yaml
