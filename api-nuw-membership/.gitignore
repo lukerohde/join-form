@@ -3,3 +3,5 @@ log/*
 pids/*
 config/private.key
 config/end_points.yaml
+cron-jobs/r59.yaml
+cron-jobs/r59.log
