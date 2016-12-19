@@ -26,7 +26,7 @@ else
 			)
 			and
 				statuschangedate >= ?
-				# TODO prevent people that were selected as stopped, being selected again as R59
+				-- TODO prevent people that were selected as stopped, being selected again as R59
 		)
 		/* OR (
 			status in (
@@ -110,3 +110,4 @@ unless response.code == 201
 end
 
 puts "Completed at #{Time.now}"
+exit # otherwise sinatra attempts to start! TODO fix
