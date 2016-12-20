@@ -126,8 +126,10 @@ class Subscription < ApplicationRecord
     # When a signature is already saved and I'm OOP
     (errors.empty? && 
       (
-        (%w[CC AB].include?(self.pay_method) && has_existing_pay_method?) ||
-        %w[PRD ABR].include?(self.pay_method) 
+        (self.pay_method == "AB" && self.join_form.direct_debit_on && has_existing_pay_method?) ||
+        (self.pay_method == "CC" && self.join_form.credit_card_on && has_existing_pay_method?) ||
+        (self.pay_method == "PRD" && self.join_form.payroll_deduction_on) ||
+        (self.pay_method == "ABR" && self.join_form.direct_debit_release_on)
       ) && (!self.join_form.signature_required || self.signature_vector.present?)
     ) || @skip_validation
   end
