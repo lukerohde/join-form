@@ -84,7 +84,7 @@ class Subscription < ApplicationRecord
   end
 
   def set_country_code(location)
-    self.country_code ||= location.country_code 
+    self.country_code ||= location 
     if self.country_code == nil || ["", "RD"].include?(self.country_code)
      self.country_code = ENV['ADDRESS_REQUIRED_COUNTRY_CODES'].split(',').first # use first as default
     end

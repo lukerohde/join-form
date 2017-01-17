@@ -56,7 +56,7 @@ class SubscriptionsController < ApplicationController
      # this is a crude hack to hide address, and probably should be a part of the address model on person
     #   - country_code can be provided by the underpayment calculator as a query param for prefilling
     #   - alternatively the system will geolocate the IP address
-    @subscription.set_country_code(params["country_code"] || request.location)
+    @subscription.set_country_code(params["country_code"] || request.location.try(:country_code))
     
     respond_to do |format|
       if save_step
