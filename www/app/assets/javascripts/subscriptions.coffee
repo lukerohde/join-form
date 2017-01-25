@@ -4,12 +4,13 @@
 
 subscription_helper_ready = ->
   Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
+  newSession = localStorage.getItem('scrollYPos') == null
   subscription.setupForm()
   subscription.autoSubmitOnPrefill()
   if ($('[type="date"]').prop('type') != 'date' )
     $('[type="date"]').datepicker()
   $('.date-picker').datepicker(dateFormat: 'yy-mm-dd')
-  subscription.goToStep()
+  subscription.goToStep() unless newSession
   $("#subscription_search_time_zone_offset").val(new Date().getTimezoneOffset())
   
 subscription =
@@ -24,24 +25,25 @@ subscription =
       $('.subscription_header').css('margin-top', noticeHeight);
 
     step = $("#step").data('step')
-    if step? && step != "contact_details" && step != "thanks" && localStorage.getItem('scrollYPos')? 
+    if step? && step != "thanks" && localStorage.getItem('scrollYPos')?
       
       # Go to last scroll position
       window.scrollTo(0, localStorage.getItem('scrollYPos'))
-      
       # show the next step
       if $("#" + step)?
-        $("#" + step).show()       
+        $("#" + step).show()
         
         # scroll down, allowing room for the notice
         top = $('#' + step).offset().top
         top = top - noticeHeight
         top = 0 if top < 0 
 
-        $('html, body').animate({ 
-            scrollTop: top 
+        $('html, body').animate({
+          scrollTop: top
         }, 1000)
 
+    localStorage.removeItem('scrollYPos')
+      
   swapSubmitLabel: ->
     temp = $('#subscription_submit').prop('value')
     $('#subscription_submit').prop('value', $('#subscription_submit').data('label'))

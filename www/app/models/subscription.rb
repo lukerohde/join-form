@@ -52,7 +52,7 @@ class Subscription < ApplicationRecord
   end
 
   def contact_details_saved?
-    (person.present? && person.email_was.present? && person.first_name_was.present? && person.first_name.downcase != "unknown") 
+    (person.present? && person.email_was.present? && !Person.temporary_email?(person.email_was) && person.first_name_was.present? && !Person.temporary_first_name?(person.first_name_was)) 
   end
 
   def subscription_saved?

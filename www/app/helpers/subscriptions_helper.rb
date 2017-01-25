@@ -528,23 +528,27 @@ module SubscriptionsHelper
   end
 
   def temporary_email
-    "#{SecureRandom.hex(8)}@unknown.com" # TODO pray for no clashes
+    Person.temporary_email
   end
 
   def temporary_email?(email)
-    (email =~ /.{16}@unknown.com/) == 0
+    Person.temporary_email?(email)
   end
 
-  def temporary_first_name
-    'unknown'
+  def temporary_last_name
+    Person.temporary_last_name  
   end
 
   def temporary_last_name?(last_name)
-    (last_name||"").downcase == 'unknown'
+    Person.temporary_last_name?(last_name)
+  end
+
+  def temporary_first_name
+    Person.temporary_first_name
   end
 
   def temporary_first_name?(first_name)
-    (first_name||"").downcase == 'unknown'
+    Person.temporary_first_name?(first_name)
   end  
 
   def fix_phone(number)

@@ -45,7 +45,6 @@ class SubscriptionsController < ApplicationController
   # GET /subscriptions/1/edit
   def edit
     prefill_form(@subscription, params)
-    flash[:notice] = next_step_notice
   end
 
   # POST /subscriptions
@@ -151,7 +150,7 @@ class SubscriptionsController < ApplicationController
 
 
   def next_step
-    unless @subscription.pay_method_saved?
+    unless @subscription.pay_method_saved? && pay_method_posted?
       #edit_subscription_path @subscription.token
       subscription_form_path(@subscription)
     else
@@ -170,6 +169,10 @@ class SubscriptionsController < ApplicationController
     return t('subscriptions.steps.plan') if (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved? 
     return t('subscriptions.steps.address') if @subscription.contact_details_saved?  
     return t('subscriptions.steps.welcome')
+  end
+
+  def pay_method_posted?
+    params.dig(:subscription, :pay_method).present?
   end
 
   # DELETE /subscriptions/1

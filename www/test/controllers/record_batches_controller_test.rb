@@ -41,6 +41,7 @@ class RecordBatchesControllerTest < ActionDispatch::IntegrationTest
 
     r = assigns(:record_batch)
     assert_redirected_to union_join_form_record_batch_path(r.join_form.union, r.join_form, r)
+    assert_equal @admin.email, r.sender.email
   end
 
   test "should show record_batch" do

@@ -24,6 +24,30 @@ class Person < ApplicationRecord
   include Filterable
   scope :name_like, -> (name) {where("first_name ilike ? or last_name ilike ? or email ilike ?", "%#{name}%", "%#{name}%", "%#{name}%")}
   
+  def self.temporary_email?(email)
+    (email =~ /.{16}@unknown.com/) == 0
+  end
+
+  def self.temporary_email
+    "#{SecureRandom.hex(8)}@unknown.com" # TODO pray for no clashes
+  end
+
+  def self.temporary_first_name
+    "unknown"
+  end
+
+  def self.temporary_first_name?(first_name)
+    (first_name||"").downcase == 'unknown'
+  end
+
+  def self.temporary_last_name
+    "unknown"
+  end
+
+  def self.temporary_last_name?(last_name)
+    (last_name||"").downcase == 'unknown'
+  end
+
   def self.ci_find_by_email(email)
     where(["email ilike ?", email.to_s.strip]).take
   end
