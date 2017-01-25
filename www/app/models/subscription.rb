@@ -11,7 +11,7 @@ class Subscription < ApplicationRecord
   validate :subscription_must_be_complete, if: :address_saved?
   validate :address_must_be_complete, if: :contact_details_saved?
   validate :pay_method_must_be_complete, if: :subscription_saved?
-
+  
   delegate :external_id, to: :person, allow_nil: true 
   delegate :schema_data, to: :join_form, allow_nil: true
   scope :with_mobile, -> { joins(:person).where.not(people: { mobile: [nil, ''] })}
@@ -155,8 +155,8 @@ class Subscription < ApplicationRecord
     end
 
     if errors.count == 0
-      pending = false 
-      completed_at = Time.now 
+      self.pending = false
+      self.completed_at = Time.now 
     end
   end
 

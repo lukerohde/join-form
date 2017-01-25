@@ -283,6 +283,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     params[:subscription].merge!(pay_method: "CC")
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
     assert response.body.include?( "couldn&#39;t be validated by our payment gateway.  Please try again."), "no error for missing stripe token"
+    refute with_subscription.reload.completed_at.present?, "completion date should not be set"
 
     params[:subscription].merge!(pay_method: "AB")
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
@@ -305,7 +306,9 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
     assert_response :redirect
-
+    
+    assert with_subscription.reload.completed_at.present?, "completion date should be set"
+    
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
 
@@ -331,6 +334,8 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
     assert_response :redirect
+    
+    assert with_subscription.reload.completed_at.present?, "completion date should be set"
 
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
