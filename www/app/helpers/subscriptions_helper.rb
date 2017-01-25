@@ -362,7 +362,7 @@ module SubscriptionsHelper
       nuw_end_point_transform_from(JSON.parse(response).deep_symbolize_keys)
     rescue Exception => exception
       # TODO A catch all like this is pretty nasty.
-      error_data = JSON.parse(exception.response) rescue exception
+      error_data = JSON.parse(exception.response) rescue nil
       ExceptionNotifier.notify_exception(exception,:env => request.env, :data => error_data)
       nil 
     end
@@ -379,7 +379,7 @@ module SubscriptionsHelper
       result
     rescue Exception => exception
       # TODO A catch all like this is pretty nasty.
-      error_data = JSON.parse(exception.response) rescue exception
+      error_data = JSON.parse(exception.response) rescue nil
       ExceptionNotifier.notify_exception(exception, :env => request.env, :data => error_data)
       nil 
     end

@@ -45,6 +45,7 @@ class SubscriptionsController < ApplicationController
   # GET /subscriptions/1/edit
   def edit
     prefill_form(@subscription, params)
+    flash[:notice] = next_step_notice
   end
 
   # POST /subscriptions
@@ -164,9 +165,9 @@ class SubscriptionsController < ApplicationController
   end
 
   def next_step_notice
-    return t('subscriptions.steps.done') if @subscription.pay_method_saved?
-    return t('subscriptions.steps.payment') if @subscription.subscription_saved?
-    return t('subscriptions.steps.plan') if @subscription.address_saved? || !@subscription.address_required?
+    return t('subscriptions.steps.done') if @subscription.pay_method_saved? && @subscription.subscription_saved? && (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved? 
+    return t('subscriptions.steps.payment') if @subscription.subscription_saved?&& (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved? 
+    return t('subscriptions.steps.plan') if (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved? 
     return t('subscriptions.steps.address') if @subscription.contact_details_saved?  
     return t('subscriptions.steps.welcome')
   end

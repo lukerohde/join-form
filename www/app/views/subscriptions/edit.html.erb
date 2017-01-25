@@ -1,5 +1,5 @@
-<% if notice.present? %>
-	<p id="notice" class="alert alert-info text-center alert-dismissible fixed-to-top" > 
+<% if notice.present? && !current_person %>
+	<p id="notice" class="alert alert-info text-center alert-dismissible fixed-to-top no-left-margin" > 
 		<%= notice %>
 	</p>
 <% end %>

@@ -159,7 +159,7 @@ en:
     steps:
       done: "Welcome to the union"
       payment: "Please provide a payment method"
-      plan: "Please choose your membership plan"
+      plan: "Please tell us some union membership detail"
       address: "Please tell us your address in Australia"
       welcome: "Please provide your contact details"
       renewal: "Hey, you are already a member! Please update your details with us."

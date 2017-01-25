@@ -38,7 +38,7 @@ class RecordBatchesController < ApplicationController
 
     @record_batch = RecordBatch.new(record_batch_params)
     @record_batch.join_form ||= @join_form
-    @record_batch.sender = current_person || @join_form.admin
+    @record_batch.sender = current_person || @join_form.organiser
     @record_batch.sender_sms_address = format_mobile(ENV['twilio_number'])
     @record_batch.sender_email_address = reply_to(@record_batch.sender.email)
 

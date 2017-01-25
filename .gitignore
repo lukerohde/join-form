@@ -12,8 +12,6 @@
 !/www/log/.keep
 /www/tmp
 
-#/config/database.yml
-#/config/secrets.yml
 /www/public/uploads
 .DS_Store
 ._.DS_Store
@@ -30,9 +28,3 @@
 /www/backup/*
 .floo
 .flooignore
-
-#/api-membership/config/end_points.yaml
-#/api-membership/config/private.key
-#/api-membership/log/*
-#/api-membership/pids/*
-/api-membership/*

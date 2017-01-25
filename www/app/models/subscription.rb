@@ -56,10 +56,9 @@ class Subscription < ApplicationRecord
   end
 
   def subscription_saved?
-
     custom_columns_saved = true
     (self.schema_data[:columns]||[]).each do |column| 
-      custom_columns_saved = false if data[column].blank?
+      custom_columns_saved = false if (data_was||{})[column].blank?
     end
 
   	(frequency_was.present? && plan_was.present? && custom_columns_saved)
@@ -136,7 +135,7 @@ class Subscription < ApplicationRecord
 
 
   def pay_method_must_be_complete
-  	return if @skip_validation
+    return if @skip_validation
     case pay_method
       when "-"
         self.restore_pay_method! # not a super elegant place to put this, but I don't want to save a dash, and I don't want to validate existing details (because they're not persisted).
@@ -169,9 +168,9 @@ class Subscription < ApplicationRecord
   end
 
   def step
-    return :thanks if pay_method_saved?
-  	return :pay_method if subscription_saved? 
-  	return :subscription if address_saved? || !address_required?
+    return :thanks if pay_method_saved? && subscription_saved? && (address_saved? || !address_required?) && contact_details_saved?
+  	return :pay_method if subscription_saved? && (address_saved? || !address_required?) && contact_details_saved?
+  	return :subscription if (address_saved? || !address_required?)  && contact_details_saved?
   	return :address if contact_details_saved?
   	:contact_details
   end
