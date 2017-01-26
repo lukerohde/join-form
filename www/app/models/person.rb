@@ -16,7 +16,7 @@ class Person < ApplicationRecord
 
   #validates :email, presence: true # devise does this already
   validates :union, presence: true
-  validate :is_authorized?
+  #validate :is_authorized? # was causing subscrption validation to fail when valid? called twice
   validate :contact_detail_must_be_complete
 
   acts_as_follower
