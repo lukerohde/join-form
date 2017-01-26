@@ -44,6 +44,23 @@ contact_details_with_subscription_and_pay_method_subscription:
   pay_method: "AB"
   partial_bsb: 123-123
   partial_account_number: 123123
+completed_subscription:
+  join_form: two
+  person: completed_person
+  token: completed_token
+  plan: asdf
+  frequency: "W"
+  pay_method: "AB"
+  partial_bsb: 123-123
+  partial_account_number: 123123
+  completed_at: <%=Time.now%>
+contact_details_with_no_subscription_but_pay_method_subscription:
+  join_form: two
+  person: contact_details_with_pay_method_person
+  token: contact_details_with_no_subscription_but_pay_method_token
+  pay_method: "AB"
+  partial_bsb: 123-123
+  partial_account_number: 123123
 column_list:
   join_form: column_list
   person: contact_details_with_address_person

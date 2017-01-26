@@ -175,7 +175,24 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
       assert_response :redirect
       #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
       follow_redirect!
-      assert response.body.include?('data-step="thanks"'), "wrong step - should be thanks"
+      assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
+    end
+  end
+
+  test "post step 1 - success, someone matched and identified who has completed a subscription online" do
+    @subscription = subscriptions(:completed_subscription)
+    @person = @subscription.person
+
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({}))
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns({ external_id: 'NV123456', first_name: 'bob', email: 'completed_person@nuw.org.au'})
+    
+    # Doesn't send a welcome message
+    assert_difference 'ActionMailer::Base.deliveries.count', 0 do 
+      post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: @person.first_name, mobile: @person.mobile, email: @person.email } }
+      assert_response :redirect
+      #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
+      follow_redirect!
+      assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
     end
   end
 
@@ -258,7 +275,29 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
-    assert response.body.include?('data-step="pay_method"'), "wrong step - should be subscription"
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
+  end
+
+  test "post step 3 with bank details - success" do 
+    no_subscription = subscriptions(:contact_details_with_no_subscription_but_pay_method_subscription)
+    params = step3_params
+    params[:subscription][:person_attributes][:id] = no_subscription.person.id
+    api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    
+    assert_difference('ActionMailer::Base.deliveries.count', 1) do    
+      patch edit_join_path(:en, @union, @join_form, no_subscription.token), params
+      # welcome and join email not sent
+      assert ActionMailer::Base.deliveries.last.subject.starts_with?("JOIN_FOLLOW_UP"), "was expecting only one follow-up email"
+    end
+    assert_response :redirect
+
+    #redirect to confirm pay method, even if you have one
+    follow_redirect!
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay method"
+
+    # TODO completed at not set
+    assert no_subscription.reload.completed_at.blank?, "Should not be completed, because pay_method hasn't been submitted/confirmed"
   end
 
   test "get step 4" do
@@ -284,7 +323,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
     assert response.body.include?( "couldn&#39;t be validated by our payment gateway.  Please try again."), "no error for missing stripe token"
     refute with_subscription.reload.completed_at.present?, "completion date should not be set"
-
+    
     params[:subscription].merge!(pay_method: "AB")
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
     assert response.body.include?( "BSB must be properly formatted BSB"), "no error for missing bsb"
@@ -389,26 +428,8 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert @subscription.data["employer"] == "asdf_e", "custom column employer didn't update"
   end
  
+  
 
-
-
-
-
-
-
-
-  # test "post form with column list - success" do 
-  #   with_address = subscriptions(:contact_details_with_address_subscription)
-  #   params = step3_params
-  #   params[:subscription][:person_attributes][:id] = with_address.person.id
-  #   api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
-  #   SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
-  #   patch edit_join_path(:en, @union, @join_form, with_address.token), params
-  #   assert_response :redirect
-  #   #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
-  #   follow_redirect!
-  #   assert response.body.include?('data-step="pay_method"'), "wrong step - should be subscription"
-  # end
 
 
   # TODO I think i have a bug in here, where the subscription join form can vary from the joinform shown

@@ -41,6 +41,16 @@ contact_details_with_pay_method_person:
   state: "state"
   postcode: "postcode"
   union: owner
+completed_person:
+  first_name: bob
+  email: completed_person@nuw.org.au 
+  mobile: "0439541887"
+  address1: "address1"
+  address2: "address2"
+  suburb: "subrb"
+  state: "state"
+  postcode: "postcode"
+  union: owner
 has_mobile:
   first_name: one
   email: has_mobile@nuw.org.au

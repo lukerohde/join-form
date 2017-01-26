@@ -220,7 +220,6 @@ class SubscriptionsController < ApplicationController
     end
 
     def resubscribe?
-
       # setup some shortcuts
       params = subscription_params
       pparams = params[:person_attributes]

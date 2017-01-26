@@ -28,6 +28,26 @@ class Subscription < ApplicationRecord
   mount_uploader :signature_image, SignatureUploader
   before_save :generate_signature_image
   before_save :set_data_if_blank
+  before_save :set_completed_at
+
+  def set_completed_at
+    # everything is saved or we are passing validation when setting the pay_method
+    if step == :thanks || (step == :pay_method && valid?)
+      self.completed_at = Time.now
+      self.pending = false
+    else
+      self.completed_at = nil
+    end
+    true # prevent halt of callback chain
+  end
+
+  def step
+    return :thanks if valid? && self.completed_at.present? && pay_method_saved? && subscription_saved? && (address_saved? || !address_required?) && contact_details_saved? 
+    return :pay_method if subscription_saved? && (address_saved? || !address_required?) && contact_details_saved?
+    return :subscription if (address_saved? || !address_required?)  && contact_details_saved?
+    return :address if contact_details_saved?
+    :contact_details
+  end
 
   def set_data_if_blank
     self.data = {} if data.blank? # set a default, when blank, because of a possible AR/jsonb bug
@@ -153,11 +173,15 @@ class Subscription < ApplicationRecord
     if join_form.signature_required && signature_vector.blank?
       errors.add(:signature_vector, I18n.translate("subscriptions.errors.not_blank"))
     end
+  end
 
-    if errors.count == 0
-      self.pending = false
-      self.completed_at = Time.now 
-    end
+  def pay_method=(value)
+    write_attribute(:pay_method, value)
+
+    # A subscription can only be completed if a pay_method is written 
+    # Essentially confirming an existing pay_method when one already exists
+    self.completed_at = Time.now
+    self.pending = false
   end
 
   def save_without_validation!
@@ -165,14 +189,6 @@ class Subscription < ApplicationRecord
     result = save!
     @skip_validation = false
     result
-  end
-
-  def step
-    return :thanks if pay_method_saved? && subscription_saved? && (address_saved? || !address_required?) && contact_details_saved?
-  	return :pay_method if subscription_saved? && (address_saved? || !address_required?) && contact_details_saved?
-  	return :subscription if (address_saved? || !address_required?)  && contact_details_saved?
-  	return :address if contact_details_saved?
-  	:contact_details
   end
 
   def discount 
