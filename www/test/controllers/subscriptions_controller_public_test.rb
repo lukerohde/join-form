@@ -175,7 +175,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
       assert_response :redirect
       #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
       follow_redirect!
-      assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
+      assert response.body.include?('data-step="thanks"'), "wrong step - should be pay_method"
     end
   end
 
@@ -192,7 +192,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
       assert_response :redirect
       #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
       follow_redirect!
-      assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
+      assert response.body.include?('data-step="thanks"'), "wrong step - should be pay_method"
     end
   end
 

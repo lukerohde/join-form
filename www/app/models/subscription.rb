@@ -28,11 +28,12 @@ class Subscription < ApplicationRecord
   mount_uploader :signature_image, SignatureUploader
   before_save :generate_signature_image
   before_save :set_data_if_blank
-  before_save :set_completed_at
+  before_save :set_completed_at 
 
   def set_completed_at
+    # called after validation
     # everything is saved or we are passing validation when setting the pay_method
-    if step == :thanks || (step == :pay_method && valid?)
+    if step == :thanks || (step == :pay_method && errors.count == 0)
       self.completed_at = Time.now
       self.pending = false
     else
@@ -42,7 +43,7 @@ class Subscription < ApplicationRecord
   end
 
   def step
-    return :thanks if valid? && self.completed_at.present? && pay_method_saved? && subscription_saved? && (address_saved? || !address_required?) && contact_details_saved? 
+    return :thanks if errors.count == 0 && self.completed_at.present? && pay_method_saved? && subscription_saved? && (address_saved? || !address_required?) && contact_details_saved? 
     return :pay_method if subscription_saved? && (address_saved? || !address_required?) && contact_details_saved?
     return :subscription if (address_saved? || !address_required?)  && contact_details_saved?
     return :address if contact_details_saved?
