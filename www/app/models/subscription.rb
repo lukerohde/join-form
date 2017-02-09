@@ -33,7 +33,7 @@ class Subscription < ApplicationRecord
   def set_completed_at
     # called after validation
     # everything is saved or we are passing validation when setting the pay_method
-    if step == :thanks || (step == :pay_method && errors.count == 0)
+    if step == :thanks || (step == :pay_method && errors.count == 0 && !@skip_validation)
       self.completed_at = Time.now
       self.pending = false
     else
