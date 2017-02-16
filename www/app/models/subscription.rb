@@ -65,7 +65,7 @@ class Subscription < ApplicationRecord
   end
 
   def address_saved?
-  	person.present? && person.address1_was.present? && person.suburb_was.present? && person.state_was.present? && person.postcode_was.present? 
+    person.present? && person.address1_was.present? && person.suburb_was.present? && person.state_was.present? && person.postcode_was.present? 
   end
 
   def address_present?
@@ -82,7 +82,7 @@ class Subscription < ApplicationRecord
       custom_columns_saved = false if (data_was||{})[column].blank?
     end
 
-  	(frequency_was.present? && plan_was.present? && custom_columns_saved)
+    (frequency_was.present? && plan_was.present? && custom_columns_saved)
   end
 
   def subscription_present?
@@ -96,11 +96,11 @@ class Subscription < ApplicationRecord
 
   def bsb_valid?
     # e.g. 123-123 or 123123
-  	bsb.decrypt =~ /^\d{3}-?\d{3}$/ || bsb.decrypt == "*encrypted*"
+    bsb.decrypt =~ /^\d{3}-?\d{3}$/ || bsb.decrypt == "*encrypted*"
   end
 
   def account_number_valid?
-  	account_number.decrypt =~ /^\d+$/ || account_number.decrypt == "*encrypted*"
+    account_number.decrypt =~ /^\d+$/ || account_number.decrypt == "*encrypted*"
   end
 
   def set_country_code(location)
@@ -131,13 +131,13 @@ class Subscription < ApplicationRecord
     return if @skip_validation
     return unless address_required? 
 
-  	if person
-  		person.errors.add(:address1,I18n.translate("subscriptions.errors.not_blank")) unless person.address1.present?
-    	person.errors.add(:suburb,I18n.translate("subscriptions.errors.not_blank")) unless person.suburb.present?
-    	person.errors.add(:state,I18n.translate("subscriptions.errors.not_blank")) unless person.state.present?
-    	person.errors.add(:postcode,I18n.translate("subscriptions.errors.not_blank")) unless person.postcode.present?
-  		errors.add(:base,I18n.translate("subscriptions.errors.complete_address")) unless person.address_valid?
-  	end
+    if person
+      person.errors.add(:address1,I18n.translate("subscriptions.errors.not_blank")) unless person.address1.present?
+      person.errors.add(:suburb,I18n.translate("subscriptions.errors.not_blank")) unless person.suburb.present?
+      person.errors.add(:state,I18n.translate("subscriptions.errors.not_blank")) unless person.state.present?
+      person.errors.add(:postcode,I18n.translate("subscriptions.errors.not_blank")) unless person.postcode.present?
+      errors.add(:base,I18n.translate("subscriptions.errors.complete_address")) unless person.address_valid?
+    end
   end
   
   def pay_method_saved?
@@ -161,15 +161,15 @@ class Subscription < ApplicationRecord
       when "-"
         self.restore_pay_method! # not a super elegant place to put this, but I don't want to save a dash, and I don't want to validate existing details (because they're not persisted).
       when "CC"
-    		errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
-    	when "AB"
+        errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
+      when "AB"
         errors.add(:bsb,I18n.translate("subscriptions.errors.bsb") ) unless bsb_valid?
-    		errors.add(:account_number,I18n.translate("subscriptions.errors.account_number") ) unless account_number_valid?
-  	  when "ABR"
+        errors.add(:account_number,I18n.translate("subscriptions.errors.account_number") ) unless account_number_valid?
+      when "ABR"
       when "PRD"
       else
-    		errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
-    	end
+        errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
+      end
 
     if join_form.signature_required && signature_vector.blank?
       errors.add(:signature_vector, I18n.translate("subscriptions.errors.not_blank"))
@@ -185,9 +185,25 @@ class Subscription < ApplicationRecord
     self.pending = false
   end
 
+  def save_without_timestamps
+    return self.save! if self.new_record?
+
+    class << self
+      def record_timestamps; false; end
+    end
+
+    begin 
+      self.save! 
+    ensure
+      class << self
+       remove_method :record_timestamps
+      end
+    end
+  end
+
   def save_without_validation!
     @skip_validation = true
-    result = save!
+    result = save_without_timestamps # do not set updated_at when the user isn't saving (api save)
     @skip_validation = false
     result
   end
@@ -220,31 +236,31 @@ class Subscription < ApplicationRecord
     end
   end
   
- 	def update_with_payment(params, union)
-	  assign_attributes(params)
-	  
-	  if valid?
-	  	customer = Stripe::Customer.create({description: person.email, card: stripe_token} , {stripe_account: union.stripe_user_id})
-	    person.stripe_token = customer.id
+  def update_with_payment(params, union)
+    assign_attributes(params)
+    
+    if valid?
+      customer = Stripe::Customer.create({description: person.email, card: stripe_token} , {stripe_account: union.stripe_user_id})
+      person.stripe_token = customer.id
       
       stripe_amount = (self.first_payment * 100).round(0).to_i
        
       if stripe_amount > 0
         charge = Stripe::Charge.create({amount: stripe_amount, currency: 'AUD', description: join_form.description, customer: person.stripe_token}, {stripe_account: union.stripe_user_id})
-	      self.payments << Payment.new(date: Date.today, amount: (stripe_amount / 100.0).round(2), person_id: self.person.id)
+        self.payments << Payment.new(date: Date.today, amount: (stripe_amount / 100.0).round(2), person_id: self.person.id)
       end
 
       save!
-	  end
-	rescue Stripe::CardError => e
-		logger.error "Stripe error while creating customer: #{e.message}"
-		errors.add :base, "#{I18n.translate('subscriptions.errors.payment_gateway_card_error')}: #{e.message}"
-	  false
-	rescue Stripe::InvalidRequestError => e
-	  logger.error "Stripe error while creating customer: #{e.message}"
-	  errors.add :base, "#{I18n.translate('subscriptions.errors.payment_gateway_error')}: #{e.message}."
-	  false
-	end
+    end
+  rescue Stripe::CardError => e
+    logger.error "Stripe error while creating customer: #{e.message}"
+    errors.add :base, "#{I18n.translate('subscriptions.errors.payment_gateway_card_error')}: #{e.message}"
+    false
+  rescue Stripe::InvalidRequestError => e
+    logger.error "Stripe error while creating customer: #{e.message}"
+    errors.add :base, "#{I18n.translate('subscriptions.errors.payment_gateway_error')}: #{e.message}."
+    false
+  end
 
   def source=(val)
     write_attribute(:source, val) if self.source.blank? # prevent overwriting

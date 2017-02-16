@@ -79,7 +79,10 @@
       </div>
     </div>
 
-  <%= render partial: 'shared/subscriptions' %> 
+  <strong><%= "#{pluralize(@subscriptions.count, "subscription")} found" %></strong>
+  <div class="row"><br/></div>
+
+  <%= render partial: 'shared/subscriptions' if @subscriptions.count > 0 %> 
 
   </div>
 </div>
