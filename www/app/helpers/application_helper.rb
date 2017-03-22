@@ -18,9 +18,9 @@ module ApplicationHelper
 		else
 			image_path('logo.png')
 		end
-	end 
+	end
 
-	def profile_thumb(person)		
+	def profile_thumb(person)
 		unless person.attachment.blank?
 			image_tag person.attachment.thumb.url, class: "profile_thumb"
 		else
@@ -33,27 +33,27 @@ module ApplicationHelper
 		Rails.application.config.languages.except(l)
 	end
 
-	def profile_logo(person)		
+	def profile_logo(person)
 		unless person.attachment.blank?
 			image_tag person.attachment.quote.url, class: "profile_logo"
 		end
 	end
 
 	def pencil_button
-		"<span class=\"small glyphicon glyphicon-pencil\"/>".html_safe 
+		"<span class=\"small glyphicon glyphicon-pencil\"/>".html_safe
 	end
 
 	def cog_button
-		"<span class=\"small glyphicon glyphicon-cog\"/>".html_safe 
+		"<span class=\"small glyphicon glyphicon-cog\"/>".html_safe
 	end
 
 	def gender_options(person)
     options_for_select(
       [
-        [t('gender.male'), 'M'], 
+        [t('gender.male'), 'M'],
         [t('gender.female'), 'F'],
         [t('gender.other'), 'N']
-		  ], 
+		  ],
       person.gender
     )
   end
@@ -67,7 +67,7 @@ module ApplicationHelper
 	def owner?
 		return false unless current_person.present?
 		return false unless owner_union.present?
-		current_person.union.id == owner_union.id 
+		current_person.union.id == owner_union.id
 	end
 
 	def can_edit_union?(union)
@@ -76,14 +76,14 @@ module ApplicationHelper
 				true
 			else
 				false
-			end 
+			end
 		else
 			false
 		end
 	end
 
 	def selected_option(entity)
-		entity ? 
+		entity ?
         options_for_select([[entity.name, entity.id]], entity.id) :
         []
 	end
@@ -119,5 +119,5 @@ module ApplicationHelper
 
   def subscription_short_path
     "/#{locale}/#{@union.short_name.downcase}/#{join_form_id(@join_form)}/#{@subscription.token}"
-  end  
+  end
 end

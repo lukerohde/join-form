@@ -3,9 +3,9 @@ module SubscriptionsHelper
   require 'rest-client'
   require 'openssl'
   require './lib/signed_request.rb'
-  
+
   include ActionView::Helpers::NumberHelper
- 
+
   def start_hidden(step)
     @subscription.step == step ? "start_hidden" : ""
   end
@@ -17,10 +17,10 @@ module SubscriptionsHelper
     result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB'] if subscription.join_form.direct_debit_on
     result << [t('subscriptions.pay_method.edit.payroll_deduction'), 'PRD'] if subscription.join_form.payroll_deduction_on
     result << [t('subscriptions.pay_method.edit.direct_debit_release'), 'ABR'] if subscription.join_form.direct_debit_release_on
-    
+
     options_for_select(
-      result, 
-      pay_method_default(subscription) 
+      result,
+      pay_method_default(subscription)
     )
   end
 
@@ -42,15 +42,15 @@ module SubscriptionsHelper
     current_selection = subscription.frequency || "F"
     current_selection = result.find { |i| i[1] == current_selection.upcase }
     current_selection = result[0] unless current_selection
-    
+
     options_for_select(
-      result, 
+      result,
       current_selection
     )
   end
-  
+
   def friendly_signature_date(subscription)
-    if @subscription.signature_vector.present? 
+    if @subscription.signature_vector.present?
       result = @subscription.signature_date.try(:strftime, "%d / %B / %Y")
       result ||= "Signed but not dated"
     else
@@ -62,15 +62,15 @@ module SubscriptionsHelper
     case freq
       when "W"
         t('subscriptions.subscription.edit.weekly')
-      when "F" 
+      when "F"
         t('subscriptions.subscription.edit.fortnightly')
-      when "M" 
+      when "M"
         t('subscriptions.subscription.edit.monthly')
-      when "Q" 
+      when "Q"
         t('subscriptions.subscription.edit.quarterly')
-      when "H" 
+      when "H"
         t('subscriptions.subscription.edit.half_yearly')
-      when "Y" 
+      when "Y"
         t('subscriptions.subscription.edit.yearly')
       else
         #raise "Unknown frequency '#{freq}'"
@@ -95,7 +95,7 @@ module SubscriptionsHelper
     u = Addressable::URI.parse(url)
     bad_request unless u.scheme
 
-    q = u.query_values || {}    
+    q = u.query_values || {}
     q.merge!(extra_params)
     u.query_values = JSON.parse(q.to_json) # convert all values to string e.g. dob
 
@@ -108,7 +108,7 @@ module SubscriptionsHelper
     # this is used for both calling system call back
     # and membership API
     result = person.slice(:external_id,*sensitive_person_params)
-    result = result.reject do |k,v| 
+    result = result.reject do |k,v|
       if [:address1, :address2, :suburb, :state, :postcode].include?(k.to_sym)
         person[:address1].blank?
       else
@@ -120,8 +120,8 @@ module SubscriptionsHelper
 
   def sensitive_person_params
     [
-      :first_name, 
-      :last_name, 
+      :first_name,
+      :last_name,
       :dob,
       :email,
       :mobile,
@@ -139,7 +139,7 @@ module SubscriptionsHelper
       :plan,
       :pay_method,
       :callback_url,
-      :status, 
+      :status,
       :next_payment_date,
       :financial_date,
       )
@@ -149,34 +149,34 @@ module SubscriptionsHelper
 
   def permitted_params
     [
-      :join_form_id, 
-      :frequency, 
-      :pay_method, 
-      :card_number, 
+      :join_form_id,
+      :frequency,
+      :pay_method,
+      :card_number,
       :expiry_month,
       :expiry_year,
-      :ccv, 
-      :stripe_token, 
-      :account_name, 
-      :account_number, 
-      :bsb, 
-      :plan, 
+      :ccv,
+      :stripe_token,
+      :account_name,
+      :account_number,
+      :bsb,
+      :plan,
       :callback_url,
       :signature_vector,
-      :partial_bsb, 
+      :partial_bsb,
       :partial_account_number,
       :partial_card_number,
-      :end_point_put_required, 
-      :source, 
+      :end_point_put_required,
+      :source,
       person_attributes: [
         :external_id,
         :first_name,
         :last_name,
         :gender,
-        :dob, 
+        :dob,
         :email,
         :mobile,
-        :address1, 
+        :address1,
         :address2,
         :suburb,
         :state,
@@ -214,7 +214,7 @@ module SubscriptionsHelper
   #   result = nil
   #   date_array = params.slice("#{date_field}(1i)", "#{date_field}(2i)", "#{date_field}(3i)").values.map(&:to_i) - [0]
   #   raise "Invalid Date" unless [0,3].include?(date_array.length)
-  #   result = Date.new(*date_array).iso8601 if date_array.length = 3 
+  #   result = Date.new(*date_array).iso8601 if date_array.length = 3
   # end
 
   def patch_subscription(subscription, params)
@@ -245,7 +245,7 @@ module SubscriptionsHelper
 
     admin = defined?(current_person) && current_person.present? ? current_person : subscription.join_form.admin
     union = subscription.join_form.union
-    
+
     result['admin'] = admin.slice(:id, :first_name, :last_name, :email, :mobile).reject{|k,v| v.nil? } if admin.present?
     result['union'] = union.slice(:id, :name, :short_name ).reject{|k,v| v.nil? } if union.present?
 
@@ -255,7 +255,7 @@ module SubscriptionsHelper
 
   def set_join_form
     id = params[:join_form_id] || params.dig(:subscription, :join_form_id) || @subscription.join_form.id
-    
+
     if (Integer(id) rescue nil)
       @join_form = @union.join_forms.find(id)
     else
@@ -278,8 +278,8 @@ module SubscriptionsHelper
     if subscription.person.present? && subscription.person.external_id.present?
       if payload = nuw_end_point_person_get(person_attributes: {external_id: subscription.person.external_id})
         subscription.person.authorizer_id = subscription.join_form.admin.id
-        
-        # My API adds mock values so the subscription can be saved. 
+
+        # My API adds mock values so the subscription can be saved.
         # Remove them here, because we don't them wanting to be overridden
         # TODO figure out why this feels so wrong - It shouldn't be the APIs responsbility nor can it be the models, maybe these values should be added not in person get, but in NUW endpoint load
         payload[:person_attributes] = payload[:person_attributes].except(:email) if temporary_email?(payload[:person_attributes][:email])
@@ -303,11 +303,11 @@ module SubscriptionsHelper
 
     payload.each do |person|
       sparams = nuw_end_point_transform_from(person.deep_symbolize_keys)
-      
+
       s = nuw_end_point_load_subscription(sparams, join_form)
       s.renewal = true unless s.status == "Potential Member"
       s.pending = true
-      
+
       results << s
     end
     results
@@ -316,11 +316,11 @@ module SubscriptionsHelper
   #def nuw_end_point_load(subscription_params, join_form)
   #  subscription = nil
   #  payload = nuw_end_point_person_get(subscription_params)
-  #  unless payload.blank? 
-  
+  #  unless payload.blank?
+
   def nuw_end_point_load_subscription(payload, join_form, subscription_params = {})
     subscription = nil
-    unless payload.blank? 
+    unless payload.blank?
       # something found via the api, update existing record
       person = Person.find_by_external_id(payload.dig(:person_parameters, :external_id)) if payload.dig(:person_parameters, :external_id)
       person ||= Person.ci_find_by_email(subscription_params.dig(:person_attributes, :email)) if subscription_params.dig(:person_attributes, :email)
@@ -334,7 +334,7 @@ module SubscriptionsHelper
       subscription.join_form_id = join_form.id
       person.authorizer_id = join_form.admin.id
       person.union_id = join_form.union.id
-    
+
       subscription.update_from_end_point(payload) # this will save
     else
       # nothing found in api, may still be someone already in this database
@@ -352,11 +352,11 @@ module SubscriptionsHelper
   def nuw_end_point_person_get(subscription_params)
     # TODO Timeout quickly and quietly
     url = nuw_end_point_uri
-    
+
     payload = person_params(subscription_params[:person_attributes])
     payload = nuw_end_point_sign(url.to_s, payload)
     url.query_values = (url.query_values || {}).merge(payload)
-    
+
     begin
       response = RestClient::Request.execute url: url.to_s, method: :get, verify_ssl: false
       nuw_end_point_transform_from(JSON.parse(response).deep_symbolize_keys)
@@ -364,10 +364,10 @@ module SubscriptionsHelper
       # TODO A catch all like this is pretty nasty.
       error_data = JSON.parse(exception.response) rescue nil
       ExceptionNotifier.notify_exception(exception,:env => request.env, :data => error_data)
-      nil 
+      nil
     end
   end
-  
+
   def nuw_end_point_person_put(subscription)
     url = nuw_end_point_uri
     payload = nuw_end_point_transform_to(subscription)
@@ -381,7 +381,7 @@ module SubscriptionsHelper
       # TODO A catch all like this is pretty nasty.
       error_data = JSON.parse(exception.response) rescue nil
       ExceptionNotifier.notify_exception(exception, :env => request.env, :data => error_data)
-      nil 
+      nil
     end
   end
 
@@ -391,7 +391,7 @@ module SubscriptionsHelper
     subscription.status = payload.dig(:subscription, :status)
     subscription.next_payment_date = payload.dig(:subscription, :next_payment_date)
     subscription.financial_date = payload.dig(:subscription, :financial_date)
-    
+
     payments = payload.dig(:subscription, :payments)
 
     # receipt payments
@@ -403,30 +403,30 @@ module SubscriptionsHelper
         end
       end
     end
-    
+
     # TODO after card details have been posted, they are no longer required (even encrypted)
     if subscription.pay_method_saved?
       subscription[:card_number] = nil
       subscription[:ccv] = nil
       subscription[:account_number]= nil
-      subscription[:bsb] = nil 
+      subscription[:bsb] = nil
 
       # keep partial details so we know how a member pay, for welcome
       subscription[:pay_method] = payload.dig(:subscription, :pay_method)
       subscription[:partial_bsb] = payload.dig(:subscription, :partial_bsb)
       subscription[:partial_account_number] = payload.dig(:subscription, :partial_account_number)
-      # TODO Test stripe token invalidation, remarked until then 
+      # TODO Test stripe token invalidation, remarked until then
       #subscription[:stripe_token] = nil if subscription[:partial_card_number] != payload.dig(:subscription, :partial_card_number) # if the card number changes, then our stripe token is probably invalid
       subscription[:partial_card_number] = payload.dig(:subscription, :partial_card_number)
       subscription[:expiry_month] = payload.dig(:subscription, :expiry_month)
       subscription[:expiry_year] = payload.dig(:subscription, :expiry_year)
-      
+
       subscription[:first_recurrent_payment_date] = payload.dig(:subscription, :first_recurrent_payment_date)
       subscription[:up_front_payment] = payload.dig(:subscription, :up_front_payment)
-      
+
       #subscription[:expiry] = nil
       #subscription.pay_method = "-" # dash indicates that the details are already on the system
-    end 
+    end
 
     subscription[:end_point_put_required] = false
     subscription.save_without_validation!
@@ -439,10 +439,10 @@ module SubscriptionsHelper
   end
 
   ## Transform from NUW end point format
- 
+
   def nuw_end_point_transform_from(payload)
     result = nil
-    unless payload.blank? 
+    unless payload.blank?
       result = nuw_end_point_transform_from_subscription(payload[:subscription])
       result[:person_attributes] = nuw_end_point_transform_from_person(payload)
       result[:payments_attributes] = nuw_end_point_transform_from_payments(payload.dig(:subscription, :payments))
@@ -453,14 +453,14 @@ module SubscriptionsHelper
   def nuw_end_point_transform_from_subscription(subscription_hash)
     return {} if subscription_hash.nil?
     result = subscription_hash.slice(:frequency, :plan, :pay_method, :status, :next_payment_date, :financial_date, :source)
-    pm = 
+    pm =
       case result[:pay_method]
         when "CC"
           subscription_hash.slice(:card_number, :partial_card_number, :expiry_month, :expiry_year, :ccv)
         when "AB"
           subscription_hash.slice(:bsb, :partial_bsb, :account_number, :partial_account_number, :up_front_payment, :first_recurrent_payment_date)
         end
-    
+
     result.merge!(pm) if pm
     result
   end
@@ -470,7 +470,7 @@ module SubscriptionsHelper
     # TODO Is it appropriate to fake here - I would have thought that'd be a concern of something higher up.
     result[:email] = temporary_email if result[:email].blank?
     result[:first_name] = temporary_first_name if result[:first_name].blank?
-    result 
+    result
   end
 
 
@@ -504,10 +504,10 @@ module SubscriptionsHelper
     result[:url] = ENV['APPLICATION_ROOT'] + subscription_form_path(subscription)
     result[:group_id] = subscription.join_form.group_id if subscription.join_form.group_id.present?
     result[:tags] = subscription.join_form.tags if subscription.join_form.tags.present?
-    
+
     if subscription.pay_method_saved?
       result[:establishment_fee] = subscription.total
-      pm = 
+      pm =
         case subscription.pay_method
           when "CC"
             hash.slice(:pay_method, :card_number, :expiry_month, :expiry_year, :ccv)
@@ -517,10 +517,10 @@ module SubscriptionsHelper
             hash.slice(:pay_method)
           when "PRD"
             hash.slice(:pay_method)
-          else 
+          else
             { pay_method: "-" } if result[:establishment_fee] >= 0.01 # is including a symbol to indicate existing pm a bad idea? A shared literal seems so.
           end
-    
+
       result.merge!(pm) if pm
     end
 
@@ -536,7 +536,7 @@ module SubscriptionsHelper
   end
 
   def temporary_last_name
-    Person.temporary_last_name  
+    Person.temporary_last_name
   end
 
   def temporary_last_name?(last_name)
@@ -549,7 +549,7 @@ module SubscriptionsHelper
 
   def temporary_first_name?(first_name)
     Person.temporary_first_name?(first_name)
-  end  
+  end
 
   def fix_phone(number)
     (number||"").gsub(/[^0-9]/, '') # remove non-numeric characters
@@ -567,13 +567,13 @@ module SubscriptionsHelper
   #  hmac_received = payload['hmac'].to_s
   #  hmac = Base64.encode64("#{OpenSSL::HMAC.digest('sha1',ENV['NUW_END_POINT_SECRET'], data)}")
   #  binding.pry
-      
+
     # halt if signatures differ
   #  unless hmac == hmac_received
   #    puts "HMAC MISMATCH!"
   #    puts "HMAC_CALCULATED: #{hmac}   HMAC_RECEIVED: #{hmac_received}"
   #    puts "PROCESSED PAYLOAD: " + data
-  #    
+  #
   #    forbidden
   #  end
   #end

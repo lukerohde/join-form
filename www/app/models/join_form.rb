@@ -1,15 +1,15 @@
 class JoinForm < ApplicationRecord
-	
+
 	belongs_to :union
 	belongs_to :admin, class_name: "Person"
 	belongs_to :organiser, class_name: "Person"
 	belongs_to :welcome_email_template, class_name: "EmailTemplate"
 	belongs_to :admin_email_template, class_name: "EmailTemplate"
-	
+
 	has_many :subscriptions, dependent: :delete_all
-	
+
 	acts_as_followable
-	
+
 	after_initialize :set_defaults
 
 	include Bootsy::Container
@@ -17,10 +17,10 @@ class JoinForm < ApplicationRecord
 	translates :description, :page_title, :schema, :header, :footer, :css, :wysiwyg_header, :wysiwyg_footer
 	#translation_class.send :serialize, :schema
 	#serialize :schema, JSONSerializer
-	
+
 	validates :short_name, :admin, :organiser, :union, presence: true
 	validates :base_rate_id, presence: true
-	validates :base_rate_weekly, numericality: { allow_blank: true }	
+	validates :base_rate_weekly, numericality: { allow_blank: true }
 	validate :is_authorized?
 	validate :has_pay_method
 	validate :signature_for_prd_and_abr
@@ -68,22 +68,22 @@ class JoinForm < ApplicationRecord
 				"H"
 			when self.base_rate_yearly||0 > 0
 				"Y"
-			end	
+			end
 	end
 
 	def fee(frequency)
 		case frequency
-      when  "W" 
+      when  "W"
         self.base_rate_weekly || 0
-      when  "F" 
+      when  "F"
         self.base_rate_fortnightly || 0
-      when  "M" 
+      when  "M"
         self.base_rate_monthly || 0
-      when  "Q" 
+      when  "Q"
         self.base_rate_quarterly || 0
-      when  "H" 
+      when  "H"
         self.base_rate_half_yearly || 0
-      when  "Y" 
+      when  "Y"
         self.base_rate_yearly || 0
       end
 	end
@@ -96,7 +96,7 @@ class JoinForm < ApplicationRecord
 		result << "PRD" if payroll_deduction_on
 		result
 	end
-	
+
 	def set_defaults
 
 		self.css ||= <<-CSS.gsub(/^\t{3}/,'')
@@ -126,10 +126,10 @@ class JoinForm < ApplicationRecord
 				color: #D33;
 			}
 
-						
+
 			/* membership card styling */
 			.membership-card {
-				background-color: white; 
+				background-color: white;
 				width: 300px;
 				height: 170px;
 				border-radius: 10px;
@@ -140,15 +140,15 @@ class JoinForm < ApplicationRecord
 			#membership-card-top-panel {
 			  background-color: red;
 			  height: 90px;
-			  padding-top: 15px; 
-			  padding-left: 15px; 
+			  padding-top: 15px;
+			  padding-left: 15px;
 			  padding-right: 10px;
 			  border-radius: 10px 10px 0px 0px;
 			}
 
 			#membership-card-union-name {
-			  width: 70%; 
-			  float:left; 
+			  width: 70%;
+			  float:left;
 			  text-align: left;
 			  font-weight: bold;
 			  font-style: italic;
@@ -157,7 +157,7 @@ class JoinForm < ApplicationRecord
 			}
 
 			#membership-card-union-logo {
-			  width: 20%; 
+			  width: 20%;
 			  float:right;
 			}
 
@@ -168,7 +168,7 @@ class JoinForm < ApplicationRecord
 			#membership-card-bottom-panel {
 			  background-color: white;
 			  height: 102px;
-			  padding-right:15px; 
+			  padding-right:15px;
 			  padding-left:15px;
 			  padding-top:15px;
 			  border-radius: 0px 0px 10px 10px;
@@ -193,10 +193,14 @@ class JoinForm < ApplicationRecord
 
 	end
 
+  def has_custom_questions?
+    schema_data.present?
+  end
+
 	# My plan is to have an advanced schema designer, but for now I've got a simple list of columns
 	# Can't use custom jsonb or custom serializer with globalize - boo
 	def column_list=(cols)
-			self.schema	 = schema_data.merge({ 
+			self.schema	 = schema_data.merge({
 				columns: (cols||"").split(',').map{|i| i.strip }
 			}).to_json
 	end
@@ -220,7 +224,7 @@ class JoinForm < ApplicationRecord
 
 	def is_authorized?(person = nil)
 		@authorizer = person unless person.blank?
-		
+
 		if @authorizer.blank?
 			errors.add(:authorizer, "hasn't be specified, so this update cannot be made.")
 			return
@@ -229,7 +233,7 @@ class JoinForm < ApplicationRecord
 		if @authorizer.union.short_name != ENV['OWNER_UNION']
 			if self.union_id != @authorizer.union_id
 				errors.add(:union, "is not your union so this assignment is not authorized.")
-			end 
+			end
 
 			if self.admin.present? && self.admin.union_id != @authorizer.union_id
 				errors.add(:admin, "is not a colleague from your union so this assignment is not authorized.")
