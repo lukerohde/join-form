@@ -1,7 +1,7 @@
 <div id="subscription" class="<%=start_hidden(:subscription) %>">
   <h2><%=t(".heading")%></h2>
 
-  <%= render 'errors' if @subscription.step == :subscription %>
+  <%= render 'errors' if @subscription.step == :miscellaneous %>
 
   <% if @subscription.join_form.description.present? %>
     <div class="form-group">
@@ -26,7 +26,7 @@
     <%= f.select :frequency,
       frequency_options(@subscription),
       {
-          include_blank: true,
+        include_blank: true,
       },
       data: {
         placeholder: t('activerecord.attributes.subscription.frequency'),

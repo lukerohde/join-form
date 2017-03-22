@@ -164,11 +164,13 @@ class SubscriptionsController < ApplicationController
   end
 
   def next_step_notice
-    return t('subscriptions.steps.done') if @subscription.pay_method_saved? && @subscription.subscription_saved? && (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved?
-    return t('subscriptions.steps.payment') if @subscription.subscription_saved?&& (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved?
-    return t('subscriptions.steps.plan') if (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved?
-    return t('subscriptions.steps.address') if @subscription.contact_details_saved?
-    return t('subscriptions.steps.welcome')
+    {
+      thanks: t('subscriptions.steps.done'),
+      pay_method: t('subscriptions.steps.payment'),
+      miscellaneous: t('subscriptions.steps.plan'),
+      address: t('subscriptions.steps.address'),
+      contact_details: t('subscriptions.steps.welcome')
+    }[@subscription.step]
   end
 
   def pay_method_posted?

@@ -34,11 +34,11 @@
     <% end %>
   <% end %>
 
-  <% if (@subscription.address_saved? || !@subscription.address_required?) && @join_form.has_custom_questions? %>
+  <% if @subscription.address_saved? || !@subscription.address_required? %>
     <%= render 'subscriptions/subscription/edit', f: f %>
   <% end %>
 
-  <% if @subscription.subscription_saved? %>
+  <% if @subscription.miscellaneous_saved? %>
     <%= render 'subscriptions/pay_method/edit', f: f %>
   <% end %>
 
@@ -48,7 +48,7 @@
 
   <div class="actions ">
     <%
-      if @subscription.subscription_saved?
+      if @subscription.miscellaneous_saved?
         if @subscription.has_existing_pay_method?
           submit_label = t(".submit_renew") # TODO this logic is dumb
         else

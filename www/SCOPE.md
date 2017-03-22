@@ -52,7 +52,12 @@ The form designer can customize the form with additional questions.  These quest
 
 TEST PLAN
 -- Subscription step skipped without custom questions
+---- unit test step method
+---- controller test, address to paymethod
 -- Subscription step not skipped with custom questions
+---- unit test step method
+---- controller test, address to custom questions
+-- When address is not required then subscription must be validated
 -- Payment method validation fails without frequency
 -- Payment method validation fails without deduction date
 -- Payment method validation fails with invalid deduction date for weekly frequency

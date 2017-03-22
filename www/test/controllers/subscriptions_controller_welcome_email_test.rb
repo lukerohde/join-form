@@ -8,24 +8,24 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     @join_form = join_forms(:welcome)
     @union = @join_form.union
     @new_subscription = Subscription.new(join_form: @join_form, person: Person.new)
-    @with_address = people(:contact_details_with_address_person)   
-    @with_subscription = subscriptions(:contact_details_with_subscription_subscription)   
+    @with_address = people(:contact_details_with_address_person)
+    @with_subscription = subscriptions(:contact_details_with_subscription_subscription)
     people(:admin).follow!(@join_form)
     WickedPdf.any_instance.stubs(:pdf_from_url).returns("PDF MOCK")
   end
 
 
   def form_params
-    params = { subscription: 
-      { 
-        join_form_id: @join_form.id, 
-        person_attributes: 
-        { 
-          email: 'lrohde@nuw.org.au', 
-          first_name: 'luke welcome' 
-        } 
+    params = { subscription:
+      {
+        join_form_id: @join_form.id,
+        person_attributes:
+        {
+          email: 'lrohde@nuw.org.au',
+          first_name: 'luke welcome'
+        }
 
-      } 
+      }
     }
     params[:subscription][:person_attributes].merge!(@with_address.attributes.slice('address1', 'address2', 'state', 'suburb', 'postcode'))
     params[:subscription][:person_attributes][:id] = @with_subscription.person.id
@@ -35,14 +35,14 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
   end
 
 
-  test "post step 4 - success - australian bank" do 
+  test "post step 4 - success - australian bank" do
     @union = @join_form.union
-    @union.update( passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
-    
+    @union.update(old_passphrase: '1234567890123456789012345678901234567890', passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
+
     params = form_params
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
-    
+
     starting_email_count = ActionMailer::Base.deliveries.count
     patch edit_join_path(:en, @union, @join_form, @with_subscription.token), params
     assert_response :redirect
@@ -54,17 +54,17 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     assert ActionMailer::Base.deliveries.last.to.include?("feed@nuw.org.au"), "was expecting a welcome email to send to lrohde@nuw.org.au"
   end
 
-  test "post step 4 - success - australian bank - don't send if user other than subscriber" do 
+  test "post step 4 - success - australian bank - don't send if user other than subscriber" do
     sign_in people(:admin)
 
     @union = @join_form.union
-    @union.update( passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
-    
+    @union.update(old_passphrase: '1234567890123456789012345678901234567890', passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
+
     params = form_params
-    
+
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
-    
+
     starting_email_count = ActionMailer::Base.deliveries.count
     patch edit_join_path(:en, @union, @join_form, @with_subscription.token), params
     assert_response :redirect
@@ -74,5 +74,5 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     #assert ActionMailer::Base.deliveries.last.to.include?("lrohde@nuw.org.au"), "was expecting a welcome email to send to lrohde@nuw.org.au"
   end
 
-  
+
 end
