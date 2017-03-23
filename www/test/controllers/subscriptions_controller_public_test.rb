@@ -424,28 +424,28 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert response.body.include?( 'Payment Method must be specified') , "no pay_method error"
   end
 
-  # test "get step 4 - has sensible credit card defaults" do
-  #   @subscription = subscriptions(:cc_pay_method)
-  #   get edit_join_path(:en, @union, @join_form, @subscription.token)
-  #   Date.stubs(:today).returns(Date.new(2017,1,1))
-  #
-  #   assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay method"
-  #   assert response.body.include?('<option selected="selected" value="CC">'), "expecting default credit card to be selected"
-  #   #assert response.body.include?('<option selected="selected" value="AB">Australian bank account</option>'
-  #   assert response.body.include?('<option selected="selected" value="F">'), "expecting default fortnightly to be selected"
-  #   assert response.body.include?('<option selected="selected" value="2017-01-01">'), "expecting default deduction date of 2017-01-1"
-  # end
-  #
-  # test "get step 4 - has sensible australian bank defaults" do
-  #   @subscription = subscriptions(:dd_pay_method)
-  #   get edit_join_path(:en, @union, @join_form, @subscription.token)
-  #   Date.stubs(:today).returns(Date.new(2017,1,1))
-  #
-  #   assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay method"
-  #   assert response.body.include?('<option selected="selected" value="AB">') , "expecting australian bank to be selected"
-  #   assert response.body.include?('<option selected="selected" value="F">'), "expecting default fortnightly to be selected"
-  #   assert response.body.include?('<option selected="selected" value="2017-01-02">'), "expecting defaultdeduction date of 2017-01-1"
-  # end
+  test "get step 4 - has sensible credit card defaults" do
+    @subscription = subscriptions(:cc_pay_method)
+    get edit_join_path(:en, @union, @join_form, @subscription.token)
+    Date.stubs(:today).returns(Date.new(2017,1,1))
+
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay method"
+    assert response.body.include?('<option selected="selected" value="CC">'), "expecting default credit card to be selected"
+    #assert response.body.include?('<option selected="selected" value="AB">Australian bank account</option>'
+    assert response.body.include?('<option selected="selected" value="F">'), "expecting default fortnightly to be selected"
+    assert response.body.include?('<option selected="selected" value="2017-01-01">'), "expecting default deduction date of 2017-01-1"
+  end
+
+  test "get step 4 - has sensible australian bank defaults" do
+    @subscription = subscriptions(:dd_pay_method)
+    get edit_join_path(:en, @union, @join_form, @subscription.token)
+    Date.stubs(:today).returns(Date.new(2017,1,1))
+
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay method"
+    assert response.body.include?('<option selected="selected" value="AB">') , "expecting australian bank to be selected"
+    assert response.body.include?('<option selected="selected" value="F">'), "expecting default fortnightly to be selected"
+    assert response.body.include?('<option selected="selected" value="2017-01-02">'), "expecting default deduction date of 2017-01-1"
+  end
 
 
 

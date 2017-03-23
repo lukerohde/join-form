@@ -43,9 +43,11 @@ contact_details_with_subscription_subscription: &UP_TO_PAY_METHOD
 cc_pay_method:
   <<: *UP_TO_PAY_METHOD
   pay_method: "CC"
+  token: cc_pay_method
 dd_pay_method:
   <<: *UP_TO_PAY_METHOD
   pay_method: "AB"
+  token: dd_pay_method
 contact_details_with_subscription_and_pay_method_subscription:
   join_form: two
   person: contact_details_with_pay_method_person

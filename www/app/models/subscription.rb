@@ -38,7 +38,6 @@ class Subscription < ApplicationRecord
   # end
 
   def step
-    #binding.pry if $break
     return :thanks if errors.count == 0 && self.completed_at.present? && pay_method_saved? && (miscellaneous_saved? || !miscellaneous_required?) && (address_saved? || !address_required?) && contact_details_saved?
     return :pay_method if (miscellaneous_saved? || !miscellaneous_required?) && (address_saved? || !address_required?) && contact_details_saved?
     return :miscellaneous if (address_saved? || !address_required?) && contact_details_saved? && miscellaneous_required?
@@ -266,6 +265,24 @@ class Subscription < ApplicationRecord
 
     save!
     @skip_validation = false
+  end
+
+  def frequency_options
+    result = []
+    form = self.join_form
+
+    %w(W F M Q H Y).each do |freq|
+      result << ["#{friendly_frequency(freq)} - #{friendly_fee(form, freq)}", freq] if form.fee(freq) > 0
+    end
+
+    current_selection = self.frequency || "F"
+    current_selection = result.find { |i| i[1] == current_selection.upcase }
+    current_selection = result[0] unless current_selection
+
+    options_for_select(
+      result,
+      current_selection
+    )
   end
 
   def deduction_date_options
