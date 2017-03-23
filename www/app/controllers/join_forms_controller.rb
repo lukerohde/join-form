@@ -1,7 +1,7 @@
 class JoinFormsController < ApplicationController
   before_action :set_join_form, only: [:edit, :update, :destroy, :show]
   before_action :forbid, only: [:edit, :update]
-  
+
   # GET /join_forms
   # GET /join_forms.json
   def index
@@ -23,7 +23,7 @@ class JoinFormsController < ApplicationController
       @join_form.short_name = "Copy of #{@join_form.short_name}"
     else
       @join_form = JoinForm.new
-    end 
+    end
 
     @join_form.union = @union
   end
@@ -85,7 +85,7 @@ class JoinFormsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def join_form_params
-      result = params.require(:join_form).permit(:short_name, :description, :advanced_designer, :css, :header, :footer, :wysiwyg_header, :wysiwyg_footer, :bootsy_image_gallery_id, :credit_card_on, :direct_debit_on, :payroll_deduction_on, :direct_debit_release_on, :page_title, :group_id, :tags, :base_rate_id, :base_rate_establishment, :base_rate_weekly, :base_rate_fortnightly, :base_rate_monthly, :base_rate_quarterly, :base_rate_half_yearly, :base_rate_yearly, :union_id, :admin_id, :organiser_id, :column_list, :signature_required, :welcome_email_template_id, :admin_email_template_id, :message_types => [])
+      result = params.require(:join_form).permit(:short_name, :description, :advanced_designer, :css, :header, :footer, :wysiwyg_header, :wysiwyg_footer, :bootsy_image_gallery_id, :credit_card_on, :direct_debit_on, :payroll_deduction_on, :direct_debit_release_on, :deferral_on, :page_title, :group_id, :tags, :base_rate_id, :base_rate_establishment, :base_rate_weekly, :base_rate_fortnightly, :base_rate_monthly, :base_rate_quarterly, :base_rate_half_yearly, :base_rate_yearly, :union_id, :admin_id, :organiser_id, :column_list, :signature_required, :welcome_email_template_id, :admin_email_template_id, :message_types => [])
       result['message_types'].delete("") if result['message_types']
       result
     end

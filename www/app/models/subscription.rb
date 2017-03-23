@@ -32,17 +32,36 @@ class Subscription < ApplicationRecord
   before_save :set_completed_at
   before_validation :set_token, on: [:create]
 
-  def check_step
-    binding.pry
-    step
-  end
+  # def check_step
+  #   binding.pry
+  #   step
+  # end
 
   def step
-    return :thanks if errors.count == 0 && self.completed_at.present? && pay_method_saved? && miscellaneous_saved? && (address_saved? || !address_required?) && contact_details_saved?
-    return :pay_method if (miscellaneous_saved?) && (address_saved? || !address_required?) && contact_details_saved?
-    return :miscellaneous if (address_saved? || !address_required?) && contact_details_saved?
+    #binding.pry if $break
+    return :thanks if errors.count == 0 && self.completed_at.present? && pay_method_saved? && (miscellaneous_saved? || !miscellaneous_required?) && (address_saved? || !address_required?) && contact_details_saved?
+    return :pay_method if (miscellaneous_saved? || !miscellaneous_required?) && (address_saved? || !address_required?) && contact_details_saved?
+    return :miscellaneous if (address_saved? || !address_required?) && contact_details_saved? && miscellaneous_required?
     return :address if contact_details_saved?
     :contact_details
+  end
+
+  # :thanks also needs errors.count == 0 && self.completed_at.present?
+  def step_new(order = [:contact_details, :address, :miscellaneous, :pay_method, :thanks])
+    check_order = order.reverse
+
+    check_order.each do |step|
+      reachable = order.take_while(&step.method(:!=)).all? do |prev_step|
+        send("#{prev_step}_saved?") && !send("#{prev_step}_required?")
+      end
+      required = step == order.last ? (errors.count == 0 && self.completed_at.present?) : send("#{step}_required?")
+
+      return step if (required && reachable) || (step == order.first)
+    end
+  end
+
+  # ??
+  def step_by_unsaved_state
   end
 
   def address_saved?
@@ -51,6 +70,10 @@ class Subscription < ApplicationRecord
 
   def address_present?
     person.present? && person.address1.present? && person.suburb.present? && person.state.present? && person.postcode.present?
+  end
+
+  def contact_details_required?
+    true
   end
 
   def contact_details_saved?
@@ -62,13 +85,14 @@ class Subscription < ApplicationRecord
     miscellaneous_saved?
   end
 
+  # Has the current data been persisted?
   def miscellaneous_saved?
     custom_columns_saved = true
     (self.schema_data[:columns]||[]).each do |column|
       custom_columns_saved = false if (data_was||{})[column].blank?
     end
 
-    (frequency_was.present? && plan_was.present? && custom_columns_saved)
+    custom_columns_saved
   end
 
   def subscription_present?
@@ -77,7 +101,8 @@ class Subscription < ApplicationRecord
   end
 
   def miscellaneous_present?
-    frequency.present? && plan.present?
+    (self.schema_data[:columns] || []).any? { |col| data[col].present? }
+    # frequency.present? && plan.present?
   end
 
   def has_existing_pay_method?
@@ -105,7 +130,7 @@ class Subscription < ApplicationRecord
 
   # Placeholder - will be based on something like join_form.has_custom_questions?
   def miscellaneous_required?
-    true
+    join_form.has_custom_questions?
   end
 
   # Placeholder
@@ -125,6 +150,7 @@ class Subscription < ApplicationRecord
         (self.pay_method == "ABR" && self.join_form.direct_debit_release_on)
       ) && (!self.join_form.signature_required || self.signature_vector.present?)
     ) || @skip_validation
+    # frequency_was.present? && plan_was.present?
   end
 
   # TODO Is this method required or preferred over  set_completed_at
@@ -242,6 +268,41 @@ class Subscription < ApplicationRecord
     @skip_validation = false
   end
 
+  def deduction_date_options
+    available_deduction_dates.map { |d| [I18n.localize(d, format: :with_day), "#{d}"] }
+  end
+
+  def deferral_dates
+    Array(Date.today..Date.today.next_year - 1).reject(&:weekend?)
+  end
+
+  # Options start from next day for AB pay method, and exclude weekends
+  # Options start from next day for ABR pay method, and exclude weekends
+  # Options start from today for the CC pay method, and exclude weekends
+  # Blank array for PRD pay method, & quarterly and yearly frequencies
+  # All options extend past their 'min' date by frequency - 1
+  def available_deduction_dates
+    return deferral_dates if join_form.deferral_on
+
+    min_date = case pay_method
+    when "CC" then Date.today
+    when "AB", "ABR" then Date.today.next_day
+    end
+
+    max_date = case frequency
+    when "W" then (min_date || Date.today) + 6
+    when "F" then (min_date || Date.today) + 13
+    when "M"
+      d1 = (min_date || Date.today)
+      d2 = d1.next_month
+      d2 - (d2.mday == d1.mday ? 1 : 0)
+    end
+
+    return [] if [min_date, max_date].include?(nil)
+
+    Array(min_date..max_date).reject(&:weekend?)
+  end
+
   private
   def set_completed_at
     # called after validation
@@ -323,9 +384,6 @@ class Subscription < ApplicationRecord
   def miscellaneous_completed
     return if @skip_validation
 
-    errors.add(:plan,I18n.translate("subscriptions.errors.not_blank")) if plan.blank?
-    errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank?
-
     # validate presence of custom columns
     (self.schema_data[:columns]||[]).each do |column|
       errors.add(column,I18n.translate("subscriptions.errors.not_blank")) if data[column].blank?
@@ -340,7 +398,6 @@ class Subscription < ApplicationRecord
   # Validate pay method
   def pay_method_completed
     return if @skip_validation
-    binding.pry if $break
     case pay_method
       when "-"
         self.restore_pay_method! # not a super elegant place to put this, but I don't want to save a dash, and I don't want to validate existing details (because they're not persisted).
@@ -354,6 +411,12 @@ class Subscription < ApplicationRecord
       else
         errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
       end
+
+    errors.add(:plan,I18n.translate("subscriptions.errors.not_blank")) if plan.blank?
+    errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank?
+
+    # For deferral disabled join forms:
+    # errors.add(:deduction_date, I18n.t("subscriptions.errors.deduction_date_out_of_bounds")) unless available_deduction_dates.include?(deduction_date)
 
     if join_form.signature_required && signature_vector.blank?
       errors.add(:signature_vector, I18n.translate("subscriptions.errors.not_blank"))

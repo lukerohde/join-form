@@ -19,15 +19,19 @@ DEFAULT: &DEFAULT
   direct_debit_on: true
 one:
   <<: *DEFAULT
+  short_name: one
 welcome:
   <<: *DEFAULT
   welcome_email_template: welcome
+  short_name: welcome
 two:
   <<: *DEFAULT
   organiser: organiser
+  short_name: two
 column_list:
   <<: *DEFAULT
   schema: "{\"columns\":[\"worksite\",\"employer\"]}"
+  short_name: column_list
 search_join_form:
   <<: *DEFAULT
   short_name: SearchString

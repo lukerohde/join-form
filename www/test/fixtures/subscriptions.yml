@@ -29,12 +29,23 @@ contact_details_with_address_subscription:
   join_form: two
   person: contact_details_with_address_person
   token: contact_details_with_address_token
-contact_details_with_subscription_subscription:
+contact_details_with_address_needing_misc_subscription:
+  join_form: column_list
+  person: contact_details_with_address_person
+  token: contact_details_with_address_needing_misc_subscription
+contact_details_with_subscription_subscription: &UP_TO_PAY_METHOD
   join_form: two
   person: contact_details_with_address_person
   token: contact_details_with_subscription_token
-  plan: asdf
-  frequency: "W"
+  data:
+    worksite: nuw bourke street
+    employer: freechange
+cc_pay_method:
+  <<: *UP_TO_PAY_METHOD
+  pay_method: "CC"
+dd_pay_method:
+  <<: *UP_TO_PAY_METHOD
+  pay_method: "AB"
 contact_details_with_subscription_and_pay_method_subscription:
   join_form: two
   person: contact_details_with_pay_method_person
@@ -44,7 +55,7 @@ contact_details_with_subscription_and_pay_method_subscription:
   pay_method: "AB"
   partial_bsb: 123-123
   partial_account_number: 123123
-completed_subscription:
+completed_subscription: &COMPLETED_SUBSCRIPTION
   join_form: two
   person: completed_person
   token: completed_token
@@ -54,6 +65,15 @@ completed_subscription:
   partial_bsb: 123-123
   partial_account_number: 123123
   completed_at: <%=Time.now%>
+completed_ab_subscription:
+  <<: *COMPLETED_SUBSCRIPTION
+completed_cc_subscription:
+  <<: *COMPLETED_SUBSCRIPTION
+  pay_method: "CC"
+  partial_account_number: "xxxxxxxxxxxxx123"
+  expiry_year: 2018
+  expiry_month: 1
+  ccv: 123
 contact_details_with_no_subscription_but_pay_method_subscription:
   join_form: two
   person: contact_details_with_pay_method_person
@@ -76,7 +96,7 @@ has_email:
   person: has_email
   join_form: one
   token: has_email
-  
+
 SEARCH_SUBSCRIPTION: &SEARCH_SUBSCRIPTION
   person: search_person
   join_form: search_join_form

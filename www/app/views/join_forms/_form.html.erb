@@ -10,24 +10,24 @@
       </ul>
     </div>
   <% end %>
-  
+
   <div class="form-group">
     <% if owner? %>
       <%= f.label :union_id %> <%=link_to "new union", new_polymorphic_path(Union), class: "small", :target => "_blank"%><br>
-      <%= f.select :union_id, 
-        selected_option(@join_form.union),  
+      <%= f.select :union_id,
+        selected_option(@join_form.union),
         {
             include_blank: false,
         },
-        data: { 
+        data: {
           placeholder: "Please select a union.",
           url: unions_path
-        }, 
-        class: "ac-select2 form-control", 
+        },
+        class: "ac-select2 form-control",
         style: "width: 100%;"
       %>
     <% else %>
-      <%= f.label :union_id %> 
+      <%= f.label :union_id %>
       <br/><%= (@join_form.union || current_person.union).name %>
       <br/><small>you can only create and edit join_forms for your union</small>
       <%= f.hidden_field :union_id, value: ((@join_form.union || current_person.union).id) %>
@@ -38,7 +38,7 @@
   <div class="form-group">
     <%= f.label :short_name %><br>
     <%= f.text_field :short_name, class: "form-control", placeholder: t('helpers.label.join_form.short_name_placeholder') %>
-  </div>  
+  </div>
 
   <h2>Fee Configuration</h2>
 
@@ -49,7 +49,7 @@
   <div class="form-group">
     <%= f.label :base_rate_id %><br>
     <%= f.text_field :base_rate_id, class: "form-control", placeholder: t('helpers.label.join_form.base_rate_id_placeholder') %>
-  </div> 
+  </div>
   <div class="form-group">
     <%= f.label :group_id %><br>
     <%= f.text_field :group_id, class: "form-control", placeholder: t('helpers.label.join_form.group_id_placeholder') %>
@@ -62,7 +62,7 @@
     <%= f.label :base_rate_establishment %><br>
     <small><%=t('helpers.label.join_form.base_rate_establishment_description')%></small><br/>
     <%= f.text_field :base_rate_establishment, class: "form-control" %>
-  </div>  
+  </div>
 
   <div class="form-group">
     <%= f.label :base_rate_weekly %><br>
@@ -94,7 +94,7 @@
     <%= f.text_field :base_rate_yearly, class: "form-control" %>
   </div>
 
-  <h2>Payment Types</h2>
+  <h2>Payment Options</h2>
 
   <div class="form-group">
     <%= f.label :credit_card_on %><br>
@@ -112,6 +112,10 @@
     <%= f.label :direct_debit_release_on %><br>
     <%= f.check_box :direct_debit_release_on, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
   </div>
+  <div class="form-group">
+    <%= f.label :deferral_on %><br/>
+    <%= f.check_box :deferral_on, class: "switch", data: { size: 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'} %>
+  </div>
 
   <h2> Notifications </h2>
 
@@ -122,11 +126,11 @@
       {
           include_blank: false,
       },
-      data: { 
+      data: {
         placeholder: "Please nominate a admin person for complete joins.",
         url: people_path
-      }, 
-      class: "ac-select2 form-control", 
+      },
+      class: "ac-select2 form-control",
       style: "width: 100%;"
     %>
   </div>
@@ -138,11 +142,11 @@
       {
           include_blank: false,
       },
-      data: { 
+      data: {
         placeholder: "Please nominate a organiser for incomplete joins.",
         url: people_path
-      }, 
-      class: "ac-select2 form-control", 
+      },
+      class: "ac-select2 form-control",
       style: "width: 100%;"
     %>
   </div>
@@ -154,11 +158,11 @@
       {
           include_blank: false,
       },
-      data: { 
+      data: {
         placeholder: "Please select an email template to be emailed to admin after they join.",
         url: email_templates_path
-      }, 
-      class: "ac-select2 form-control", 
+      },
+      class: "ac-select2 form-control",
       style: "width: 100%;"
     %>
   </div>
@@ -171,11 +175,11 @@
       {
           include_blank: false,
       },
-      data: { 
+      data: {
         placeholder: "Please select an email template to be emailed to the member after they join.",
         url: email_templates_path
-      }, 
-      class: "ac-select2 form-control", 
+      },
+      class: "ac-select2 form-control",
       style: "width: 100%;"
     %>
   </div>
@@ -191,12 +195,12 @@
   <div class="form-group">
     <%= f.label :column_list %><br>
     <%= f.text_field :column_list, class: "form-control", placeholder: t('helpers.label.join_form.columns_placeholder') %>
-  </div>  
+  </div>
 
   <div class="form-group">
     <%= f.label :signature_required %><br>
     <%= f.check_box :signature_required, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
-  </div> 
+  </div>
 
   <h2> Design </h2>
 
@@ -204,7 +208,7 @@
   <div class="form-group">
     <%= f.label :advanced_designer %><br>
     <%= f.check_box :advanced_designer, :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
-  </div>  
+  </div>
 
   <div id="advanced_designer_fields" style="display:none;">
     <div class="form-group">
@@ -235,7 +239,7 @@
     </div>
   </div>
 
-  
+
   <div class="actions">
     <%= f.submit value: "Save Join Form", class: "btn btn-default"%>
   </div>

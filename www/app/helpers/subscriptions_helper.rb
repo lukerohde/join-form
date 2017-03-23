@@ -152,6 +152,7 @@ module SubscriptionsHelper
       :join_form_id,
       :frequency,
       :pay_method,
+      :deduction_date,
       :card_number,
       :expiry_month,
       :expiry_year,

@@ -3,33 +3,33 @@
   <h2><%=t(".heading")%></h2>
 
   <%= render 'errors' if @subscription.step == :pay_method %>
-    
-  <% if @subscription.establishment_fee > 0 %> 
+
+  <% if @subscription.establishment_fee > 0 %>
     <div class="detail">
 
       <div class="row">
-        <div class="col-xs-6"><%=t(".application_fee")%></div> 
+        <div class="col-xs-6"><%=t(".application_fee")%></div>
         <div class="col-xs-6"><%=number_to_currency(@subscription.establishment_fee, locale: locale) %> </div>
       </div>
       <% if @subscription.discount > 0 %>
         <div class="row">
-          <div class="col-xs-6"><%=t(".member_discount")%></div> 
+          <div class="col-xs-6"><%=t(".member_discount")%></div>
           <div class="col-xs-6"><%=number_to_currency(@subscription.discount, locale: locale) %> </div>
         </div>
         <div class="row">
-          <div class="col-xs-6"><strong><%=t(".total")%></strong></div> 
+          <div class="col-xs-6"><strong><%=t(".total")%></strong></div>
           <div class="col-xs-6"><strong><u><%=number_to_currency(@subscription.total, locale: locale) %></u></strong> </div>
         </div>
       <% end %>
     </div>
-  <% end %> 
+  <% end %>
   <br/>
   <div class="form-group">
     <%= f.label :pay_method %><br>
     <%= f.select :pay_method,
       pay_method_options(@subscription),
       {
-          include_blank: false,
+        include_blank: false,
       },
       data: {
         placeholder: t('activerecord.attributes.subscription.pay_method'),
@@ -40,12 +40,44 @@
     %>
   </div>
 
+  <div class="form-group">
+    <%= f.label :frequency %><br>
+    <%= f.select :frequency,
+      frequency_options(@subscription),
+      {
+        include_blank: true,
+      },
+      data: {
+        placeholder: t('activerecord.attributes.subscription.frequency'),
+      },
+      class: "form-control",
+      style: "width: 100%;"
+    %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :deduction_date %><br/>
+    <%= f.select :deduction_date,
+      @subscription.deduction_date_options,
+      {
+        include_blank: false,
+      },
+      data: {
+        placeholder: t('activerecord.attributes.subscription.deduction_date'),
+      },
+      class: "form-control",
+      style: "width: 100%;"
+    %>
+  </div>
+
+  <%= f.hidden_field :plan, value: @subscription.join_form.base_rate_id %>
+
   <%= render 'subscriptions/pay_method/edit_au_bank_account', f: f %>
 
   <%= render 'subscriptions/pay_method/edit_credit_card', f: f %>
 
   <%= render 'subscriptions/pay_method/edit_direct_debit_release', f: f %>
-  
+
   <%= render 'subscriptions/pay_method/edit_payroll_deduction', f: f %>
 
   <%= render 'subscriptions/pay_method/edit_existing', f: f %>
@@ -68,7 +100,16 @@
       <strong><%= friendly_signature_date(@subscription) %></strong>
     </div>
     <br/>
-  <% end %> 
+  <% end %>
+
+  <% if @subscription.join_form.description.present? %>
+    <div class="form-group">
+      <%= f.label :description, t('helpers.label.subscription.description') %><br>
+      <p class="detail">
+        <%= @subscription.join_form.description.html_safe %>
+      </p>
+    </div>
+  <% end %>
 
   <div id="stripe_error">
     <noscript>JavaScript is not enabled and is required for this form. First enable it in your web browser settings.</noscript>

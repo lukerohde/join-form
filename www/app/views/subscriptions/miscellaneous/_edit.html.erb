@@ -1,0 +1,12 @@
+<div id="subscription" class="<%=start_hidden(:subscription) %>">
+  <h2><%=t(".heading")%></h2>
+
+  <%= render 'errors' if @subscription.step == :miscellaneous %>
+
+  <% (@subscription.schema_data[:columns]||[]).each do |column| %>
+    <div class="form-group">
+      <%= label_tag "subscription[data[#{column}]]", column %><br>
+      <%= text_field_tag "subscription[data[#{column}]]", @subscription.data[column], class: "form-control" %>
+    </div>
+  <% end %>
+</div>

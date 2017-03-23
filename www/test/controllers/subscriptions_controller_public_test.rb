@@ -46,7 +46,8 @@ include SubscriptionsHelper
 
 class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
   setup do
-    @join_form = join_forms(:one)
+    @join_form = join_forms(:column_list)
+    @join_form_no_misc = join_forms(:one)
     @union = @join_form.union
     @new_subscription = Subscription.new(join_form: @join_form, person: Person.new)
     people(:admin).follow!(@join_form)
@@ -65,6 +66,20 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
 
       }
     }
+  end
+
+  def step2_params
+    @with_address = people(:contact_details_with_address_person)
+    params = step1_params
+    params[:subscription][:person_attributes].merge!(@with_address.attributes.slice('address1', 'address2', 'state', 'suburb', 'postcode'))
+    params
+  end
+
+  def step3_params
+    @with_subscription = subscriptions(:contact_details_with_subscription_subscription)
+    params = step2_params
+    params[:subscription][:data] = @with_subscription.data
+    params
   end
 
   test "get step 1" do
@@ -176,7 +191,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
       #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
       follow_redirect!
       # even if a member has a pay method, they have to at least confirm it through the system, before moving to the thanks step
-      assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
+      assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be miscellaneous"
     end
   end
 
@@ -189,7 +204,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
 
     # Doesn't send a welcome message
     assert_difference 'ActionMailer::Base.deliveries.count', 0 do
-      post new_join_path(:en, @union, @join_form), subscription: { join_form_id: @join_form.id, person_attributes: { first_name: @person.first_name, mobile: @person.mobile, email: @person.email } }
+      post new_join_path(:en, @union, @join_form_no_misc), subscription: { join_form_id:@join_form_no_misc.id, person_attributes: { first_name: @person.first_name, mobile: @person.mobile, email: @person.email } }
       assert_response :redirect
       #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from({external_id: 'NV391215', first_name: "Lucas", email: 'lrohde@nuw.org.au'}))
       follow_redirect!
@@ -197,12 +212,6 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def step2_params
-    @with_address = people(:contact_details_with_address_person)
-    params = step1_params
-    params[:subscription][:person_attributes].merge!(@with_address.attributes.slice('address1', 'address2', 'state', 'suburb', 'postcode'))
-    params
-  end
 
   test "get step 2" do
     @subscription = subscriptions(:contact_details_only_subscription)
@@ -234,34 +243,31 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
-    assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be subscription"
+    assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be miscellaneous"
     assert ActionMailer::Base.deliveries.last.subject.starts_with?("JOIN_FOLLOW_UP:"), "was expecting join follow up email"
   end
 
-  def step3_params
-    @with_subscription = subscriptions(:contact_details_with_subscription_subscription)
-    params = step2_params
-    params[:subscription].merge!(@with_subscription.slice('plan', 'frequency'))
-    params
+  test "get step 3 - no column list" do
+    @subscription = subscriptions(:contact_details_with_address_subscription)
+    get edit_join_path(:en, @union, @join_form_no_misc, @subscription.token)
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
   end
 
-  test "get step 3" do
+  test "get step 3 - column list" do
     @subscription = subscriptions(:contact_details_with_address_subscription)
     get edit_join_path(:en, @union, @join_form, @subscription.token)
-    assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be address"
+    assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be miscellaneous"
   end
 
   test "post step 3 - failure" do
     with_address = subscriptions(:contact_details_with_address_subscription)
-    params = step2_params
+    params = step2_params.merge(join_form: with_address.join_form)
 
     params[:subscription][:person_attributes][:id] = with_address.person.id
     patch edit_join_path(:en, @union, @join_form, with_address.token), params
     assert_response :success
-    assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be subscription"
+    assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be miscellaneous"
     #TODO figure out how to get the address validations to show for person
-    assert response.body.include?( 'Payment Frequency can&#39;t be blank') , "no frequency error"
-    assert response.body.include?( 'Plan can&#39;t be blank') , "no plan error"
   end
 
 
@@ -271,13 +277,14 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     params[:subscription][:person_attributes][:id] = with_address.person.id
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    #$break = true
     patch edit_join_path(:en, @union, @join_form, with_address.token), params
     assert_response :redirect
     #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nuw_end_point_transform_from(api_params))
     follow_redirect!
     assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
   end
-
+  #
   test "post step 3 with bank details - success" do
     no_subscription = subscriptions(:contact_details_with_no_subscription_but_pay_method_subscription)
     params = step3_params
@@ -338,7 +345,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     params = step3_params
 
     params[:subscription][:person_attributes][:id] = with_subscription.person.id
-    params[:subscription].merge!(pay_method: "AB", bsb: "123-123", account_number: "1231231")
+    params[:subscription].merge!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "1231231")
 
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
@@ -363,7 +370,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     params = step3_params
 
     params[:subscription][:person_attributes][:id] = with_subscription.person.id
-    params[:subscription].merge!(pay_method: "CC", expiry_year: "2018", expiry_month: "06", card_number: "12341234123141234", stripe_token: "asdfasdf")
+    params[:subscription].merge!(pay_method: "CC", plan: "asdf", frequency: "F", expiry_year: "2018", expiry_month: "06", card_number: "12341234123141234", stripe_token: "asdfasdf")
 
     Stripe::Customer.expects(:create).returns (OpenStruct.new(id: 123))
     Stripe::Charge.expects(:create).returns (true)
@@ -392,7 +399,11 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert response.body.include?('freechange'), "missing custom employer value"
   end
 
-  test "post form with column list - failure" do
+  test "post form with column list - failure from blanking prior step" do
+
+    # TODO Consider changing this behaviour by rewinding the user to
+    # the step that is now failing validation.
+
     @subscription = subscriptions(:column_list)
     params = step3_params
     params[:subscription][:join_form_id] = @subscription.join_form_id
@@ -402,31 +413,41 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     params[:subscription][:data][:employer] = ""
 
     patch edit_join_path(:en, @union, @subscription.join_form, @subscription.token), params
-    assert_response :success
+    assert_response 200
 
-    assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be subscription"
-    #TODO figure out how to get the address validations to show for person
+    #assert response.body.include?('data-step="miscellaneous"'), "wrong step - should be miscellaneous"
+    assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
     assert response.body.include?( 'Worksite can&#39;t be blank') , "no worksite error"
     assert response.body.include?( 'Employer can&#39;t be blank') , "no employer error"
+    assert response.body.include?( 'Frequency can&#39;t be blank') , "no worksite error"
+    assert response.body.include?( 'Plan can&#39;t be blank') , "no plan error" # TODO PRevent this
+    assert response.body.include?( 'Payment Method must be specified') , "no pay_method error"
   end
 
+  # test "get step 4 - has sensible credit card defaults" do
+  #   @subscription = subscriptions(:cc_pay_method)
+  #   get edit_join_path(:en, @union, @join_form, @subscription.token)
+  #   Date.stubs(:today).returns(Date.new(2017,1,1))
+  #
+  #   assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay method"
+  #   assert response.body.include?('<option selected="selected" value="CC">'), "expecting default credit card to be selected"
+  #   #assert response.body.include?('<option selected="selected" value="AB">Australian bank account</option>'
+  #   assert response.body.include?('<option selected="selected" value="F">'), "expecting default fortnightly to be selected"
+  #   assert response.body.include?('<option selected="selected" value="2017-01-01">'), "expecting default deduction date of 2017-01-1"
+  # end
+  #
+  # test "get step 4 - has sensible australian bank defaults" do
+  #   @subscription = subscriptions(:dd_pay_method)
+  #   get edit_join_path(:en, @union, @join_form, @subscription.token)
+  #   Date.stubs(:today).returns(Date.new(2017,1,1))
+  #
+  #   assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay method"
+  #   assert response.body.include?('<option selected="selected" value="AB">') , "expecting australian bank to be selected"
+  #   assert response.body.include?('<option selected="selected" value="F">'), "expecting default fortnightly to be selected"
+  #   assert response.body.include?('<option selected="selected" value="2017-01-02">'), "expecting defaultdeduction date of 2017-01-1"
+  # end
 
-  test "post form with column list - success" do
-    @subscription = subscriptions(:column_list)
-    params = step3_params
-    params[:subscription][:join_form_id] = @subscription.join_form_id
-    params[:subscription][:person_attributes][:id] = @subscription.person.id
-    params[:subscription][:data] = {}
-    params[:subscription][:data][:worksite] = "asdf_w"
-    params[:subscription][:data][:employer] = "asdf_e"
 
-    patch edit_join_path(:en, @union, @subscription.join_form, @subscription.token), params
-    assert_response :redirect
-
-    @subscription.reload
-    assert @subscription.data["worksite"] == "asdf_w", "custom column worksite didn't update"
-    assert @subscription.data["employer"] == "asdf_e", "custom column employer didn't update"
-  end
 
 
 

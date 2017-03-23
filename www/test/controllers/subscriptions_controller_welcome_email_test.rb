@@ -29,8 +29,8 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     }
     params[:subscription][:person_attributes].merge!(@with_address.attributes.slice('address1', 'address2', 'state', 'suburb', 'postcode'))
     params[:subscription][:person_attributes][:id] = @with_subscription.person.id
-    params[:subscription].merge!(@with_subscription.slice('plan', 'frequency'))
-    params[:subscription].merge!(pay_method: "AB", bsb: "123-123", account_number: "1231231")
+    params[:subscription].merge!(pay_method: "AB", bsb: "123-123", account_number: "1231231", plan: "asdf", frequency: "W")
+
     params
   end
 

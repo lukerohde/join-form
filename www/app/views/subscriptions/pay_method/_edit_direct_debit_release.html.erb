@@ -1,14 +1,14 @@
 <div id="edit_direct_debit_release"  style="<%= "display:none" unless pay_method_default(@subscription) == "ABR" %>">
 
-	<h3><%=t('subscriptions.pay_method.edit.direct_debit_release_title')%></h3>
+  <h3><%=t('subscriptions.pay_method.edit.direct_debit_release_title')%></h3>
 
-	<small>
-		<%=t('subscriptions.pay_method.edit.direct_debit_release_terms', union: @join_form.union.name).html_safe %>
-	</small>
+  <small>
+    <%=t('subscriptions.pay_method.edit.direct_debit_release_terms', union: @join_form.union.name).html_safe %>
+  </small>
 
   <%= render 'subscriptions/pay_method/reoccurring_terms' %>
-	<!--
-	<strong> 
+  <!--
+  <strong>
     Initial Payment: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
     <br/><small> Deductions will usually commence within 3 business days.  </small>
   </strong>

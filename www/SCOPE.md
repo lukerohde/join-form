@@ -43,7 +43,7 @@ Risks
 
 
 ### Part 1 - Get it done
-When there are no custom questions in the custom questions it does not show.  In the payment step the user is presented with a reasonable set of default options, in the following order - pay method (DD or CC), Frequency (fortnightly), deduction date (starting today unless DD, then next working day).  If the user changes pay method, frequency or deduction date the payment step is refreshed, keeping their input where possible, but only presenting valid input choices - for instance, it doesn't make sense to have today as the first day of payment for direct debit.  Choosing a weekly payment doesn't allow deferred payment beyond a week.  Choosing a fortnightly option doesn't allow deferring beyond more than a fortnight.  Choosing a monthly payment doesn't allow selecting a date beyond one month. Choosing an quarterly or annual payment option may not show any deferred payment option at all.  Choosing a pay roll deduction option doesn't show the frequency or deferred payment options.  Choosing dd release, allows frequency and shows a notice explaining payment will start after dd release.  Changing a frequency will change the amount payable now. Defering a payment will defer the charge to the user and will validate the credit card.  Subscription description will show somewhere sensible.  Translations for all text changes.
+When there are no custom questions in the custom questions it does not show TESTED.  In the payment step the user is presented with a reasonable set of default options, in the following order - pay method (DD or CC), Frequency (fortnightly), deduction date (starting today unless DD, then next working day).  If the user changes pay method, frequency or deduction date the payment step is refreshed, keeping their input where possible, but only presenting valid input choices - for instance, it doesn't make sense to have today as the first day of payment for direct debit.  Choosing a weekly payment doesn't allow deferred payment beyond a week.  Choosing a fortnightly option doesn't allow deferring beyond more than a fortnight.  Choosing a monthly payment doesn't allow selecting a date beyond one month. Choosing an quarterly or annual payment option may not show any deferred payment option at all.  Choosing a pay roll deduction option doesn't show the frequency or deferred payment options.  Choosing dd release, allows frequency and shows a notice explaining payment will start after dd release.  Changing a frequency will change the amount payable now. Defering a payment will defer the charge to the user and will validate the credit card.  Subscription description will show somewhere sensible.  Translations for all text changes.
 
 ### Part 2 - Finesse
 The system will not refresh the page between steps, instead will progressively expand the form.  The form designer shall be able to customize which contact details fields will be shown, including skipping the address field.  The system shall have an optional 'I'd like to join the join checkbox' which expands the regular payment options field..  When 'I'd like to join the union' is unticked, and the signature is enabled, then the user can sign.  The form designer can change the label on the submit button when the user is not joining, and when the user is joining.  The system has a counter towards a goal that the form designer can set.  The form designer can set an offset for the counter.  The counter is shown when setup along side prominent sharing options.
@@ -51,14 +51,14 @@ The system will not refresh the page between steps, instead will progressively e
 The form designer can customize the form with additional questions.  These questions can be placed at the start of the form or before payment.  
 
 TEST PLAN
--- Subscription step skipped without custom questions
----- unit test step method
----- controller test, address to paymethod
--- Subscription step not skipped with custom questions
----- unit test step method
----- controller test, address to custom questions
--- When address is not required then subscription must be validated
--- Payment method validation fails without frequency
+-- Subscription step skipped without custom questions DONE
+---- unit test step method DONE
+---- controller test, address to paymethod DONE
+-- Subscription step not skipped with custom questions DONE
+---- unit test step method DONE
+---- controller test, address to custom questions DONE
+-- When address is not required then it skips appropriately (to miscellaneous or pay method)
+-- Payment method validation fails without frequency TESTED
 -- Payment method validation fails without deduction date
 -- Payment method validation fails with invalid deduction date for weekly frequency
 -- Payment method validation fails with invalid deduction date for fortnightly frequency

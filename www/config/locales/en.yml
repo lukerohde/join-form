@@ -27,7 +27,7 @@ en:
         short_name_placeholder: Please enter an short name for this join form, for the url
         columns_placeholder: A comma separated list of extra questions you'd like to ask
         description: Subscription Description
-        description_placeholder: Please enter a short description of the subscription, to be shown to the user. 
+        description_placeholder: Please enter a short description of the subscription, to be shown to the user.
         page_title: Page Title
         page_title_placeholder: Specify a web browser title for the page
         header: Header
@@ -37,18 +37,18 @@ en:
         css: Inline CSS
         css_placeholder:  Customize how your form looks using CSS
         wysiwyg_header: Header
-        wysiwyg_header_placeholder: Optional header to appear at the top of your join form 
+        wysiwyg_header_placeholder: Optional header to appear at the top of your join form
         wysiwyg_footer: Footer
-        wysiwyg_footer_placeholder: Optional footer to appear at the bottom of your join form 
+        wysiwyg_footer_placeholder: Optional footer to appear at the bottom of your join form
         group_id: Optional Group/Company/Site ID
         group_id_placeholder: "Optionally provide a group/company/site id for members to go into, if left blank, member group allocation will be left to admin"
         tags: Optional Tags
         tags_placeholder: "Optionally provide a comma separated list of tags to add to the member"
         base_rate_id: Plan ID
         base_rate_id_placeholder: Please enter an id identify what fee level/plan they member is on
-        base_rate_establishment:  Up front payment 
+        base_rate_establishment:  Up front payment
         base_rate_establishment_description: Typically $0 but when joining for a service could be something like $200.00
-        base_rate_weekly: Weekly fee 
+        base_rate_weekly: Weekly fee
         base_rate_fortnightly: Fortnightly fee
         base_rate_monthly: Monthly fee
         base_rate_quarterly: Quarterly fee
@@ -118,7 +118,7 @@ en:
       edit:
         heading: "Address Details"
     subscription:
-      edit: 
+      edit:
         heading: "Union Membership Detail"
         weekly: "Weekly"
         fortnightly: "Fortnightly"
@@ -133,7 +133,7 @@ en:
         au_bank_account: "Australian bank account"
         direct_debit_release: "Get my bank account from my employer"
         direct_debit_release_title: "Direct Debit and Release of Details Authority"
-        direct_debit_release_terms: | 
+        direct_debit_release_terms: |
           By becoming a member of the %{union}, I request and authorise my employer to release to the %{union} my:
           <ul>
             <li>personal details (including my gender and date of birth)</li>
@@ -172,6 +172,6 @@ en:
       pay_method: "must be specified"
       payment_gateway_error: "Our payment provider had an error while creating your customer record"
       payment_gateway_card_error: "Our payment provider had a problem with your credit card"
-      error_summary: 
+      error_summary:
         one:  "1 error prevented your membership application from being saved."
         other: "%{count} errors prevented your membership application from being saved."
