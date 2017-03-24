@@ -58,6 +58,7 @@ en:
         direct_debit_on: Direct Debit Enabled
         payroll_deduction_on: Payroll Deduction Enabled
         direct_debit_release_on: Direct Debit Release Enabled
+        deduction_date_on: "Allow user to set preferred deduction date"
       subscription:
         description: "Description"
   gender:
