@@ -16,48 +16,56 @@ class DeductionDateOptions < ActiveSupport::TestCase
     @subscription.available_deduction_dates == date_range(start_date, end_date)
   end
 
-  def no_deduction_dates(freq)
+  def assert_deduction_dates_match(freq, from, start_date, end_date)
+    Date.expects(:today).returns(Date.parse(from))
     @subscription.frequency = freq
-    @subscription.available_deduction_dates == []
+
+    assert @subscription.available_deduction_dates == date_range(start_date, end_date),
+      "Failed for '#{@subscription.pay_method}' '#{freq}' from '#{from}', got #{@subscription.available_deduction_dates}"
   end
 
-  test "deduction date for weekly australian bank without deferral" do
+  def assert_no_deduction_dates(freq)
+    @subscription.frequency = freq
+    assert @subscription.available_deduction_dates == [], "Didn't expect '#{@subscription.pay_method}' '#{freq}' to have deduction dates, got #{@subscription.available_deduction_dates}"
+  end
+
+  test "deduction date for australian bank without deferral" do
     @subscription.pay_method = 'AB'
-    assert deduction_dates_match('W', '2017-01-01', '2017-01-02', '2017-01-08'), "failed for 'W', '2017-01-01'"
-    assert deduction_dates_match('F', '2017-01-01', '2017-01-02', '2017-01-15'), "failed for 'F', '2017-01-01'"
-    assert deduction_dates_match('M', '2017-01-01', '2017-01-02', '2017-02-01'), "failed for 'M', '2017-01-01'"
-    assert no_deduction_dates('Q')
-    assert no_deduction_dates('Y')
+    assert_deduction_dates_match 'W', '2017-01-01', '2017-01-02', '2017-01-08'
+    assert_deduction_dates_match 'F', '2017-01-01', '2017-01-02', '2017-01-15'
+    assert_deduction_dates_match 'M', '2017-01-01', '2017-01-02', '2017-02-01'
+    assert_no_deduction_dates 'Q'
+    assert_no_deduction_dates 'Y'
   end
 
-  test "deduction date for weekly australian bank release without deferral" do
+  test "deduction date for australian bank release without deferral" do
     @subscription.pay_method = 'ABR'
-    assert deduction_dates_match('W', '2017-01-01', '2017-01-02', '2017-01-08'), "failed for 'W', '2017-01-01'"
-    assert deduction_dates_match('F', '2017-01-01', '2017-01-02', '2017-01-15'), "failed for 'F', '2017-01-01'"
-    assert deduction_dates_match('M', '2017-01-01', '2017-01-02', '2017-02-01'), "failed for 'M', '2017-01-01'"
-    assert no_deduction_dates('Q')
-    assert no_deduction_dates('Y')
+    assert_deduction_dates_match 'W', '2017-01-01', '2017-01-02', '2017-01-08'
+    assert_deduction_dates_match 'F', '2017-01-01', '2017-01-02', '2017-01-15'
+    assert_deduction_dates_match 'M', '2017-01-01', '2017-01-02', '2017-02-01'
+    assert_no_deduction_dates 'Q'
+    assert_no_deduction_dates 'Y'
   end
 
-  test "deduction date for fortnightly credit card without deferral" do
+  test "deduction date for credit card without deferral" do
     @subscription.pay_method = 'CC'
-    assert deduction_dates_match('W', '2017-01-01', '2017-01-01', '2017-01-07'), "failed for 'W', '2017-01-01'"
-    assert deduction_dates_match('F', '2017-01-01', '2017-01-01', '2017-01-14'), "failed for 'F', '2017-01-01'"
-    assert deduction_dates_match('M', '2017-01-01', '2017-01-01', '2017-01-31'), "failed for 'M', '2017-01-01'"
-    assert deduction_dates_match('M', '2017-01-31', '2017-01-31', '2017-02-28'), "failed for 'M', '2017-01-31'"
-    assert deduction_dates_match('M', '2017-02-28', '2017-02-28', '2017-03-27'), "failed for 'M', '2017-02-28'"
-    assert deduction_dates_match('M', '2017-03-01', '2017-03-01', '2017-03-31'), "failed for 'M', '2017-03-01'"
-    assert no_deduction_dates('Q')
-    assert no_deduction_dates('Y')
+    assert_deduction_dates_match 'W', '2017-01-01', '2017-01-01', '2017-01-07'
+    assert_deduction_dates_match 'F', '2017-01-01', '2017-01-01', '2017-01-14'
+    assert_deduction_dates_match 'M', '2017-01-01', '2017-01-01', '2017-01-31'
+    assert_deduction_dates_match 'M', '2017-01-31', '2017-01-31', '2017-02-28'
+    assert_deduction_dates_match 'M', '2017-02-28', '2017-02-28', '2017-03-27'
+    assert_deduction_dates_match 'M', '2017-03-01', '2017-03-01', '2017-03-31'
+    assert_no_deduction_dates 'Q'
+    assert_no_deduction_dates 'Y'
   end
 
-  test "deduction date for yearly australian bank without deferral" do
+  test "deduction date for payroll deduction without deferral" do
     @subscription.pay_method = 'PRD'
-    assert no_deduction_dates('W')
-    assert no_deduction_dates('F')
-    assert no_deduction_dates('M')
-    assert no_deduction_dates('Q')
-    assert no_deduction_dates('Y')
+    assert_no_deduction_dates 'W'
+    assert_no_deduction_dates 'F'
+    assert_no_deduction_dates 'M'
+    assert_no_deduction_dates 'Q'
+    assert_no_deduction_dates 'Y'
   end
 
   test "deduction date options" do
