@@ -104,7 +104,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal({
       :bsb=>["must be properly formatted BSB e.g. 123-123"],
       :account_number=>["must be properly formatted e.g. 123456"],
-      :plan=>["can't be blank"]
+      :plan=>["can't be blank"],
+      :deduction_date=>["can't be blank"]
     }, s.errors.messages)
 
     assert_equal :pay_method, s.step
@@ -118,6 +119,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       :bsb=>["must be properly formatted BSB e.g. 123-123"],
       :account_number=>["must be properly formatted e.g. 123456"],
       :plan=>["can't be blank"],
+      :deduction_date=>["can't be blank"]
       # :frequency=>["can't be blank"]
     }, s.errors.messages)
 
@@ -132,6 +134,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal({
       :card_number=>["couldn't be validated by our payment gateway.  Please try again."],
       :plan=>["can't be blank"],
+      :deduction_date=>["can't be blank"]
       # :frequency=>["can't be blank"]
     }, s.errors.messages)
 
@@ -183,7 +186,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     s = subscriptions(:contact_details_with_subscription_subscription)
     result = s.join_form.union.update( old_passphrase: '1234567890123456789012345678901234567890', passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
 
-    assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx")
+    # TODO provide a comment to this assertion
+    # FIXME needs to stub the Date.today response (where?)
+    assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx", deduction_date: "2017-02-01")
 
     assert_equal :thanks, s.step
     s.reload
@@ -198,80 +203,12 @@ class SubscriptionTest < ActiveSupport::TestCase
     Stripe::Charge.expects(:create).returns (true)
 
     s.person.union = s.join_form.union
-    assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123"}, s.join_form.union)
+    # TODO provide a comment to this assertion
+    # FIXME needs to stub the Date.today response (where?)
+    assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123", deduction_date: "2017-01-31"}, s.join_form.union)
 
     assert_equal :thanks, s.step
     s.reload
     assert_equal :thanks, s.step
-  end
-
-  class DeductionDateOptions < ActiveSupport::TestCase
-    def setup
-      @subscription = subscriptions(:contact_details_with_subscription_subscription)
-      Date.stubs(:today).returns(Date.new(2017,1,1))
-    end
-
-    def date_range(start_date,end_date)
-      Array(Date.parse(start_date)..Date.parse(end_date)).reject(&:weekend?)
-    end
-
-    def deduction_dates_match(freq, from, start_date, end_date)
-      Date.expects(:today).returns(Date.parse(from))
-      @subscription.frequency = freq
-      @subscription.available_deduction_dates == date_range(start_date, end_date)
-    end
-
-    def no_deduction_dates(freq)
-      @subscription.frequency = freq
-      @subscription.available_deduction_dates == []
-    end
-
-    test "deduction date for weekly australian bank without deferral" do
-      @subscription.pay_method = 'AB'
-      assert deduction_dates_match('W', '2017-01-01', '2017-01-02', '2017-01-08'), "failed for 'W', '2017-01-01'"
-      assert deduction_dates_match('F', '2017-01-01', '2017-01-02', '2017-01-15'), "failed for 'F', '2017-01-01'"
-      assert deduction_dates_match('M', '2017-01-01', '2017-01-02', '2017-02-01'), "failed for 'M', '2017-01-01'"
-      assert no_deduction_dates('Q')
-      assert no_deduction_dates('Y')
-    end
-
-    test "deduction date for weekly australian bank release without deferral" do
-      @subscription.pay_method = 'ABR'
-      assert deduction_dates_match('W', '2017-01-01', '2017-01-02', '2017-01-08'), "failed for 'W', '2017-01-01'"
-      assert deduction_dates_match('F', '2017-01-01', '2017-01-02', '2017-01-15'), "failed for 'F', '2017-01-01'"
-      assert deduction_dates_match('M', '2017-01-01', '2017-01-02', '2017-02-01'), "failed for 'M', '2017-01-01'"
-      assert no_deduction_dates('Q')
-      assert no_deduction_dates('Y')
-    end
-
-    test "deduction date for fortnightly credit card without deferral" do
-      @subscription.pay_method = 'CC'
-      assert deduction_dates_match('W', '2017-01-01', '2017-01-01', '2017-01-07'), "failed for 'W', '2017-01-01'"
-      assert deduction_dates_match('F', '2017-01-01', '2017-01-01', '2017-01-14'), "failed for 'F', '2017-01-01'"
-      assert deduction_dates_match('M', '2017-01-01', '2017-01-01', '2017-01-31'), "failed for 'M', '2017-01-01'"
-      assert deduction_dates_match('M', '2017-01-31', '2017-01-31', '2017-02-28'), "failed for 'M', '2017-01-31'"
-      assert deduction_dates_match('M', '2017-02-28', '2017-02-28', '2017-03-27'), "failed for 'M', '2017-02-28'"
-      assert deduction_dates_match('M', '2017-03-01', '2017-03-01', '2017-03-31'), "failed for 'M', '2017-03-01'"
-      assert no_deduction_dates('Q')
-      assert no_deduction_dates('Y')
-    end
-
-    test "deduction date for yearly australian bank without deferral" do
-      @subscription.pay_method = 'PRD'
-      assert no_deduction_dates('W')
-      assert no_deduction_dates('F')
-      assert no_deduction_dates('M')
-      assert no_deduction_dates('Q')
-      assert no_deduction_dates('Y')
-    end
-
-    test "deduction date options" do
-      @presenter = SubscriptionPresenter.new(@subscription)
-      @subscription.pay_method = "CC"
-      @subscription.frequency = "W"
-      Date.stubs(:today).returns(Date.new(2017,1,1))
-      assert_equal @presenter.deduction_date_options.count, 5
-      assert_equal @presenter.deduction_date_options[0], ["Monday,  2 January 2017", '2017-01-02']
-    end
   end
 end
