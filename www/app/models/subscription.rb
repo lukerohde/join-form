@@ -31,6 +31,8 @@ class Subscription < ApplicationRecord
   before_save :set_data_if_blank
   before_save :set_completed_at
   before_validation :set_token, on: [:create]
+  after_initialize :set_frequency_if_blank
+  after_initialize :set_pay_method_if_blank
 
   # def check_step
   #   binding.pry
@@ -267,28 +269,6 @@ class Subscription < ApplicationRecord
     @skip_validation = false
   end
 
-  def frequency_options
-    result = []
-    form = self.join_form
-
-    %w(W F M Q H Y).each do |freq|
-      result << ["#{friendly_frequency(freq)} - #{friendly_fee(form, freq)}", freq] if form.fee(freq) > 0
-    end
-
-    current_selection = self.frequency || "F"
-    current_selection = result.find { |i| i[1] == current_selection.upcase }
-    current_selection = result[0] unless current_selection
-
-    options_for_select(
-      result,
-      current_selection
-    )
-  end
-
-  def deduction_date_options
-    available_deduction_dates.map { |d| [I18n.localize(d, format: :with_day), "#{d}"] }
-  end
-
   def deferral_dates
     Array(Date.today..Date.today.next_year - 1).reject(&:weekend?)
   end
@@ -335,6 +315,14 @@ class Subscription < ApplicationRecord
 
   def set_data_if_blank
     self.data = {} if data.blank? # set a default, when blank, because of a possible AR/jsonb bug
+  end
+
+  def set_frequency_if_blank
+    self.frequency ||= "F"
+  end
+
+  def set_pay_method_if_blank
+    self.pay_method ||= "AB"
   end
 
   def get_key_pair
@@ -412,31 +400,47 @@ class Subscription < ApplicationRecord
     [:pay_method, :thanks].include?(step) && pay_method_required?
   end
 
-  # Validate pay method
+  # Validate the pay method step, including the :plan, :pay_method, :frequency,
+  # :deduction_date, and :signature_vector attributes
   def pay_method_completed
     return if @skip_validation
-    case pay_method
-      when "-"
-        self.restore_pay_method! # not a super elegant place to put this, but I don't want to save a dash, and I don't want to validate existing details (because they're not persisted).
-      when "CC"
-        self.errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
-      when "AB"
-        self.errors.add(:bsb,I18n.translate("subscriptions.errors.bsb") ) unless bsb_valid?
-        self.errors.add(:account_number,I18n.translate("subscriptions.errors.account_number") ) unless account_number_valid?
-      when "ABR"
-      when "PRD"
-      else
-        errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method") )
-      end
 
     errors.add(:plan,I18n.translate("subscriptions.errors.not_blank")) if plan.blank?
     errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank?
 
-    # For deferral disabled join forms:
-    # errors.add(:deduction_date, I18n.t("subscriptions.errors.deduction_date_out_of_bounds")) unless available_deduction_dates.include?(deduction_date)
+    validate_pay_method()
+    validate_deduction_date()
 
     if join_form.signature_required && signature_vector.blank?
       errors.add(:signature_vector, I18n.translate("subscriptions.errors.not_blank"))
+    end
+  end
+
+  def validate_pay_method
+    case pay_method
+    # not a super elegant place to put this, but I don't want to save a dash, and I don't want to validate existing details (because they're not persisted).
+    when "-" then self.restore_pay_method!
+    when "CC"
+      errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
+    when "AB"
+      errors.add(:bsb,I18n.translate("subscriptions.errors.bsb")) unless bsb_valid?
+      errors.add(:account_number,I18n.translate("subscriptions.errors.account_number")) unless account_number_valid?
+    when "ABR"
+    when "PRD"
+    else
+      errors.add(:pay_method,I18n.translate("subscriptions.errors.pay_method"))
+    end
+  end
+
+  # Nil value is OK for some pay methods and frequencies. These pay methods
+  # and frequencies will have an empty array of available_deduction_dates.
+  def validate_deduction_date
+    if deduction_date.nil?
+      error_msg = I18n.t("subscriptions.errors.deduction_date_must_be_set")
+      errors.add(:deduction_date, error_msg) unless available_deduction_dates.empty?
+    else
+      error_msg = I18n.t("subscriptions.errors.deduction_date_out_of_bounds")
+      errors.add(:deduction_date, error_msg) unless available_deduction_dates.include?(deduction_date)
     end
   end
 

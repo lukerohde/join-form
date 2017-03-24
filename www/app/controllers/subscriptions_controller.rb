@@ -26,13 +26,13 @@ class SubscriptionsController < ApplicationController
   # GET /subscriptions/1
   # GET /subscriptions/1.json
   def show
-
   end
 
   def setup_new
     @subscription = Subscription.new
     @subscription.person = Person.new
     @subscription.join_form = @join_form
+    @presenter = SubscriptionPresenter.new(@subscription)
     @subscription.source = params[:source] || request.referer
   end
 
@@ -198,6 +198,8 @@ class SubscriptionsController < ApplicationController
     def set_subscription
       @subscription = Subscription.find_by_token(params[:id])
       @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
+      @presenter = SubscriptionPresenter.new(@subscription)
+
       if @subscription.nil?
         forbidden
       else
