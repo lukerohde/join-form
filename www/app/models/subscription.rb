@@ -40,7 +40,6 @@ class Subscription < ApplicationRecord
   # end
 
   def step
-    #binding.pry if $break
     return :thanks if errors.count == 0 && self.completed_at.present? && pay_method_saved? && (miscellaneous_saved? || !miscellaneous_required?) && (address_saved? || !address_required?) && contact_details_saved?
     return :pay_method if (miscellaneous_saved? || !miscellaneous_required?) && (address_saved? || !address_required?) && contact_details_saved?
     return :miscellaneous if (address_saved? || !address_required?) && contact_details_saved? && miscellaneous_required?
@@ -155,15 +154,15 @@ class Subscription < ApplicationRecord
     # frequency_was.present? && plan_was.present?
   end
 
-  # TODO Is this method required or preferred over  set_completed_at
-  def pay_method=(value)
-    write_attribute(:pay_method, value)
-
-    # A subscription can only be completed if a pay_method is written
-    # Essentially confirming an existing pay_method when one already exists
-    self.completed_at = Time.now
-    self.pending = false
-  end
+  # # TODO Is this method required or preferred over  set_completed_at
+  # def pay_method=(value)
+  #   write_attribute(:pay_method, value)
+  #
+  #   # A subscription can only be completed if a pay_method is written
+  #   # Essentially confirming an existing pay_method when one already exists
+  #   self.completed_at = Time.now
+  #   self.pending = false
+  # end
 
   def save_without_validation!
     @skip_validation = true
@@ -280,6 +279,7 @@ class Subscription < ApplicationRecord
   # Blank array for PRD pay method, & quarterly and yearly frequencies
   # All options extend past their 'min' date by frequency - 1
   def available_deduction_dates
+    binding.pry if $break
     return deferral_dates if join_form.deferral_on
 
     min_date = case pay_method
