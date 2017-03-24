@@ -1,0 +1,16 @@
+<%= fields_for @subscription do |f| %>
+  <div class="form-group">
+    <%= f.label :frequency %><br>
+    <%= f.select :frequency,
+      options_for_select(@presenter.frequency_options, @presenter.frequency_default),
+      {
+        include_blank: true,
+      },
+      data: {
+        placeholder: t('activerecord.attributes.subscription.frequency'),
+      },
+      class: "form-control",
+      style: "width: 100%;"
+    %>
+  </div>
+<% end %>

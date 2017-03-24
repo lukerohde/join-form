@@ -1,7 +1,8 @@
 class SubscriptionsController < ApplicationController
   before_action :allow_iframe
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
-  before_action :set_subscription, only: [:show, :edit, :update, :destroy, :end_point_put]
+  before_action :set_subscription_with_api_lookup, only: [:show, :edit, :update, :destroy, :end_point_put]
+  # before_action :set_subscription, only: [:refresh]
   before_action :set_join_form, except: [:index, :temp_report]
   before_action :facebook_new, only: [:create]
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create]
@@ -50,6 +51,7 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions
   # POST /subscriptions.json
   def create
+    # NOTE no @presenter created here?
     @subscription = Subscription.new(subscription_params)
     @subscription.renewal = false
 
@@ -81,6 +83,16 @@ class SubscriptionsController < ApplicationController
         format.html { render :edit }
         format.json { render json: @subscription.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  # POST /subscriptions/refresh
+  def refresh
+    @subscription = Subscription.new(subscription_params.except(:person_attributes))
+    @presenter = SubscriptionPresenter.new(@subscription)
+
+    respond_to do |format|
+      format.html { render partial: "subscriptions/pay_method/edit", layout: false }
     end
   end
 
@@ -194,11 +206,15 @@ class SubscriptionsController < ApplicationController
   end
 
   private
+  def set_subscription
+    @subscription = Subscription.find_by_token(params[:id])
+    @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
+    @presenter = SubscriptionPresenter.new(@subscription)
+  end
+
     # Use callbacks to share common setup or constraints between actions.
-    def set_subscription
-      @subscription = Subscription.find_by_token(params[:id])
-      @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
-      @presenter = SubscriptionPresenter.new(@subscription)
+    def set_subscription_with_api_lookup
+      set_subscription
 
       if @subscription.nil?
         forbidden

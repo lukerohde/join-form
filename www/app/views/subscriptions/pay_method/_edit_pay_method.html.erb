@@ -1,0 +1,17 @@
+<%= fields_for @subscription do |f| %>
+  <div class="form-group">
+    <%= f.label :pay_method %><br>
+    <%= f.select :pay_method,
+      options_for_select(@presenter.pay_method_options, @presenter.pay_method_default),
+      {
+        include_blank: false,
+      },
+      data: {
+        placeholder: t('activerecord.attributes.subscription.pay_method'),
+      },
+      class: "form-control",
+      style: "width: 100%;"
+      # onchange: "pay_method_change(this)"
+    %>
+  </div>
+<% end %>

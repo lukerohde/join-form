@@ -1,119 +1,131 @@
-<div id="pay_method" class="<%=start_hidden(:pay_method) %>">
+<%= fields_for @subscription do |f| %>
+  <div id="pay_method" class="<%=start_hidden(:pay_method) %>">
+    <h2><%=t(".heading")%></h2>
 
-  <h2><%=t(".heading")%></h2>
+    <%= render 'errors' if @subscription.step == :pay_method %>
 
-  <%= render 'errors' if @subscription.step == :pay_method %>
-
-  <% if @subscription.establishment_fee > 0 %>
-    <div class="detail">
-
-      <div class="row">
-        <div class="col-xs-6"><%=t(".application_fee")%></div>
-        <div class="col-xs-6"><%=number_to_currency(@subscription.establishment_fee, locale: locale) %> </div>
-      </div>
-      <% if @subscription.discount > 0 %>
+    <% if @subscription.establishment_fee > 0 %>
+      <div class="detail">
         <div class="row">
-          <div class="col-xs-6"><%=t(".member_discount")%></div>
-          <div class="col-xs-6"><%=number_to_currency(@subscription.discount, locale: locale) %> </div>
+          <div class="col-xs-6"><%=t(".application_fee")%></div>
+          <div class="col-xs-6"><%=number_to_currency(@subscription.establishment_fee, locale: locale) %> </div>
         </div>
-        <div class="row">
-          <div class="col-xs-6"><strong><%=t(".total")%></strong></div>
-          <div class="col-xs-6"><strong><u><%=number_to_currency(@subscription.total, locale: locale) %></u></strong> </div>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
-  <br/>
-  <div class="form-group">
-    <%= f.label :pay_method %><br>
-    <%= f.select :pay_method,
-      options_for_select(@presenter.pay_method_options, @presenter.pay_method_default),
-      {
-        include_blank: false,
-      },
-      data: {
-        placeholder: t('activerecord.attributes.subscription.pay_method'),
-      },
-      class: "form-control",
-      style: "width: 100%;",
-      onchange: "pay_method_change(this)"
-    %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :frequency %><br>
-    <%= f.select :frequency,
-      options_for_select(@presenter.frequency_options, @presenter.frequency_default),
-      {
-        include_blank: true,
-      },
-      data: {
-        placeholder: t('activerecord.attributes.subscription.frequency'),
-      },
-      class: "form-control",
-      style: "width: 100%;"
-    %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :deduction_date %><br/>
-    <%= f.select :deduction_date,
-      options_for_select(@presenter.deduction_date_options, @presenter.deduction_date_default),
-      {
-        include_blank: false,
-      },
-      # data: {
-      #   placeholder: t('activerecord.attributes.subscription.deduction_date'),
-      # },
-      class: "form-control",
-      style: "width: 100%;"
-    %>
-  </div>
-
-  <%= f.hidden_field :plan, value: @subscription.join_form.base_rate_id %>
-
-  <%= render 'subscriptions/pay_method/edit_au_bank_account', f: f %>
-
-  <%= render 'subscriptions/pay_method/edit_credit_card', f: f %>
-
-  <%= render 'subscriptions/pay_method/edit_direct_debit_release', f: f %>
-
-  <%= render 'subscriptions/pay_method/edit_payroll_deduction', f: f %>
-
-  <%= render 'subscriptions/pay_method/edit_existing', f: f %>
-
-  <% if @subscription.join_form.signature_required %>
-    <%= hidden_field_tag "signature_vector", @subscription.signature_vector %>
-    <div class="sigPad" style="width:300px; margin-top: 16px; margin-bottom: 16px;">
-      <ul class="sigNav">
-        <li class="drawIt"><a href="#draw-it" ><%=t("subscriptions.pay_method.edit.sign_here")%></a></li>
-        <li class="clearButton"><a href="#clear"><%=t("subscriptions.pay_method.edit.clear_signature")%></a></li>
-      </ul>
-      <div class="sig sigWrapper" style="width:300px; height: 100px;">
-        <div class="typed"></div>
-        <canvas class="pad" width="298px" height="98px"></canvas>
-        <input type="hidden" name="subscription[signature_vector]" class="output">
+        <% if @subscription.discount > 0 %>
+          <div class="row">
+            <div class="col-xs-6"><%=t(".member_discount")%></div>
+            <div class="col-xs-6"><%=number_to_currency(@subscription.discount, locale: locale) %> </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-6"><strong><%=t(".total")%></strong></div>
+            <div class="col-xs-6"><strong><u><%=number_to_currency(@subscription.total, locale: locale) %></u></strong> </div>
+          </div>
+        <% end %>
       </div>
-    </div>
-
-    <div class="" style="width: 300px; border-bottom: solid 1px black; padding: 10px;">
-      <strong><%= friendly_signature_date(@subscription) %></strong>
-    </div>
+    <% end %>
     <br/>
-  <% end %>
 
-  <% if @subscription.join_form.description.present? %>
-    <div class="form-group">
-      <%= f.label :description, t('helpers.label.subscription.description') %><br>
-      <p class="detail">
-        <%= @subscription.join_form.description.html_safe %>
-      </p>
+    <div id="pay-method-container">
+      <%= render 'subscriptions/pay_method/edit_pay_method' %>
     </div>
-  <% end %>
 
-  <div id="stripe_error">
-    <noscript>JavaScript is not enabled and is required for this form. First enable it in your web browser settings.</noscript>
+    <div id="frequency-container">
+      <%= render 'subscriptions/pay_method/edit_frequency' %>
+    </div>
+
+    <div id="deduction-date-container">
+      <%= render 'subscriptions/pay_method/edit_deduction_date' %>
+    </div>
+
+    <%= f.hidden_field :plan, value: @subscription.join_form.base_rate_id %>
+
+    <%= render 'subscriptions/pay_method/edit_au_bank_account', f: f %>
+    <%= render 'subscriptions/pay_method/edit_credit_card', f: f %>
+    <%= render 'subscriptions/pay_method/edit_direct_debit_release', f: f %>
+    <%= render 'subscriptions/pay_method/edit_payroll_deduction', f: f %>
+    <%= render 'subscriptions/pay_method/edit_existing', f: f %>
+
+    <% if @subscription.join_form.signature_required %>
+      <%= hidden_field_tag "signature_vector", @subscription.signature_vector %>
+      <div class="sigPad" style="width:300px; margin-top: 16px; margin-bottom: 16px;">
+        <ul class="sigNav">
+          <li class="drawIt"><a href="#draw-it" ><%=t("subscriptions.pay_method.edit.sign_here")%></a></li>
+          <li class="clearButton"><a href="#clear"><%=t("subscriptions.pay_method.edit.clear_signature")%></a></li>
+        </ul>
+        <div class="sig sigWrapper" style="width:300px; height: 100px;">
+          <div class="typed"></div>
+          <canvas class="pad" width="298px" height="98px"></canvas>
+          <input type="hidden" name="subscription[signature_vector]" class="output">
+        </div>
+      </div>
+
+      <div class="" style="width: 300px; border-bottom: solid 1px black; padding: 10px;">
+        <strong><%= friendly_signature_date(@subscription) %></strong>
+      </div>
+      <br/>
+    <% end %>
+
+    <% if @subscription.join_form.description.present? %>
+      <div class="form-group">
+        <%= f.label :description, t('helpers.label.subscription.description') %><br>
+        <p class="detail">
+          <%= @subscription.join_form.description.html_safe %>
+        </p>
+      </div>
+    <% end %>
+
+    <div id="stripe_error">
+      <noscript>JavaScript is not enabled and is required for this form. First enable it in your web browser settings.</noscript>
+    </div>
   </div>
+<% end %>
 
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#subscription_frequency").on("change", refreshForm);
+    $("#subscription_pay_method").on("change", refreshForm);
+    setDeductionDateVisibility();
+  })
 
-</div>
+  function refreshForm(){
+    var form = $("#subscription-form");
+
+    $("#pay-method-fields").css('opacity', 0.5);
+    $.ajax({
+      type: "POST",
+      url: "<%= refresh_subscription_path %>",
+      data: form.serialize(),
+      dataType: 'html',
+      success: function(response){
+        $("#pay-method-fields").html(response);
+        $("#pay-method-fields").css('opacity', 1);
+      }
+    })
+  }
+
+  function setDeductionDateVisibility(){
+    var freq = $("#subscription_frequency").val();
+    var pm = $("#subscription_pay_method").val();
+
+    if(pm=="PRD" || ["Q","H","Y"].includes(freq)){
+      $("#deduction-date-container").addClass("collapse");
+
+      return false; /*hidden*/
+    } else {
+      $("#deduction-date-container").removeClass("collapse");
+
+      return true; /*shown*/
+    }
+  }
+  //
+  // function reloadPayMethod(){
+  //   $("#pay-method-container").load("");
+  // }
+  //
+  // function reloadFrequency(){
+  //   $("#frequency-container").load("");
+  // }
+  //
+  // function reloadDeductionDate(){
+  //   $("#deduction-date-container").load("");
+  // }
+</script>

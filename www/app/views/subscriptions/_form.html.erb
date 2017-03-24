@@ -22,7 +22,7 @@
   </div>
 <% end %>
 
-<%= form_for(subscription, url: subscription_form_path(subscription)) do |f| %>
+<%= form_for(subscription, url: subscription_form_path(subscription), html: { id: "subscription-form" }) do |f| %>
 
   <%= f.fields_for :person do |p| %>
     <%= render 'subscriptions/person/edit', f: p, person: @subscription.person  %>
@@ -39,7 +39,9 @@
   <% end %>
 
   <% if @subscription.miscellaneous_saved? %>
-    <%= render 'subscriptions/pay_method/edit', f: f %>
+    <div id="pay-method-fields">
+      <%= render 'subscriptions/pay_method/edit' %>
+    </div>
   <% end %>
 
   <%= f.hidden_field :join_form_id %>

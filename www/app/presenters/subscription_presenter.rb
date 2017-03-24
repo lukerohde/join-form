@@ -13,7 +13,7 @@ class SubscriptionPresenter
   end
 
   def deduction_date_default
-    deduction_date_options.first
+    subscription.deduction_date || deduction_date_options.first
   end
 
   def frequency_options
