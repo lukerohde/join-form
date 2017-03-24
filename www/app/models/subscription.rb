@@ -419,7 +419,7 @@ class Subscription < ApplicationRecord
       when "-"
         self.restore_pay_method! # not a super elegant place to put this, but I don't want to save a dash, and I don't want to validate existing details (because they're not persisted).
       when "CC"
-        errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
+        self.errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
       when "AB"
         self.errors.add(:bsb,I18n.translate("subscriptions.errors.bsb") ) unless bsb_valid?
         self.errors.add(:account_number,I18n.translate("subscriptions.errors.account_number") ) unless account_number_valid?
