@@ -324,9 +324,12 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
     #TODO figure out how to get the address validations to show for person
-    
+    # assert response.body.include?('Payment Method must be specified') , "no pay method error"
+
     params[:subscription].merge!(pay_method: "CC")
+    #$break = true
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
+    #$break = false
     assert response.body.include?( "couldn&#39;t be validated by our payment gateway.  Please try again."), "no error for missing stripe token"
     refute with_subscription.reload.completed_at.present?, "completion date should not be set"
 
@@ -344,10 +347,11 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     params = step3_params
 
     params[:subscription][:person_attributes][:id] = with_subscription.person.id
-    params[:subscription].merge!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "1231231")
+    params[:subscription].merge!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "1231231", deduction_date: "2017-01-02")
 
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    Date.stubs(:today).returns(Date.new(2017,1,1))
 
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params
     assert_response :redirect
@@ -369,10 +373,11 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     params = step3_params
 
     params[:subscription][:person_attributes][:id] = with_subscription.person.id
-    params[:subscription].merge!(pay_method: "CC", plan: "asdf", frequency: "F", expiry_year: "2018", expiry_month: "06", card_number: "12341234123141234", stripe_token: "asdfasdf")
+    params[:subscription].merge!(pay_method: "CC", plan: "asdf", frequency: "F", expiry_year: "2018", expiry_month: "06", card_number: "12341234123141234", stripe_token: "asdfasdf", deduction_date: "2017-01-02")
 
     Stripe::Customer.expects(:create).returns (OpenStruct.new(id: 123))
     Stripe::Charge.expects(:create).returns (true)
+    Date.stubs(:today).returns(Date.new(2017,1,1))
 
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)

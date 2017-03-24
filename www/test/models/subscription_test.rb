@@ -187,8 +187,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     result = s.join_form.union.update( old_passphrase: '1234567890123456789012345678901234567890', passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
 
     # TODO provide a comment to this assertion
-    # FIXME needs to stub the Date.today response (where?)
-    assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx", deduction_date: "2017-02-01")
+    Date.stubs(:today).returns(Date.new(2017,1,2))
+    assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx", deduction_date: "2017-01-03")
 
     assert_equal :thanks, s.step
     s.reload
@@ -204,8 +204,8 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     s.person.union = s.join_form.union
     # TODO provide a comment to this assertion
-    # FIXME needs to stub the Date.today response (where?)
-    assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123", deduction_date: "2017-01-31"}, s.join_form.union)
+    Date.stubs(:today).returns(Date.new(2017,1,2))
+    assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123", deduction_date: "2017-01-2"}, s.join_form.union)
 
     assert_equal :thanks, s.step
     s.reload

@@ -29,7 +29,7 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     }
     params[:subscription][:person_attributes].merge!(@with_address.attributes.slice('address1', 'address2', 'state', 'suburb', 'postcode'))
     params[:subscription][:person_attributes][:id] = @with_subscription.person.id
-    params[:subscription].merge!(pay_method: "AB", bsb: "123-123", account_number: "1231231", plan: "asdf", frequency: "W")
+    params[:subscription].merge!(pay_method: "AB", bsb: "123-123", account_number: "1231231", plan: "asdf", frequency: "W", deduction_date: '2017-01-03')
 
     params
   end
@@ -42,6 +42,7 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
     params = form_params
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    Date.stubs(:today).returns(Date.new(2017,1,2))
 
     starting_email_count = ActionMailer::Base.deliveries.count
     patch edit_join_path(:en, @union, @join_form, @with_subscription.token), params
@@ -64,6 +65,7 @@ class SubscriptionsControllerWelcomeEmailTest < ActionDispatch::IntegrationTest
 
     api_params = params[:subscription][:person_attributes].merge!(external_id: 'NV123456')
     SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(api_params)
+    Date.stubs(:today).returns(Date.new(2017,1,2))
 
     starting_email_count = ActionMailer::Base.deliveries.count
     patch edit_join_path(:en, @union, @join_form, @with_subscription.token), params
