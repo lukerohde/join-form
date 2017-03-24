@@ -27,5 +27,5 @@ class SubscriptionsControllerFacebookPageTab < ActionDispatch::IntegrationTest
    assert_template :new
    assert response.headers['X-Frame-Options'].blank?, "Expected to be able to render in iframe"
   end
-  
+
 end

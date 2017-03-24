@@ -324,7 +324,7 @@ class SubscriptionsControllerPublicTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert response.body.include?('data-step="pay_method"'), "wrong step - should be pay_method"
     #TODO figure out how to get the address validations to show for person
-    assert response.body.include?( 'Payment Method must be specified') , "no pay method error"
+    assert response.body.include?('Payment Method must be specified') , "no pay method error"
 
     params[:subscription].merge!(pay_method: "CC")
     patch edit_join_path(:en, @union, @join_form, with_subscription.token), params

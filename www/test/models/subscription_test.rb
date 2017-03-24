@@ -3,9 +3,9 @@ require 'test_helper'
 class SubscriptionTest < ActiveSupport::TestCase
   test "step reported correctly, consequetive times" do
     s = subscriptions(:completed_subscription)
-    assert s.step == :thanks
+    assert_equal :thanks, s.step
     # was failing the second time because of a problem with person authorization
-    assert s.step == :thanks, "second assertion fails"
+    assert_equal :thanks, s.step, "second assertion fails"
   end
 
   test "save without updating timestamps" do
@@ -33,34 +33,34 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.person = Person.new()
     s.join_form = join_forms(:one)
 
-    assert s.step == :contact_details
+    assert_equal :contact_details, s.step
   end
 
   test "step 2 - address" do
     s = subscriptions(:contact_details_only_subscription)
-    assert s.step == :address
+    assert_equal :address, s.step
   end
 
   test "step 3 - no custom columns - pay_method" do
     s = subscriptions(:contact_details_with_address_subscription)
-    assert s.step == :pay_method
+    assert_equal :pay_method, s.step
   end
 
   test "step 3 - custom columns - miscellaneous" do
     s = subscriptions(:contact_details_with_address_subscription)
     s.update(join_form: join_forms(:column_list))
-    assert s.step == :miscellaneous
+    assert_equal :miscellaneous, s.step
   end
 
 
   test "step 4 - pay method" do
     s = subscriptions(:contact_details_with_subscription_subscription)
-    assert s.step == :pay_method
+    assert_equal :pay_method, s.step
   end
 
   test "step 5 - thanks" do
     s = subscriptions(:completed_subscription)
-    assert s.step == :thanks
+    assert_equal :thanks, s.step
   end
 
   test "step 1 - contact details validation fail" do
@@ -68,75 +68,74 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.person = Person.new()
     s.join_form = join_forms(:one)
 
-    assert s.save == false
-    assert s.errors.messages == {
+    assert_equal s.save, false
+    assert_equal s.errors.messages, {
       :"person.email"=>["can't be blank"],
       :"person.union"=>["can't be blank"],
       :"person.first_name"=>["can't be blank"]
     }
-    assert s.step == :contact_details
+    assert_equal :contact_details, s.step
   end
 
   test "step 2 - address validation fail" do
     s = subscriptions(:contact_details_only_subscription)
-    assert s.save == false
-    assert s.errors.messages == {
+    assert_equal s.save, false
+    assert_equal s.errors.messages, {
      :base=>["You must complete your address"]
     }
-    assert s.step == :address
+    assert_equal :address, s.step
   end
 
   test "step 3 - subscription validation fail" do
     s = subscriptions(:contact_details_with_address_subscription)
     s.update(join_form: join_forms(:column_list))
-    assert s.save == false
-    assert s.errors.messages == {
+    assert_equal s.save, false
+    assert_equal s.errors.messages, {
       :worksite=>["can't be blank"],
       :employer=>["can't be blank"]
     }, 'expecting worksite and employer validation messages only'
 
-    assert s.step == :miscellaneous
+    assert_equal :miscellaneous, s.step
   end
 
   test "step 4 - pay method validation fail" do
     s = subscriptions(:contact_details_with_subscription_subscription)
-    assert s.save == false
-    assert s.errors.messages == {
-      :pay_method=>["must be specified"],
-      :plan=>["can't be blank"],
-      :frequency=>["can't be blank"]
-    }
+    assert_equal false, s.save
+    assert_equal({
+      :bsb=>["must be properly formatted BSB e.g. 123-123"],
+      :account_number=>["must be properly formatted e.g. 123456"],
+      :plan=>["can't be blank"]
+    }, s.errors.messages)
 
-    assert s.step == :pay_method
+    assert_equal :pay_method, s.step
   end
 
   test "step 4 - pay method validation fail - AB" do
     s = subscriptions(:contact_details_with_subscription_subscription)
     s.pay_method = "AB"
-    assert s.save == false
-    assert s.errors.messages == {
+    assert_equal false, s.save
+    assert_equal({
       :bsb=>["must be properly formatted BSB e.g. 123-123"],
       :account_number=>["must be properly formatted e.g. 123456"],
       :plan=>["can't be blank"],
-      :frequency=>["can't be blank"]
-    }
+      # :frequency=>["can't be blank"]
+    }, s.errors.messages)
 
-    assert s.step == :pay_method
+    assert_equal :pay_method, s.step
   end
 
   test "step 4 - pay method validation fail - CC" do
     s = subscriptions(:contact_details_with_subscription_subscription)
 
-    assert s.update(pay_method: "CC") == false
+    assert_equal false, s.update(pay_method: "CC")
 
-    assert s.errors.messages == {
+    assert_equal({
       :card_number=>["couldn't be validated by our payment gateway.  Please try again."],
       :plan=>["can't be blank"],
-      :frequency=>["can't be blank"]
-    }
+      # :frequency=>["can't be blank"]
+    }, s.errors.messages)
 
-    assert s.step == :pay_method
-
+    assert_equal :pay_method, s.step
   end
 
   test "step 1 - contact details validation pass" do
@@ -146,19 +145,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.join_form = join_forms(:one)
 
     assert s.update(person_attributes: { email: 'asdf@asdf.com', first_name: "asdf" })
-    assert s.step == :address
+    assert_equal :address, s.step
     s.reload
-    assert s.step == :address
-
+    assert_equal :address, s.step
   end
 
   test "step 2 - address validation pass - custom columns off" do
     s = subscriptions(:contact_details_only_subscription)
     assert s.update(person_attributes: { id: s.person.id, address1: "adsf", suburb: "asdf", state: "asdf", postcode: "1123", union_id: supergroups(:owner).id })
     #binding.pry
-    assert s.step == :pay_method
+    assert_equal :pay_method, s.step
     s.reload
-    assert s.step == :pay_method
+    assert_equal :pay_method, s.step
   end
 
   test "step 2 - address validation pass - custom columns on" do
@@ -166,9 +164,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.update(join_form: join_forms(:column_list))
 
     assert s.update(person_attributes: { id: s.person.id, address1: "adsf", suburb: "asdf", state: "asdf", postcode: "1123", union_id: supergroups(:owner).id })
-    assert s.step == :miscellaneous
+    assert_equal :miscellaneous, s.step
     s.reload
-    assert s.step == :miscellaneous
+    assert_equal :miscellaneous, s.step
   end
 
   test "step 3 - miscellaneous validation pass" do
@@ -176,9 +174,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.update(join_form: join_forms(:column_list))
 
     assert s.update(data: {employer: "asdf", worksite: "asdf"})
-    assert s.step == :pay_method
+    assert_equal :pay_method, s.step
     s.reload
-    assert s.step == :pay_method
+    assert_equal :pay_method, s.step
   end
 
   test "step 4 - pay_method validation australian bank pass" do
@@ -187,9 +185,9 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx")
 
-    assert s.step == :thanks
+    assert_equal :thanks, s.step
     s.reload
-    assert s.step == :thanks
+    assert_equal :thanks, s.step
   end
 
   test "step 4 - pay_method validation credit card pass" do
@@ -202,12 +200,12 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.person.union = s.join_form.union
     assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123"}, s.join_form.union)
 
-    assert s.step == :thanks
+    assert_equal :thanks, s.step
     s.reload
-    assert s.step == :thanks
+    assert_equal :thanks, s.step
   end
 
-  class DeductionDateOptions < SubscriptionTest
+  class DeductionDateOptions < ActiveSupport::TestCase
     def setup
       @subscription = subscriptions(:contact_details_with_subscription_subscription)
       Date.stubs(:today).returns(Date.new(2017,1,1))
@@ -268,11 +266,12 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
 
     test "deduction date options" do
+      @presenter = SubscriptionPresenter.new(@subscription)
       @subscription.pay_method = "CC"
       @subscription.frequency = "W"
       Date.stubs(:today).returns(Date.new(2017,1,1))
-      assert_equal @subscription.deduction_date_options.count, 5
-      assert_equal @subscription.deduction_date_options[0], ["Monday,  2 January 2017", '2017-01-02']
+      assert_equal @presenter.deduction_date_options.count, 5
+      assert_equal @presenter.deduction_date_options[0], ["Monday,  2 January 2017", '2017-01-02']
     end
   end
 end

@@ -27,7 +27,7 @@
   <div class="form-group">
     <%= f.label :pay_method %><br>
     <%= f.select :pay_method,
-      pay_method_options(@subscription),
+      options_for_select(@presenter.pay_method_options, @presenter.pay_method_default),
       {
         include_blank: false,
       },
@@ -43,7 +43,7 @@
   <div class="form-group">
     <%= f.label :frequency %><br>
     <%= f.select :frequency,
-      frequency_options(@subscription),
+      options_for_select(@presenter.frequency_options, @presenter.frequency_default),
       {
         include_blank: true,
       },
@@ -58,13 +58,13 @@
   <div class="form-group">
     <%= f.label :deduction_date %><br/>
     <%= f.select :deduction_date,
-      @subscription.deduction_date_options,
+      options_for_select(@presenter.deduction_date_options, @presenter.deduction_date_default),
       {
         include_blank: false,
       },
-      data: {
-        placeholder: t('activerecord.attributes.subscription.deduction_date'),
-      },
+      # data: {
+      #   placeholder: t('activerecord.attributes.subscription.deduction_date'),
+      # },
       class: "form-control",
       style: "width: 100%;"
     %>

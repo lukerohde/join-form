@@ -31,6 +31,8 @@ class Subscription < ApplicationRecord
   before_save :set_data_if_blank
   before_save :set_completed_at
   before_validation :set_token, on: [:create]
+  after_initialize :set_frequency_if_blank
+  after_initialize :set_pay_method_if_blank
 
   # def check_step
   #   binding.pry
@@ -268,10 +270,6 @@ class Subscription < ApplicationRecord
     @skip_validation = false
   end
 
-  def deduction_date_options
-    available_deduction_dates.map { |d| [I18n.localize(d, format: :with_day), "#{d}"] }
-  end
-
   def deferral_dates
     Array(Date.today..Date.today.next_year - 1).reject(&:weekend?)
   end
@@ -318,6 +316,14 @@ class Subscription < ApplicationRecord
 
   def set_data_if_blank
     self.data = {} if data.blank? # set a default, when blank, because of a possible AR/jsonb bug
+  end
+
+  def set_frequency_if_blank
+    self.frequency ||= "F"
+  end
+
+  def set_pay_method_if_blank
+    self.pay_method ||= "AB"
   end
 
   def get_key_pair
