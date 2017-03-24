@@ -93,23 +93,88 @@ class DeductionDateOptions < ActiveSupport::TestCase
 
   def assert_valid_deduction_date(pm, freq, from, dd, explanation)
     error = validate_deduction_date(pm, freq, from, dd, explanation)
-    assert error.blank?, "Error thrown for deduction date '#{dd}' for '#{pm}' '#{freq}' on '#{from}': #{explanation}"
+    assert error.blank?, "Error thrown for deduction date '#{dd}' for '#{pm}' '#{freq}' on '#{from}': #{explanation} - #{error}"
   end
 
   test "invalid direct debit deduction date, without deferral" do
     assert_invalid_deduction_date "AB", "W", '2017-01-03', '2017-01-02', "can't have a deduction date in the past"
     assert_invalid_deduction_date "AB", "W", '2017-01-02', '2017-01-02', "can't have a same day deduction"
-    assert_invalid_deduction_date "AB", "W", '2017-01-01', '2017-01-01', "can't have a weekend deduction"
+    assert_invalid_deduction_date "AB", "W", '2016-12-31', '2017-01-01', "can't have a weekend deduction"
     assert_invalid_deduction_date "AB", "W", '2017-01-02', '2017-01-10', "can't have a deduction beyond one week"
-    assert_valid_deduction_date "AB", "W", '2017-01-02', '2017-01-3', "can't have a deduction beyond one week"
-    # TODO check more frequencies, and deferral
+
+    assert_invalid_deduction_date "AB", "F", '2017-01-02', '2017-01-02', "can't have a same day deduction"
+    assert_invalid_deduction_date "AB", "F", '2017-01-02', '2017-01-17', "can't have a deduction beyond two weeks"
+
+    assert_invalid_deduction_date "AB", "M", '2017-01-02', '2017-01-2', "can't have a same day deduction date"
+    assert_invalid_deduction_date "AB", "M", '2017-01-02', '2017-02-3', "can't have a beyond one month"
+
+    # Testing current behaviour which may change - i.e. no deduction date is valid
+    assert_invalid_deduction_date "AB", "Q", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "AB", "H", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "AB", "Y", '2017-01-02', '2017-01-3', "no deduction date is valid"
+  end
+
+  test "valid direct debit deduction date, without deferral" do
+    assert_valid_deduction_date "AB", "W", '2017-01-02', '2017-01-03', "can have a same day deduction"
+    assert_valid_deduction_date "AB", "W", '2017-01-02', '2017-01-09', "can have a deduction date at the end of the week"
+    assert_valid_deduction_date "AB", "F", '2017-01-02', '2017-01-16', "can have a deduction date at the end of next week"
+    assert_valid_deduction_date "AB", "M", '2017-01-02', '2017-02-02', "can have a deduction date at the start of next month"
+  end
+
+  test "invalid direct debit release deduction date, without deferral" do
+    assert_invalid_deduction_date "ABR", "W", '2017-01-03', '2017-01-02', "can't have a deduction date in the past"
+    assert_invalid_deduction_date "ABR", "W", '2017-01-02', '2017-01-02', "can't have a same day deduction"
+    assert_invalid_deduction_date "ABR", "W", '2016-12-31', '2017-01-01', "can't have a weekend deduction"
+    assert_invalid_deduction_date "ABR", "W", '2017-01-02', '2017-01-10', "can't have a deduction beyond one week"
+
+    assert_invalid_deduction_date "ABR", "F", '2017-01-02', '2017-01-02', "can't have a same day deduction"
+    assert_invalid_deduction_date "ABR", "F", '2017-01-02', '2017-01-17', "can't have a deduction beyond two weeks"
+
+    assert_invalid_deduction_date "ABR", "M", '2017-01-02', '2017-01-2', "can't have a same day deduction date"
+    assert_invalid_deduction_date "ABR", "M", '2017-01-02', '2017-02-3', "can't have a beyond one month"
+
+    # Testing current behaviour which may change - i.e. no deduction date is valid
+    assert_invalid_deduction_date "ABR", "Q", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "ABR", "H", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "ABR", "Y", '2017-01-02', '2017-01-3', "no deduction date is valid"
+  end
+
+  test "valid direct debit release deduction date, without deferral" do
+    assert_valid_deduction_date "ABR", "W", '2017-01-02', '2017-01-03', "can have a same day deduction"
+    assert_valid_deduction_date "ABR", "W", '2017-01-02', '2017-01-09', "can have a deduction date at the end of the week"
+    assert_valid_deduction_date "ABR", "F", '2017-01-02', '2017-01-16', "can have a deduction date at the end of next week"
+    assert_valid_deduction_date "ABR", "M", '2017-01-02', '2017-02-02', "can have a deduction date at the start of next month"
   end
 
   test "invalid credit card deduction date, without deferral" do
     assert_invalid_deduction_date "CC", "W", '2017-01-03', '2017-01-02', "can't have a deduction date in the past"
-    assert_valid_deduction_date "CC", "W", '2017-01-02', '2017-01-02', "can have a same day deduction"
     assert_invalid_deduction_date "CC", "W", '2017-01-01', '2017-01-01', "can't have a weekend deduction"
-    assert_invalid_deduction_date "CC", "W", '2017-01-02', '2017-01-10', "can't have a deduction beyond one week"
-    # TODO check more frequencies, and deferral
+    assert_invalid_deduction_date "CC", "W", '2017-01-02', '2017-01-9', "can't have a deduction beyond one week"
+
+    assert_invalid_deduction_date "CC", "F", '2017-01-02', '2017-01-16', "can't have a deduction beyond two weeks"
+
+    assert_invalid_deduction_date "CC", "M", '2017-01-02', '2017-02-2', "can't have a beyond one month"
+
+    # Testing current behaviour which may change - i.e. no deduction date is valid
+    assert_invalid_deduction_date "CC", "Q", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "CC", "H", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "CC", "Y", '2017-01-02', '2017-01-3', "no deduction date is valid"
+  end
+
+  test "valid credit card deduction date, without deferral" do
+    assert_valid_deduction_date "CC", "W", '2017-01-02', '2017-01-02', "can have a same day deduction"
+    assert_valid_deduction_date "CC", "W", '2017-01-02', '2017-01-06', "can have a deduction date at the end of the week"
+    assert_valid_deduction_date "CC", "F", '2017-01-02', '2017-01-13', "can have a deduction date at the end of next week"
+    assert_valid_deduction_date "CC", "M", '2017-01-02', '2017-02-01', "can have a deduction date at the start of next month"
+  end
+
+  test "invalid PRD deduction date, without deferral" do
+    # Testing current behaviour which may change - i.e. no deduction date is valid
+    assert_invalid_deduction_date "PRD", "W", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "PRD", "F", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "PRD", "M", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "PRD", "Q", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "PRD", "H", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_invalid_deduction_date "PRD", "Y", '2017-01-02', '2017-01-3', "no deduction date is valid"
   end
 end

@@ -66,12 +66,12 @@ TEST PLAN
 ---- Deduction starting next working day TESTED
 
 -- Payment method validation fails without frequency TESTED
--- Payment method validation fails without deduction date
--- Payment method validation fails with invalid deduction date for weekly frequency
--- Payment method validation fails with invalid deduction date for fortnightly frequency
--- Payment method validation fails with invalid deduction date for monthly frequency
--- Payment method validation fails with invalid deduction date for quarterly frequency
--- Payment method validation fails with invalid deduction date for yearly frequency
+-- Payment method validation fails without deduction date TESTED
+-- Payment method validation fails with invalid deduction date for weekly frequency TESTED
+-- Payment method validation fails with invalid deduction date for fortnightly frequency TESTED
+-- Payment method validation fails with invalid deduction date for monthly frequency TESTED
+-- Payment method validation fails with invalid deduction date for quarterly frequency TESTED
+-- Payment method validation fails with invalid deduction date for yearly frequency TESTED
 -- Payment method validation passes with deduction date deferred
 -- Credit card validated rather than charged with deduction date is deferred
 -- deduction is not shown when disabled
@@ -80,6 +80,5 @@ TEST PLAN
 -- Changing the pay_method to credit card reloads the form allowing immediate deduction
 -- Changing the pay_method to australian bank account reloads the form not allowing immediate deduction, setting an invalid field value to tomorrow
 -- Direct Debit Release validates without deduction date
--- Payroll
--- Payroll deduction valids without deduction date and frequency
+-- Payroll deduction validates without deduction date and frequency
 -- Changing between credit card and direct persist what fields can be persisted.
