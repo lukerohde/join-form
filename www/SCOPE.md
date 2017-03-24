@@ -74,9 +74,10 @@ TEST PLAN
 -- Payment method validation fails with invalid deduction date for yearly frequency TESTED
 -- Payment method validation passes with deduction date deferred
 -- Credit card validated rather than charged with deduction date is deferred
--- deduction is not shown when disabled
 -- deduction date can be enabled for the join form
+-- deduction is not shown when disabled
 -- deduction date is disabled by default on new join forms
+-- join form cannot be saved with deferral_on and deduction_date off
 -- Changing the pay_method to credit card reloads the form allowing immediate deduction
 -- Changing the pay_method to australian bank account reloads the form not allowing immediate deduction, setting an invalid field value to tomorrow
 -- Direct Debit Release validates without deduction date

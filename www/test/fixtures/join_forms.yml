@@ -24,10 +24,15 @@ welcome:
   <<: *DEFAULT
   welcome_email_template: welcome
   short_name: welcome
-two:
+two: &TWO
   <<: *DEFAULT
   organiser: organiser
   short_name: two
+deferred:
+  <<: *TWO
+  organiser: organiser
+  short_name: deferred
+  deferral_on: true
 column_list:
   <<: *DEFAULT
   schema: "{\"columns\":[\"worksite\",\"employer\"]}"

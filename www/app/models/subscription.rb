@@ -47,6 +47,7 @@ class Subscription < ApplicationRecord
     :contact_details
   end
 
+  # TODO get this working so we can replace step with custom step order
   # :thanks also needs errors.count == 0 && self.completed_at.present?
   def step_new(order = [:contact_details, :address, :miscellaneous, :pay_method, :thanks])
     check_order = order.reverse
@@ -71,10 +72,6 @@ class Subscription < ApplicationRecord
 
   def address_present?
     person.present? && person.address1.present? && person.suburb.present? && person.state.present? && person.postcode.present?
-  end
-
-  def contact_details_required?
-    true
   end
 
   def contact_details_saved?
@@ -117,6 +114,11 @@ class Subscription < ApplicationRecord
     end
   end
 
+
+  def contact_details_required?
+    true
+  end
+
   # Address is required if the user is determined to be from Australia or the
   # U.S. (because of a large number of U.S. proxy users)
   def address_required?
@@ -153,16 +155,6 @@ class Subscription < ApplicationRecord
     ) || @skip_validation
     # frequency_was.present? && plan_was.present?
   end
-
-  # # TODO Is this method required or preferred over  set_completed_at
-  # def pay_method=(value)
-  #   write_attribute(:pay_method, value)
-  #
-  #   # A subscription can only be completed if a pay_method is written
-  #   # Essentially confirming an existing pay_method when one already exists
-  #   self.completed_at = Time.now
-  #   self.pending = false
-  # end
 
   def save_without_validation!
     @skip_validation = true
@@ -279,7 +271,6 @@ class Subscription < ApplicationRecord
   # Blank array for PRD pay method, & quarterly and yearly frequencies
   # All options extend past their 'min' date by frequency - 1
   def available_deduction_dates
-    binding.pry if $break
     return deferral_dates if join_form.deferral_on
 
     min_date = case pay_method

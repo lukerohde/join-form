@@ -58,6 +58,7 @@ en:
         direct_debit_on: Direct Debit Enabled
         payroll_deduction_on: Payroll Deduction Enabled
         direct_debit_release_on: Direct Debit Release Enabled
+        deferral_on: Allow deferral of first payment
       subscription:
         description: "Description"
   gender:
