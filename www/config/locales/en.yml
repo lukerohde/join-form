@@ -172,6 +172,7 @@ en:
       pay_method: "must be specified"
       payment_gateway_error: "Our payment provider had an error while creating your customer record"
       payment_gateway_card_error: "Our payment provider had a problem with your credit card"
+      out_of_bounds: "must be one of the available deduction dates"
       error_summary:
         one:  "1 error prevented your membership application from being saved."
         other: "%{count} errors prevented your membership application from being saved."

@@ -69,11 +69,12 @@ class DeductionDateOptions < ActiveSupport::TestCase
   end
 
   test "deduction date options" do
+    @presenter = SubscriptionPresenter.new(@subscription)
     @subscription.pay_method = "CC"
     @subscription.frequency = "W"
     Date.stubs(:today).returns(Date.new(2017,1,1))
-    assert_equal @subscription.deduction_date_options.count, 5
-    assert_equal @subscription.deduction_date_options[0], ["Monday,  2 January 2017", '2017-01-02']
+    assert_equal @presenter.deduction_date_options.count, 5
+    assert_equal @presenter.deduction_date_options[0], ["Monday,  2 January 2017", '2017-01-02']
   end
 
   def validate_deduction_date(pm, freq, from, dd, explanation)

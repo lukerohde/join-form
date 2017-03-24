@@ -104,7 +104,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal({
       :bsb=>["must be properly formatted BSB e.g. 123-123"],
       :account_number=>["must be properly formatted e.g. 123456"],
-      :plan=>["can't be blank"]
+      :plan=>["can't be blank"],
+      :deduction_date=>["can't be blank"]
     }, s.errors.messages)
 
     assert_equal :pay_method, s.step
@@ -118,6 +119,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       :bsb=>["must be properly formatted BSB e.g. 123-123"],
       :account_number=>["must be properly formatted e.g. 123456"],
       :plan=>["can't be blank"],
+      :deduction_date=>["can't be blank"]
       # :frequency=>["can't be blank"]
     }, s.errors.messages)
 
@@ -132,6 +134,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal({
       :card_number=>["couldn't be validated by our payment gateway.  Please try again."],
       :plan=>["can't be blank"],
+      :deduction_date=>["can't be blank"]
       # :frequency=>["can't be blank"]
     }, s.errors.messages)
 
@@ -183,7 +186,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     s = subscriptions(:contact_details_with_subscription_subscription)
     result = s.join_form.union.update( old_passphrase: '1234567890123456789012345678901234567890', passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
 
-    assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx")
+    # TODO provide a comment to this assertion
+    # FIXME needs to stub the Date.today response (where?)
+    assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx", deduction_date: "2017-02-01")
 
     assert_equal :thanks, s.step
     s.reload
@@ -198,7 +203,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     Stripe::Charge.expects(:create).returns (true)
 
     s.person.union = s.join_form.union
-    assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123"}, s.join_form.union)
+    # TODO provide a comment to this assertion
+    # FIXME needs to stub the Date.today response (where?)
+    assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123", deduction_date: "2017-01-31"}, s.join_form.union)
 
     assert_equal :thanks, s.step
     s.reload

@@ -436,10 +436,10 @@ class Subscription < ApplicationRecord
   # and frequencies will have an empty array of available_deduction_dates.
   def validate_deduction_date
     if deduction_date.nil?
-      error_msg = I18n.t("subscriptions.errors.deduction_date_must_be_set")
+      error_msg = I18n.t("subscriptions.errors.not_blank")
       errors.add(:deduction_date, error_msg) unless available_deduction_dates.empty?
     else
-      error_msg = I18n.t("subscriptions.errors.deduction_date_out_of_bounds")
+      error_msg = I18n.t("subscriptions.errors.out_of_bounds")
       errors.add(:deduction_date, error_msg) unless available_deduction_dates.include?(deduction_date)
     end
   end
