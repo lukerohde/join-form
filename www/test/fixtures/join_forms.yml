@@ -33,10 +33,18 @@ deferred:
   organiser: organiser
   short_name: deferred
   deferral_on: true
-column_list:
+column_list: &COLS_ON
   <<: *DEFAULT
   schema: "{\"columns\":[\"worksite\",\"employer\"]}"
   short_name: column_list
+address_off:
+  <<: *DEFAULT
+  short_name: address_off
+  address_on: false
+address_off_column_list:
+  <<: *COLS_ON
+  short_name: address_off_column_list
+  address_on: false
 search_join_form:
   <<: *DEFAULT
   short_name: SearchString

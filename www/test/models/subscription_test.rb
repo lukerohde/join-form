@@ -153,6 +153,33 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal :address, s.step
   end
 
+  test "step 1 - contact details validation pass - address not required, custom columns on" do
+    s = Subscription.new()
+    s.person = Person.new()
+    s.person.union = supergroups(:owner)
+    s.join_form = join_forms(:address_off_column_list)
+
+    #Subscription.any_instance.stubs(:address_required?).returns(false)
+    assert s.update(person_attributes: { email: 'asdf@asdf.com', first_name: "asdf" })
+    assert_equal :miscellaneous, s.step, "before save"
+    s.reload
+    assert_equal :miscellaneous, s.step, "after save"
+  end
+
+  test "step 1 - contact details validation pass - address not required" do
+    s = Subscription.new()
+    s.person = Person.new()
+    s.person.union = supergroups(:owner)
+    s.join_form = join_forms(:address_off)
+
+    #Subscription.any_instance.stubs(:address_required?).returns(false)
+    assert s.update(person_attributes: { email: 'asdf@asdf.com', first_name: "asdf" })
+    assert_equal :pay_method, s.step, "before save"
+    s.reload
+    assert_equal :pay_method, s.step, "after save"
+  end
+
+
   test "step 2 - address validation pass - custom columns off" do
     s = subscriptions(:contact_details_only_subscription)
     assert s.update(person_attributes: { id: s.person.id, address1: "adsf", suburb: "asdf", state: "asdf", postcode: "1123", union_id: supergroups(:owner).id })
@@ -211,4 +238,6 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.reload
     assert_equal :thanks, s.step
   end
+
+
 end
