@@ -57,9 +57,9 @@ TEST PLAN
 -- Subscription step not skipped with custom questions DONE
 ---- unit test step method DONE
 ---- controller test, address to custom questions DONE
--- When address is not required then it skips appropriately
----- when misc required, to miscellaneous  
----- when misc not required, to pay method
+-- When address is not required then it skips appropriately DONE
+---- when misc required, to miscellaneous  DONE
+---- when misc not required, to pay method DONE
 -- On paymethod step the user is shown a reasonable set of defaults options TESTED
 ---- Australian Bank account TESTED
 ---- fortnightly TESTED

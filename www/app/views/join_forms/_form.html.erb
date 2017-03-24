@@ -198,6 +198,11 @@
   </div>
 
   <div class="form-group">
+    <%= f.label :address_on %><br>
+    <%= f.check_box :address_on, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
+  </div>
+
+  <div class="form-group">
     <%= f.label :signature_required %><br>
     <%= f.check_box :signature_required, class: "switch", :data => { :size => 'small', 'on-text'=>'Yes', 'off-text'=>'No', 'on-color'=>'success'}  %>
   </div>
