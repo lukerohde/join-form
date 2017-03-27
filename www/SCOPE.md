@@ -57,29 +57,29 @@ TEST PLAN
 -- Subscription step not skipped with custom questions DONE
 ---- unit test step method DONE
 ---- controller test, address to custom questions DONE
--- When address is not required then it skips appropriately
----- when misc required, to miscellaneous  
----- when misc not required, to pay method
+-- When address is not required then it skips appropriately DONE
+---- when misc required, to miscellaneous  DONE
+---- when misc not required, to pay method DONE
 -- On paymethod step the user is shown a reasonable set of defaults options TESTED
 ---- Australian Bank account TESTED
 ---- fortnightly TESTED
 ---- Deduction starting next working day TESTED
 
 -- Payment method validation fails without frequency TESTED
--- Payment method validation fails without deduction date
--- Payment method validation fails with invalid deduction date for weekly frequency
--- Payment method validation fails with invalid deduction date for fortnightly frequency
--- Payment method validation fails with invalid deduction date for monthly frequency
--- Payment method validation fails with invalid deduction date for quarterly frequency
--- Payment method validation fails with invalid deduction date for yearly frequency
+-- Payment method validation fails without deduction date TESTED
+-- Payment method validation fails with invalid deduction date for weekly frequency TESTED
+-- Payment method validation fails with invalid deduction date for fortnightly frequency TESTED
+-- Payment method validation fails with invalid deduction date for monthly frequency TESTED
+-- Payment method validation fails with invalid deduction date for quarterly frequency TESTED
+-- Payment method validation fails with invalid deduction date for yearly frequency TESTED
 -- Payment method validation passes with deduction date deferred
 -- Credit card validated rather than charged with deduction date is deferred
--- deduction is not shown when disabled
 -- deduction date can be enabled for the join form
+-- deduction is not shown when disabled
 -- deduction date is disabled by default on new join forms
+-- join form cannot be saved with deferral_on and deduction_date off
 -- Changing the pay_method to credit card reloads the form allowing immediate deduction
 -- Changing the pay_method to australian bank account reloads the form not allowing immediate deduction, setting an invalid field value to tomorrow
 -- Direct Debit Release validates without deduction date
--- Payroll
--- Payroll deduction valids without deduction date and frequency
+-- Payroll deduction validates without deduction date and frequency
 -- Changing between credit card and direct persist what fields can be persisted.

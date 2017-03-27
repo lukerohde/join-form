@@ -24,14 +24,27 @@ welcome:
   <<: *DEFAULT
   welcome_email_template: welcome
   short_name: welcome
-two:
+two: &TWO
   <<: *DEFAULT
   organiser: organiser
   short_name: two
-column_list:
+deferred:
+  <<: *TWO
+  organiser: organiser
+  short_name: deferred
+  deferral_on: true
+column_list: &COLS_ON
   <<: *DEFAULT
   schema: "{\"columns\":[\"worksite\",\"employer\"]}"
   short_name: column_list
+address_off:
+  <<: *DEFAULT
+  short_name: address_off
+  address_on: false
+address_off_column_list:
+  <<: *COLS_ON
+  short_name: address_off_column_list
+  address_on: false
 search_join_form:
   <<: *DEFAULT
   short_name: SearchString

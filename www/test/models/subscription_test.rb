@@ -153,6 +153,33 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal :address, s.step
   end
 
+  test "step 1 - contact details validation pass - address not required, custom columns on" do
+    s = Subscription.new()
+    s.person = Person.new()
+    s.person.union = supergroups(:owner)
+    s.join_form = join_forms(:address_off_column_list)
+
+    #Subscription.any_instance.stubs(:address_required?).returns(false)
+    assert s.update(person_attributes: { email: 'asdf@asdf.com', first_name: "asdf" })
+    assert_equal :miscellaneous, s.step, "before save"
+    s.reload
+    assert_equal :miscellaneous, s.step, "after save"
+  end
+
+  test "step 1 - contact details validation pass - address not required" do
+    s = Subscription.new()
+    s.person = Person.new()
+    s.person.union = supergroups(:owner)
+    s.join_form = join_forms(:address_off)
+
+    #Subscription.any_instance.stubs(:address_required?).returns(false)
+    assert s.update(person_attributes: { email: 'asdf@asdf.com', first_name: "asdf" })
+    assert_equal :pay_method, s.step, "before save"
+    s.reload
+    assert_equal :pay_method, s.step, "after save"
+  end
+
+
   test "step 2 - address validation pass - custom columns off" do
     s = subscriptions(:contact_details_only_subscription)
     assert s.update(person_attributes: { id: s.person.id, address1: "adsf", suburb: "asdf", state: "asdf", postcode: "1123", union_id: supergroups(:owner).id })
@@ -187,8 +214,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     result = s.join_form.union.update( old_passphrase: '1234567890123456789012345678901234567890', passphrase: '1234567890123456789012345678901234567890', passphrase_confirmation: '1234567890123456789012345678901234567890')
 
     # TODO provide a comment to this assertion
-    # FIXME needs to stub the Date.today response (where?)
-    assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx", deduction_date: "2017-02-01")
+    Date.stubs(:today).returns(Date.new(2017,1,2))
+    assert s.update!(pay_method: "AB", plan: "asdf", frequency: "F", bsb: "123-123", account_number: "123456", partial_account_number: "123xxx", deduction_date: "2017-01-03")
 
     assert_equal :thanks, s.step
     s.reload
@@ -204,11 +231,13 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     s.person.union = s.join_form.union
     # TODO provide a comment to this assertion
-    # FIXME needs to stub the Date.today response (where?)
-    assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123", deduction_date: "2017-01-31"}, s.join_form.union)
+    Date.stubs(:today).returns(Date.new(2017,1,2))
+    assert s.update_with_payment({pay_method: "CC", plan: "asdf", frequency: "F", stripe_token: "asdf", partial_card_number: "xxxxxxxxxxxxx123", deduction_date: "2017-01-2"}, s.join_form.union)
 
     assert_equal :thanks, s.step
     s.reload
     assert_equal :thanks, s.step
   end
+
+
 end

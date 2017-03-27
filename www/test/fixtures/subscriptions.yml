@@ -69,6 +69,7 @@ completed_subscription: &COMPLETED_SUBSCRIPTION
   completed_at: <%=Time.now%>
 completed_ab_subscription:
   <<: *COMPLETED_SUBSCRIPTION
+  token: completed_ab_subscription
 completed_cc_subscription:
   <<: *COMPLETED_SUBSCRIPTION
   pay_method: "CC"
@@ -76,6 +77,7 @@ completed_cc_subscription:
   expiry_year: 2018
   expiry_month: 1
   ccv: 123
+  token: completed_cc_subscription
 contact_details_with_no_subscription_but_pay_method_subscription:
   join_form: two
   person: contact_details_with_pay_method_person

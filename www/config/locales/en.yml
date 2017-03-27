@@ -58,6 +58,8 @@ en:
         direct_debit_on: Direct Debit Enabled
         payroll_deduction_on: Payroll Deduction Enabled
         direct_debit_release_on: Direct Debit Release Enabled
+        deferral_on: Enable payment deferral
+        address_on: Address Step Enabled
       subscription:
         description: "Description"
   gender:

@@ -76,6 +76,7 @@ class SubscriptionsController < ApplicationController
   # PATCH/PUT /subscriptions/1.json
   def update
     respond_to do |format|
+      #binding.pry if $break
       if save_step
         format.html { redirect_to next_step, notice: next_step_notice }
         format.json { render :show, status: :ok, location: @subscription }
