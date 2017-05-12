@@ -10,11 +10,16 @@ class SubscriptionsControllerAjaxTest < Capybara::Rails::JSTestCase #ActionDispa
 
     WickedPdf.any_instance.stubs(:pdf_from_url).returns("PDF MOCK")
     Date.stubs(:today).returns(Date.parse('2017-01-01'))
+    SubscriptionsController.any_instance.expects(:nuw_end_point_person_put).returns(nil)
+    #SubscriptionsController.any_instance.expects(:nuw_end_point_person_get).returns(nil)
+
   end
 
   def teardown
     Date.unstub(:today)
     WickedPdf.any_instance.unstub(:pdf_from_url)
+    SubscriptionsController.any_instance.unstub(:nuw_end_point_person_put)
+    #SubscriptionsController.any_instance.unstub(:nuw_end_point_person_get)
 
     super
   end
@@ -51,8 +56,6 @@ class SubscriptionsControllerAjaxTest < Capybara::Rails::JSTestCase #ActionDispa
     select_wait dd, from: "Deduction Date"
 
     page.execute_script('sig.regenerate([{"lx":10,"ly":10,"mx":60,"my":60},{"lx":60,"ly":10,"mx":10,"my":60}])')
-
-
 
     click_button "Join Now"
     page.must_have_content "Online Membership Card"
@@ -115,7 +118,7 @@ class SubscriptionsControllerAjaxTest < Capybara::Rails::JSTestCase #ActionDispa
   end
 
 
-  test "direct debit" do
+  test "direct debit w/deduction date" do
     @join_form = join_forms(:js_testing1)
     @union = @join_form.union
 
@@ -136,5 +139,27 @@ class SubscriptionsControllerAjaxTest < Capybara::Rails::JSTestCase #ActionDispa
   end
 
 
+  test "direct debit w/no deduction date" do
+
+    @join_form = join_forms(:js_testing3)
+    @union = @join_form.union
+
+    @subscription = subscriptions(:column_list)
+    visit edit_join_path(:en, @union, @join_form, @subscription.token)
+
+    select_wait "Australian bank account", from: "Payment Method"
+
+    select_wait "Weekly - $9.99", from: "Payment Frequency"
+    assert has_no_select?("Deduction Date"), "Deduction Date shouldn't be present for quarterly"
+
+    fill_in "BSB", with: "123-123"
+    fill_in "Account Number", with: "4242424242424242"
+
+    click_button "Join Now"
+    page.must_have_content "Online Membership Card"
+
+    @subscription.reload
+    assert @subscription.deduction_date.nil?, "deduction date should not be set"
+  end
 
 end

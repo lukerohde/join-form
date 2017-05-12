@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170323231506) do
+ActiveRecord::Schema.define(version: 20170324001810) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -113,6 +113,7 @@ ActiveRecord::Schema.define(version: 20170323231506) do
     t.integer  "organiser_id"
     t.boolean  "deferral_on",                                       default: false, null: false
     t.boolean  "address_on",                                        default: true,  null: false
+    t.boolean  "deduction_date_on",                                 default: true,  null: false
   end
 
   add_index "join_forms", ["admin_id"], name: "index_join_forms_on_admin_id", using: :btree

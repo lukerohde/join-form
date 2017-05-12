@@ -60,6 +60,7 @@ en:
         direct_debit_release_on: Direct Debit Release Enabled
         deferral_on: Enable payment deferral
         address_on: Address Step Enabled
+        deduction_date_on: "Allow user to set preferred deduction date"
       subscription:
         description: "Description"
   gender:

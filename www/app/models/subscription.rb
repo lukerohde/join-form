@@ -271,7 +271,7 @@ class Subscription < ApplicationRecord
   # All options extend past their 'min' date by frequency - 1
   def available_deduction_dates
     return deferral_dates if join_form.deferral_on
-    return [] unless deduction_date_required? 
+    return [] unless deduction_date_required?
 
     min_date = case pay_method
     when "CC" then Date.today
@@ -293,7 +293,7 @@ class Subscription < ApplicationRecord
   end
 
   def deduction_date_required?
-    join_form.deferral_on || (self.pay_method != "PRD" && ["W", "F", "M"].include?(self.frequency))
+    join_form.deduction_date_on && (join_form.deferral_on || (self.pay_method != "PRD" && ["W", "F", "M"].include?(self.frequency)))
   end
 
   private

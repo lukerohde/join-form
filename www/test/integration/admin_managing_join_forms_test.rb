@@ -65,12 +65,19 @@ class AdminManagingJoinFormsTest < ActionDispatch::IntegrationTest
     assert one.column_list == "a, b", "custom columns cannot be set"
   end
 
-	test "admin can disable address" do
-		one = join_forms(:one)
-		assert_equal one.address_on, true
-		patch join_form_path(one.id), join_form: { short_name: "new name", admin_id: @current_person.id, address_on: "false"}
-    one.reload
-		assert_equal one.address_on, false
-	end
+test "admin can hide deduction date" do
+	one = join_forms(:one)
+	assert_equal true, one.deduction_date_on
+	patch join_form_path(one.id), join_form: { short_name: "new name", admin_id: @current_person.id, deduction_date_on: "false" }
+one.reload
+	assert_equal false, one.deduction_date_on
+end
 
+test "admin can disable address" do
+	one = join_forms(:one)
+	assert_equal one.address_on, true
+	patch join_form_path(one.id), join_form: { short_name: "new name", admin_id: @current_person.id, address_on: "false"}
+one.reload
+	assert_equal one.address_on, false
+end
 end

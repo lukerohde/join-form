@@ -48,6 +48,10 @@ js_testing2:
   direct_debit_on: false
   signature_required: true
   short_name: js_testing2
+js_testing3:
+  <<: *COLS_ON
+  short_name: js_testing3
+  deduction_date_on: false
 address_off:
   <<: *DEFAULT
   short_name: address_off
