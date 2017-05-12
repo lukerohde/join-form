@@ -1,7 +1,7 @@
-<div id="edit_existing" style="<%= "display:none" unless  pay_method_default(@subscription) == "-" %>">
+<div id="edit_existing" style="<%= "display:none" unless  @presenter.pay_method_default == "-" %>">
 
-	<% if @subscription.pay_method == "CC" %> 
-	
+	<% if @subscription.pay_method == "CC" %>
+
 		<div class="form-group">
 	    <%= f.label :partial_card_number %><br/>
 	    <span class="form-control readonly"><%=@subscription.partial_card_number%></span>
@@ -31,7 +31,7 @@
 		  <span class="form-control readonly"><%=@subscription.partial_account_number%></span>
 	  </div>
 
-	<% end %> 
+	<% end %>
 
 	<%= render 'subscriptions/pay_method/reoccurring_terms' %>
 
@@ -43,8 +43,8 @@
   </div>
 -->
 
-	<!-- 
-	<strong> 
+	<!--
+	<strong>
     Initial Payment: <%= number_to_currency(@subscription.first_payment, locale: locale) %>
     <br/><small> Deductions will usually commence within 3 business days.  </small>
   </strong>

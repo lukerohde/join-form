@@ -1,8 +1,8 @@
 class SubscriptionsController < ApplicationController
   before_action :allow_iframe
-  before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update]
+  before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :refresh]
   before_action :set_subscription_with_api_lookup, only: [:show, :edit, :update, :destroy, :end_point_put]
-  # before_action :set_subscription, only: [:refresh]
+  #before_action :set_subscription, only: [:refresh]
   before_action :set_join_form, except: [:index, :temp_report]
   before_action :facebook_new, only: [:create]
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create]
@@ -10,6 +10,7 @@ class SubscriptionsController < ApplicationController
   before_action :set_authorizer, only: [:new]
   before_action :resubscribe?, only: [:create]
   before_action :clear_pending, only: [:update]
+  #before_action :set_presenter
 
   #layout 'subscription', except: [:index]
 
@@ -33,7 +34,7 @@ class SubscriptionsController < ApplicationController
     @subscription = Subscription.new
     @subscription.person = Person.new
     @subscription.join_form = @join_form
-    @presenter = SubscriptionPresenter.new(@subscription)
+    #@presenter = SubscriptionPresenter.new(@subscription)
     @subscription.source = params[:source] || request.referer
   end
 
@@ -90,7 +91,7 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions/refresh
   def refresh
     @subscription = Subscription.new(subscription_params.except(:person_attributes))
-    @presenter = SubscriptionPresenter.new(@subscription)
+    #@presenter = SubscriptionPresenter.new(@subscription)
 
     respond_to do |format|
       format.html { render partial: "subscriptions/pay_method/edit", layout: false }
@@ -207,11 +208,22 @@ class SubscriptionsController < ApplicationController
   end
 
   private
-  def set_subscription
-    @subscription = Subscription.find_by_token(params[:id])
-    @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
-    @presenter = SubscriptionPresenter.new(@subscription)
-  end
+    def set_subscription
+      @subscription = Subscription.find_by_token(params[:id])
+      @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
+      #@presenter = SubscriptionPresenter.new(@subscription)
+    end
+
+    def set_presenter
+      @presenter = SubscriptionPresenter.new(@subscription) if @subscription.class == Subscription
+    end
+
+    # I want the presenter set for rendering only, at the last
+    # possible moment prior to rendering
+    def render *args
+      set_presenter
+      super
+    end
 
     # Use callbacks to share common setup or constraints between actions.
     def set_subscription_with_api_lookup

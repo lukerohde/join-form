@@ -193,7 +193,6 @@ class Subscription < ApplicationRecord
 
   def update_with_payment(params, union)
     assign_attributes(params)
-
     if valid?
       customer = Stripe::Customer.create({description: person.email, card: stripe_token} , {stripe_account: union.stripe_user_id})
       person.stripe_token = customer.id
@@ -272,6 +271,7 @@ class Subscription < ApplicationRecord
   # All options extend past their 'min' date by frequency - 1
   def available_deduction_dates
     return deferral_dates if join_form.deferral_on
+    return [] unless deduction_date_required? 
 
     min_date = case pay_method
     when "CC" then Date.today
@@ -290,6 +290,10 @@ class Subscription < ApplicationRecord
     return [] if [min_date, max_date].include?(nil)
 
     Array(min_date..max_date).reject(&:weekend?)
+  end
+
+  def deduction_date_required?
+    join_form.deferral_on || (self.pay_method != "PRD" && ["W", "F", "M"].include?(self.frequency))
   end
 
   private
@@ -427,12 +431,14 @@ class Subscription < ApplicationRecord
   # Nil value is OK for some pay methods and frequencies. These pay methods
   # and frequencies will have an empty array of available_deduction_dates.
   def validate_deduction_date
-    if deduction_date.nil?
-      error_msg = I18n.t("subscriptions.errors.not_blank")
-      errors.add(:deduction_date, error_msg) unless available_deduction_dates.empty?
-    else
-      error_msg = I18n.t("subscriptions.errors.out_of_bounds")
-      errors.add(:deduction_date, error_msg) unless available_deduction_dates.include?(deduction_date)
+    if deduction_date_required?
+      if deduction_date.nil?
+        error_msg = I18n.t("subscriptions.errors.not_blank")
+        errors.add(:deduction_date, error_msg) unless available_deduction_dates.empty?
+      else
+        error_msg = I18n.t("subscriptions.errors.out_of_bounds")
+        errors.add(:deduction_date, error_msg) unless available_deduction_dates.include?(deduction_date)
+      end
     end
   end
 

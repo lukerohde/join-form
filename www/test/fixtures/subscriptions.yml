@@ -85,7 +85,7 @@ contact_details_with_no_subscription_but_pay_method_subscription:
   pay_method: "AB"
   partial_bsb: 123-123
   partial_account_number: 123123
-column_list:
+column_list: &COLUMN_LIST
   join_form: column_list
   person: contact_details_with_address_person
   token: column_list
@@ -100,7 +100,36 @@ has_email:
   person: has_email
   join_form: one
   token: has_email
-
+completed_cc_subscription_no_api_call:
+  <<: *COLUMN_LIST
+  token: completed_no_api_call
+  frequency: "Q"
+  pay_method: "CC"
+  ccv: "i8I+H7FnOl7Bo9qbMVec1TERtNTnEvZawgk86zy1X7cvebQdIYdqRatuDcaD\n1a9JskO71TqokNvVg+ibSQIrFzGdQQe7d3UObBDAMnMTgqb/FccIz4nBZraI\nGz+M3+495FTOU2nCfL6g2K6b/wYJWuxsrxQPLRVHlzVjtbZ4oKGimXr7aFDb\nvuCm8ANXyKOzX3BOqPGPWL/LpzV76AVdjxipB4KNctr0OFTcc4U13v9oGjRW\nyIlUde+zyHvzpaP4XvcanZQ7M6ygUuwdoSwm8heWfR6XClfRRsiinIKKtOiC\npM6baOwsmCdpAy3T2nwxd4glMzpVYmguOnzDcnsTNA==\n"
+  stripe_token: tok_1AI9AhAi6k4QPkEBjHUQhp9I
+  plan: "groupnva"
+  card_number: "Aorl2o5i/4rMEHjLgkPnQTTKXqRU6R7gfxKD8rEHT1oFGbRTkXRhvSx4Ujzi\nSS2KZ2mDAmwIKMuNtrbFER1INluSQRcTd6FqkT6fD6p6EPNFM7tYRyuXCCQp\ni1Q2RuozIJRsG4h+Yt600cCrB/0ZPzYPIVgmpa1SYsT7X4pd5CUud7gVASvW\nNnMTJGlaw/3wIaX24Mo8ulUC2Q0TK34Hu6PM7cjNZWE66YLVp8meJ5yKnJJH\n0bq8Zn9NjZCRcpepz7cz7YJMVAiMOb/Mmaw30rtYBWhsiCBvn/xSUVh5pL2L\nyHyurR0zFQPx+gfEmrXlBrCAUV+Bl+k7yQtfL1D2eA==\n"
+  partial_card_number: "XXXXXXXXXXXXX242"
+  end_point_put_required: true
+  completed_at: <%=Time.now%>
+  deduction_date: <%=Date.today%>
+  expiry_month: 12
+  expiry_year: 2018
+  updated_at: <%=Time.now%>
+completed_dd_subscription_no_api_call:
+  <<: *COLUMN_LIST
+  token: completed_dd_no_api_call
+  frequency: "M"
+  pay_method: "AB"
+  bsb: "saDuK6DT1VBePzIuuNKL2DVjglQy+jRvgHmHtWOBLMdXu7O5KZOfzzwMTM1z\n162oPnfCFDvcp/Si2HHgggBQgeuQsatxkH9E3EKvMreAfJ9iwOtli0qqJdNq\nm8SwMz278VrWM5u6v19azhp9kVXkhGyhpAZ6OE021lQF8r0a45yig15qdvfI\n11xvmPizQFR/RiiagxyYn9gTzYTkDQZTu61HzEvYRpkE/JmgGCnJriQ80LNf\nDxHGazvv1PjwxQCbpn/vu4u+F7/jumrFPj1wK/JkzpbPTCYhzZHJg3tAA9+K\nN/0q7t1XlUM3Uh0ySo+Im7aaDBn+tCer1LEl9rd5iQ==\n"
+  plan: "groupnva"
+  account_number: "T821jJIUotUTc9ir1v9St1sBtFLzEVm9zvL/5phn1A4ioNfuwjsrUHoQQgB8\nqXpDFa7/BRMh/Z0XVSlBhEfU/pT25l5NzGuxcYNlaKRcOKuoRBGmyldgzXMH\nALlykIYf0K73dpgBTuL68rVpwLm3OiuiTnXxFgDd4/QqsTzrlseskO9r3lYN\ngGnBZHugH9iEE8Scr0SWdfaChdprkKF7KkvoU+re27icLdgslzTPbw/IYE/5\n2i4BOnpZJaBX7zhbkfcLVqRVIiAqSNldickcq2OiVE948EoNyzdkfRPj9tR3\n16r+Db/atKRvaWhItbxv7svuDtU69Yy/gVHhaH67nA==\n"
+  partial_account_number: "XXXXXXXXXXXXX242"
+  partial_bsb: "XXX-123"
+  end_point_put_required: true
+  completed_at: <%=Time.now%>
+  deduction_date: <%=Date.today%>
+  updated_at: <%=Time.now%>
 SEARCH_SUBSCRIPTION: &SEARCH_SUBSCRIPTION
   person: search_person
   join_form: search_join_form

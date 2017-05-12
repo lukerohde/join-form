@@ -97,6 +97,12 @@ class DeductionDateOptions < ActiveSupport::TestCase
     assert error.blank?, "Error thrown for deduction date '#{dd}' for '#{pm}' '#{freq}' on '#{from}' with deferral #{deferral ? 'enabled' : 'disabled'}: #{explanation} - #{error}"
   end
 
+  def assert_irrelevant_deduction_date(deferral, pm, freq, from, dd, explanation)
+    error = validate_deduction_date(deferral, pm, freq, from, dd, explanation)
+    assert @subscription.available_deduction_dates == [], "When deduction date is irrelevant, no deduction dates should be available - '#{dd}' for '#{pm}' '#{freq}' on '#{from}' with deferral #{deferral ? 'enabled' : 'disabled'}"
+    assert error.blank?, "Error thrown for an irrelevant deduction date '#{dd}' for '#{pm}' '#{freq}' on '#{from}' with deferral #{deferral ? 'enabled' : 'disabled'}: #{explanation} - #{error}"
+  end
+
   test "invalid direct debit deduction date, without deferral" do
     assert_invalid_deduction_date false, "AB", "W", '2017-01-03', '2017-01-02', "can't have a deduction date in the past"
     assert_invalid_deduction_date false, "AB", "W", '2017-01-02', '2017-01-02', "can't have a same day deduction"
@@ -109,10 +115,13 @@ class DeductionDateOptions < ActiveSupport::TestCase
     assert_invalid_deduction_date false, "AB", "M", '2017-01-02', '2017-01-2', "can't have a same day deduction date"
     assert_invalid_deduction_date false, "AB", "M", '2017-01-02', '2017-02-3', "can't have a beyond one month"
 
+  end
+
+  test "irrelevant direct debit deduction date" do
     # Testing current behaviour which may change - i.e. no deduction date is valid
-    assert_invalid_deduction_date false, "AB", "Q", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "AB", "H", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "AB", "Y", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_irrelevant_deduction_date false, "AB", "Q", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "AB", "H", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "AB", "Y", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
   end
 
   test "valid direct debit deduction date, without deferral" do
@@ -133,11 +142,13 @@ class DeductionDateOptions < ActiveSupport::TestCase
 
     assert_invalid_deduction_date false, "ABR", "M", '2017-01-02', '2017-01-2', "can't have a same day deduction date"
     assert_invalid_deduction_date false, "ABR", "M", '2017-01-02', '2017-02-3', "can't have a beyond one month"
+  end
 
+  test "irrelevant direct debit release deduction date" do
     # Testing current behaviour which may change - i.e. no deduction date is valid
-    assert_invalid_deduction_date false, "ABR", "Q", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "ABR", "H", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "ABR", "Y", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_irrelevant_deduction_date false, "ABR", "Q", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "ABR", "H", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "ABR", "Y", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
   end
 
   test "valid direct debit release deduction date, without deferral" do
@@ -155,11 +166,13 @@ class DeductionDateOptions < ActiveSupport::TestCase
     assert_invalid_deduction_date false, "CC", "F", '2017-01-02', '2017-01-16', "can't have a deduction beyond two weeks"
 
     assert_invalid_deduction_date false, "CC", "M", '2017-01-02', '2017-02-2', "can't have a beyond one month"
+  end
 
+  test "irrelevant credit card deduction date" do
     # Testing current behaviour which may change - i.e. no deduction date is valid
-    assert_invalid_deduction_date false, "CC", "Q", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "CC", "H", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "CC", "Y", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_irrelevant_deduction_date false, "CC", "Q", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "CC", "H", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "CC", "Y", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
   end
 
   test "valid credit card deduction date, without deferral" do
@@ -169,14 +182,14 @@ class DeductionDateOptions < ActiveSupport::TestCase
     assert_valid_deduction_date false, "CC", "M", '2017-01-02', '2017-02-01', "can have a deduction date at the start of next month"
   end
 
-  test "invalid PRD deduction date, without deferral" do
+  test "irrelevant PRD deduction date" do
     # Testing current behaviour which may change - i.e. no deduction date is valid
-    assert_invalid_deduction_date false, "PRD", "W", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "PRD", "F", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "PRD", "M", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "PRD", "Q", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "PRD", "H", '2017-01-02', '2017-01-3', "no deduction date is valid"
-    assert_invalid_deduction_date false, "PRD", "Y", '2017-01-02', '2017-01-3', "no deduction date is valid"
+    assert_irrelevant_deduction_date false, "PRD", "W", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "PRD", "F", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "PRD", "M", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "PRD", "Q", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "PRD", "H", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
+    assert_irrelevant_deduction_date false, "PRD", "Y", '2017-01-02', '2017-01-3', "deduction date can persist but should be meaningless"
   end
 
   test "invalid direct debit deduction date, with deferral" do

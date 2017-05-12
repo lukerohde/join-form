@@ -1,4 +1,4 @@
-<div id="edit_au_bank_account" style="<%= "display:none" unless pay_method_default(@subscription) == "AB" %>">
+<div id="edit_au_bank_account">
 
 	<!--
 	<div class="form-group">
@@ -18,7 +18,7 @@
 	</div>
 
 
-	<strong> 
+	<strong>
 		<%=t('subscriptions.pay_method.edit.direct_debit_charge', first_payment: number_to_currency(@subscription.first_payment, locale: locale)).html_safe %>
   </strong>
 

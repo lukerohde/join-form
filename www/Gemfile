@@ -57,6 +57,11 @@ group :test do
   gem 'minitest-focus'
   gem 'm'
   gem 'mocha'
+  gem 'selenium-webdriver', '2.53.4'
+  gem 'poltergeist'
+  gem 'database_cleaner'
+  gem 'connection_pool'
+  gem 'launchy'
 end
 
 group :development do

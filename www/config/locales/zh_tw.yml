@@ -12,7 +12,7 @@ zh_tw:
         short_name: Slug
         short_name_placeholder: Please enter an short name for this join form, for the url
         description: Subscription Description
-        description_placeholder: Please enter a short description of the subscription, to be shown to the user. 
+        description_placeholder: Please enter a short description of the subscription, to be shown to the user.
         page_title: Page Title
         page_title_placeholder: Specify a web browser title for the page
         header: Header
@@ -21,9 +21,9 @@ zh_tw:
         css_placeholder:  Customize how your form looks using CSS
         base_rate_id: Plan ID
         base_rate_id_placeholder: Please enter an id identify what fee level/plan they member is on
-        base_rate_establishment:  Up front payment 
+        base_rate_establishment:  Up front payment
         base_rate_establishment_description: Typically $0 but when joining for a service could be something like $200.00
-        base_rate_weekly: Weekly fee 
+        base_rate_weekly: Weekly fee
         base_rate_fortnightly: Fortnightly fee
         base_rate_monthly: Monthly fee
         base_rate_quarterly: Quarterly fee
@@ -36,6 +36,7 @@ zh_tw:
       subscription:
         frequency: "付款頻率"
         pay_method: "付款方式"
+        deduction_date: "Deduction Date"
         account_name: "銀行帳戶持有人/卡片上名稱/"
         bsb: "BSB"
         account_number: "帳號名稱"
@@ -74,6 +75,8 @@ zh_tw:
       not_blank: "不能留空白"
   subscriptions:
     form:
+      first_deduction_date: "Starting Deduction Date"
+      next_deduction_date: "Next Deduction Date"
       submit_join: "現在加入"
       submit_renew: "更新"
       submit_next: "下一步"
@@ -95,7 +98,7 @@ zh_tw:
       edit:
         heading: "地址"
     subscription:
-      edit: 
+      edit:
         heading: "基本資料"
         weekly: "週繳"
         fortnightly: "１４天一次繳費"
@@ -109,6 +112,8 @@ zh_tw:
         credit_card: "信用卡"
         au_bank_account: "澳洲銀行帳戶"
         use_existing: "用我之前所登入的繳費方式"
+        use_existing_bank_account: "Use the bank account I have on file"
+        use_existing_credit_card: "Use the credit card I have file"
         application_fee: "申請費用"
         member_discount: "既有會員折扣"
         direct_debit_release: "從我的雇主那邊提供我的銀行帳戶"
@@ -116,7 +121,7 @@ zh_tw:
         payroll_deduction: "請從我的工資中扣除我的工會費"
         payroll_deduction_title: "Payroll Deduction Authority"
         payroll_deduction_terms: "I authorize my employer to deduct %{fee} per week (being my %{union} fees) and forward them to the %{union} and release my contact details to the %{union}."
-        direct_debit_release_terms: | 
+        direct_debit_release_terms: |
           為了成為%{union}的會員之一，我要求並授權我的雇主移轉%{union}我的 <br/><small>By becoming a member of the %{union}, I request and authorise my employer to release to the %{union} my:</small>
           <ul>
             <li>個人資料(包含性別及出生日期)<br/><small>personal details (including my gender and date of birth)</small></li>
@@ -149,7 +154,7 @@ zh_tw:
       pay_method: "請確認"
       payment_gateway_error: "銀行端在登入你的資料時發現錯誤"
       payment_gateway_card_error: "銀行端在確認你的信用卡時發現錯誤"
-      error_summary: 
+      error_summary:
         one:  "錯誤１　導致資料無法儲存"
         other: "錯誤%{count}　導致資料無法儲存"
   date:

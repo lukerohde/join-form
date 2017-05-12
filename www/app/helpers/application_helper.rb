@@ -120,4 +120,29 @@ module ApplicationHelper
   def subscription_short_path
     "/#{locale}/#{@union.short_name.downcase}/#{join_form_id(@join_form)}/#{@subscription.token}"
   end
+
+	def merge_data(subscription)
+    # For Email Merge
+    result = subscription.attributes
+    result.merge!(subscription.person.attributes)
+
+    presenter = SubscriptionPresenter.new(subscription)
+    result.merge!({
+        'frequency' => (presenter.friendly_frequency(subscription[:frequency])||"").downcase,
+        'fee' => presenter.friendly_fee(subscription[:frequency]),
+        'formatted_up_front_payment' => number_to_currency(subscription[:up_front_payment], locale: locale),
+        'url' => "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}",
+        'edit_url' => "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}",
+        'signature_url' => subscription.signature_image.url
+      })
+
+    admin = defined?(current_person) && current_person.present? ? current_person : subscription.join_form.admin
+    union = subscription.join_form.union
+
+    result['admin'] = admin.slice(:id, :first_name, :last_name, :email, :mobile).reject{|k,v| v.nil? } if admin.present?
+    result['union'] = union.slice(:id, :name, :short_name ).reject{|k,v| v.nil? } if union.present?
+
+    result = result.reject{|k,v| v.nil? }
+    result
+  end
 end

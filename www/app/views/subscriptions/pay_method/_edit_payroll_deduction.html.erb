@@ -1,9 +1,9 @@
-<div id="edit_payroll_deduction" style="<%= "display:none" unless pay_method_default(@subscription) == "PRD" %>">
+<div id="edit_payroll_deduction">
 
 	<h3><%=t('subscriptions.pay_method.edit.payroll_deduction_title')%></h3>
 
 	<small>
-		<%=t('subscriptions.pay_method.edit.payroll_deduction_terms', fee: friendly_fee(@subscription.join_form, 'W'), union: @join_form.union.short_name).html_safe %>
+		<%=t('subscriptions.pay_method.edit.payroll_deduction_terms', fee: @presenter.friendly_fee('W'), union: @join_form.union.short_name).html_safe %>
 	</small>
 
 </div>

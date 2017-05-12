@@ -12,13 +12,6 @@ Rails.application.routes.draw do
     patch '/subscription/refresh', to: 'subscriptions#refresh', as: 'refresh_subscription'
     resources :subscriptions do
       resources :records, except: [:edit]
-      resources :form_partials, controller: 'subscriptions/form_partials', only: [] do
-        collection do
-          get 'pay_method'
-          get 'frequency'
-          get 'deduction_date'
-        end
-      end
       #resources :sms, except: [:edit], type: "SMS"
       #resources :emails, except: [:edit], type: "Email"
     end

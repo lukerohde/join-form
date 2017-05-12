@@ -42,6 +42,26 @@
     <div id="pay-method-fields">
       <%= render 'subscriptions/pay_method/edit' %>
     </div>
+
+    <% if @subscription.join_form.signature_required %>
+      <%= hidden_field_tag "signature_vector", @subscription.signature_vector %>
+      <div class="sigPad" style="width:300px; margin-top: 16px; margin-bottom: 16px;">
+        <ul class="sigNav">
+          <li class="drawIt"><a href="#draw-it" ><%=t("subscriptions.pay_method.edit.sign_here")%></a></li>
+          <li class="clearButton"><a href="#clear"><%=t("subscriptions.pay_method.edit.clear_signature")%></a></li>
+        </ul>
+        <div class="sig sigWrapper" style="width:300px; height: 100px;">
+          <div class="typed"></div>
+          <canvas class="pad" width="298px" height="98px"></canvas>
+          <input type="hidden" name="subscription[signature_vector]" class="output">
+        </div>
+      </div>
+
+      <div class="" style="width: 300px; border-bottom: solid 1px black; padding: 10px;">
+        <strong><%= @presenter.friendly_signature_date %></strong>
+      </div>
+      <br/>
+    <% end %>
   <% end %>
 
   <%= f.hidden_field :join_form_id %>
@@ -49,19 +69,8 @@
   <%= f.hidden_field :source %>
 
   <div class="actions ">
-    <%
-      if @subscription.miscellaneous_saved?
-        if @subscription.has_existing_pay_method?
-          submit_label = t(".submit_renew") # TODO this logic is dumb
-        else
-          submit_label = t(".submit_join")
-        end
-      else
-        submit_label = t(".submit_next")
-      end
-    %>
 
-    <%= f.submit submit_label, class: "btn btn-success", id: "subscription_submit", data: { label: t(".submit_processing")} %>
+    <%= f.submit @presenter.submit_label, class: "btn btn-success", id: "subscription_submit", data: { label: t(".submit_processing")} %>
   </div>
 <% end %>
 

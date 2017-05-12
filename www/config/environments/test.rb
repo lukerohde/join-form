@@ -13,7 +13,7 @@ Rails.application.configure do
   config.eager_load = false
 
   # Configure public file server for tests with Cache-Control for performance.
-  # RAILS5 
+  # RAILS5
   # config.public_file_server.enabled = true
   # config.public_file_server.headers = {
   #   'Cache-Control' => 'public, max-age=3600'
@@ -22,6 +22,8 @@ Rails.application.configure do
   config.serve_static_files   = true
   config.static_cache_control = 'public, max-age=3600'
 
+  config.assets.debug = true # added to avoid compiling assets before each test run
+  # config.assets.debug = true # but maybe I should use this instead of config.assets.debug = true
 
   # Show full error reports and disable caching.
   config.consider_all_requests_local       = true
@@ -33,13 +35,13 @@ Rails.application.configure do
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
   #config.action_mailer.perform_caching = false
- 
+
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { host: ENV['mailgun_host'], port: 3000 }
-  
+
   # Randomize the order test cases are executed.
   config.active_support.test_order = :random
 

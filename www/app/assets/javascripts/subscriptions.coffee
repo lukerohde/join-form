@@ -12,7 +12,7 @@ subscription_helper_ready = ->
   $('.date-picker').datepicker(dateFormat: 'yy-mm-dd')
   subscription.goToStep() unless newSession
   $("#subscription_search_time_zone_offset").val(new Date().getTimezoneOffset())
-  
+
 subscription =
   autoSubmitOnPrefill: ->
     if (window.location.search.indexOf('auto_submit=true')>-1)
@@ -20,42 +20,42 @@ subscription =
 
   goToStep: ->
     noticeHeight = 0
-    if $('#notice')? 
+    if $('#notice')?
       noticeHeight = $('#notice').outerHeight()
       $('.subscription_header').css('margin-top', noticeHeight);
 
     step = $("#step").data('step')
     if step? && step != "thanks" && localStorage.getItem('scrollYPos')?
-      
+
       # Go to last scroll position
       window.scrollTo(0, localStorage.getItem('scrollYPos'))
       # show the next step
       if $("#" + step)?
         $("#" + step).show()
-        
+
         # scroll down, allowing room for the notice
         top = $('#' + step).offset().top
         top = top - noticeHeight
-        top = 0 if top < 0 
+        top = 0 if top < 0
 
         $('html, body').animate({
           scrollTop: top
         }, 1000)
 
     localStorage.removeItem('scrollYPos')
-      
+
   swapSubmitLabel: ->
     temp = $('#subscription_submit').prop('value')
     $('#subscription_submit').prop('value', $('#subscription_submit').data('label'))
     $('#subscription_submit').data('label', temp)
-    
+
   setupForm: ->
     $('#new_subscription, .edit_subscription').submit ->
-      
+
       subscription.swapSubmitLabel()
       $('#subscription_submit').attr('disabled', true)
       localStorage.setItem('scrollYPos', window.scrollY);
-      if $('#subscription_pay_method').val() == "CC" 
+      if $('#subscription_pay_method').val() == "CC"
         if $('#subscription_card_number').length
             subscription.processCard()
             false
@@ -63,7 +63,7 @@ subscription =
             true
       else
         true
-  
+
   processCard: ->
     card =
       number: $('#subscription_card_number').val()
@@ -71,7 +71,7 @@ subscription =
       expMonth: $('#subscription_expiry_month').val()
       expYear: $('#subscription_expiry_year').val()
     Stripe.createToken(card, subscription.handleStripeResponse)
-  
+
   handleStripeResponse: (status, response) ->
     if status == 200
       $('#subscription_stripe_token').val(response.id)
@@ -81,33 +81,53 @@ subscription =
       $('#subscription_submit').attr('disabled', false)
       subscription.swapSubmitLabel()
 
-@pay_method_change = (e) ->
-  $("#edit_credit_card").toggle (e.value is "CC")
-  $("#edit_au_bank_account").toggle (e.value is "AB")
-  $("#edit_existing").toggle (e.value is "-")
-  $("#edit_direct_debit_release").toggle (e.value is "ABR")
-  $("#edit_payroll_deduction").toggle (e.value is "PRD")
-
-pay_method_ready = ->
+setupSignature = ->
   if $('#signature_vector').val()?
     if $('#signature_vector').val() != ""
-      sig = $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, displayOnly: true, lineTop: 68})
-      sig.regenerate($('#signature_vector').val())
+      @sig = $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, displayOnly: true, lineTop: 68})
+      @sig.regenerate($('#signature_vector').val())
     else
-      $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, lineTop: 68, validateFields: false})
-  
-  #$('#edit_credit_card').hide()
-  #$('#edit_au_bank_account').hide()
-  #switch $('#subscription_pay_method').val()
-  #  when 'CC'
-  #    $('#edit_credit_card').show()
-  #  when 'AB'
-  #    $('#edit_au_bank_account').show()
-  return
-     
+      @sig = $('.edit_subscription, #new_subscription').signaturePad({drawOnly:true, lineTop: 68, validateFields: false})
+
+@payMethod =
+  init: (refresh_path) ->
+    $('#subscription_frequency').on 'change', payMethod.refreshForm
+    $('#subscription_pay_method').on 'change', payMethod.refreshForm
+    payMethod.refreshPath = refresh_path
+    #payMethod.setDeductionDateVisibility()
+    return
+
+  refreshForm: ->
+    form = $('#subscription-form')
+    $('#pay-method-fields').css 'opacity', 0.5
+    $.ajax
+      type: 'POST'
+      url: payMethod.refreshPath
+      data: form.serialize()
+      dataType: 'html'
+      success: (response) ->
+        $('#pay-method-fields').html response
+        $('#pay-method-fields').css 'opacity', 1
+        return
+    return
+
+  # setDeductionDateVisibility: ->
+  #   freq = $('#subscription_frequency').val()
+  #   pm = $('#subscription_pay_method').val()
+  #   if pm == 'PRD' or [
+  #       'Q'
+  #       'H'
+  #       'Y'
+  #     ].indexOf(freq) != -1
+  #     $('#deduction-date-container').addClass 'collapse'
+  #     false
+  #   else
+  #     $('#deduction-date-container').removeClass 'collapse'
+  #     true
+
 subscription_ready = ->
   if $('meta[name="js-context"]').attr('controller') == "subscriptions"
     subscription_helper_ready()
-    pay_method_ready()
+    setupSignature()
 
 $(document).ready(subscription_ready);

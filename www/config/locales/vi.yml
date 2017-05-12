@@ -12,7 +12,7 @@ vi:
         short_name: Slug
         short_name_placeholder: Please enter an short name for this join form, for the url
         description: Subscription Description
-        description_placeholder: Please enter a short description of the subscription, to be shown to the user. 
+        description_placeholder: Please enter a short description of the subscription, to be shown to the user.
         page_title: Page Title
         page_title_placeholder: Specify a web browser title for the page
         header: Header
@@ -21,9 +21,9 @@ vi:
         css_placeholder:  Customize how your form looks using CSS
         base_rate_id: Plan ID
         base_rate_id_placeholder: Please enter an id identify what fee level/plan they member is on
-        base_rate_establishment:  Up front payment 
+        base_rate_establishment:  Up front payment
         base_rate_establishment_description: Typically $0 but when joining for a service could be something like $200.00
-        base_rate_weekly: Weekly fee 
+        base_rate_weekly: Weekly fee
         base_rate_fortnightly: Fortnightly fee
         base_rate_monthly: Monthly fee
         base_rate_quarterly: Quarterly fee
@@ -36,6 +36,7 @@ vi:
       subscription:
         frequency: "Tần số thanh toán"
         pay_method: "Phương thức thanh toán"
+        deduction_date: "Deduction Date"
         account_name: "Tên chủ tài khoản / Tên trên thẻ"
         bsb: "BSB"
         account_number: "Số tài khoản"
@@ -74,6 +75,8 @@ vi:
       not_blank: "không thể để trống"
   subscriptions:
     form:
+      first_deduction_date: "Starting Deduction Date"
+      next_deduction_date: "Next Deduction Date"
       submit_join: "Tham gia ngay"
       submit_renew: "Đổi mới ngay"
       submit_next: "Tiếp tục"
@@ -95,7 +98,7 @@ vi:
       edit:
         heading: "Chi tiết địa chỉ"
     subscription:
-      edit: 
+      edit:
         heading: "Chi tiết kế hoạch Thành viên"
         weekly: "Mỗi tuần"
         fortnightly: "Mỗi hai tuần"
@@ -110,7 +113,7 @@ vi:
         au_bank_account: "Tài khoản ngân hàng Úc"
         direct_debit_release: "Lấy tài khoản ngân hàng của tôi từ nhà chủ đầu tư của tôi"
         direct_debit_release_title: "Ghi nợ trực tiếp và chuyển nhượng chi tiết được ủy quyền"
-        direct_debit_release_terms: | 
+        direct_debit_release_terms: |
           Để trở thành một thành viên %{union}, Tôi yêu cầu và ủy quyền cho người chủ đầu tư của tôi để chuyển đến %{union} của tôi:
           <ul>
             <li>chi tiết cá nhân (bao gồm giới tính và ngày sinh của tôi)</li>
@@ -124,6 +127,8 @@ vi:
         payroll_deduction_title: "Ủy quyền khấu trừ tiền lương"
         payroll_deduction_terms: "Tôi ủy quyền cho người chủ của tôi để trích %{fee} mỗi tuần (being my %{union} fees) và chuyển đến %{union} và đưa chi tiết liên lạc của tôi cho %{union}."
         use_existing: "Sử dụng hình thức thanh toán đang tồn tại của tôi"
+        use_existing_bank_account: "Use the bank account I have on file"
+        use_existing_credit_card: "Use the credit card I have file"
         application_fee: "Phí đơn:"
         member_discount: "Thành viên giảm giá:"
         total: "Phí trả trước:"
@@ -149,7 +154,7 @@ vi:
       pay_method: "phải được đặt biệt"
       payment_gateway_error: "Dịch vụ thanh toán của chúng tôi đã có lỗi trong khi tạo ra hồ sơ khách hàng"
       payment_gateway_card_error: "Dịch vụ thanh toán của chúng tôi đã có sự cố với thẻ tín dụng của bạn"
-      error_summary: 
+      error_summary:
         one:  "1 lổi ngăn chặn đơn thành viên của bạn đã được lưu trữ."
         other: "%{count} lổi ngăn chặn đơn thành viên của bạn đã được lưu trữ."
   date:

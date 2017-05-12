@@ -1,4 +1,4 @@
-<div id="edit_credit_card"  style="<%= "display:none" unless pay_method_default(@subscription)== "CC" %>">
+<div id="edit_credit_card">
   <!--
   <div class="form-group">
     <%= f.label :account_name, "Name On Card" %><br/>
@@ -32,7 +32,7 @@
     <%= f.hidden_field :stripe_token, value: nil %>
   </div>
 
-  <strong> 
+  <strong>
     <%=t('subscriptions.pay_method.edit.credit_card_charge', first_payment: number_to_currency(@subscription.first_payment, locale: locale)).html_safe%>
   </strong>
 

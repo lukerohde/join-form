@@ -10,82 +10,6 @@ module SubscriptionsHelper
     @subscription.step == step ? "start_hidden" : ""
   end
 
-	def pay_method_options(subscription)
-    result = []
-    result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if subscription.has_existing_pay_method?
-    result << [t('subscriptions.pay_method.edit.credit_card'), 'CC'] if subscription.join_form.credit_card_on
-    result << [t('subscriptions.pay_method.edit.au_bank_account'), 'AB'] if subscription.join_form.direct_debit_on
-    result << [t('subscriptions.pay_method.edit.payroll_deduction'), 'PRD'] if subscription.join_form.payroll_deduction_on
-    result << [t('subscriptions.pay_method.edit.direct_debit_release'), 'ABR'] if subscription.join_form.direct_debit_release_on
-
-    options_for_select(
-      result,
-      pay_method_default(subscription)
-    )
-  end
-
-  def pay_method_default(subscription)
-    methods = subscription.join_form.pay_methods << "-"
-    result = subscription.has_existing_pay_method? && ["AB", "CC"].include?(subscription.pay_method) ? "-" : (subscription.pay_method || "AB") # made this the default since more people choose it and it'll work without JS
-    result = methods[0] unless methods.include?(result)
-    result
-  end
-
-  def frequency_options(subscription)
-    result = []
-    form = subscription.join_form
-
-    %w(W F M Q H Y).each do |freq|
-      result << ["#{friendly_frequency(freq)} - #{friendly_fee(form, freq)}", freq] if form.fee(freq) > 0
-    end
-
-    current_selection = subscription.frequency || "F"
-    current_selection = result.find { |i| i[1] == current_selection.upcase }
-    current_selection = result[0] unless current_selection
-
-    options_for_select(
-      result,
-      current_selection
-    )
-  end
-
-  def friendly_signature_date(subscription)
-    if @subscription.signature_vector.present?
-      result = @subscription.signature_date.try(:strftime, "%d / %B / %Y")
-      result ||= "Signed but not dated"
-    else
-      result = Date.today.strftime("%d / %B / %Y")
-    end
-  end
-
-  def friendly_frequency(freq)
-    case freq
-      when "W"
-        t('subscriptions.subscription.edit.weekly')
-      when "F"
-        t('subscriptions.subscription.edit.fortnightly')
-      when "M"
-        t('subscriptions.subscription.edit.monthly')
-      when "Q"
-        t('subscriptions.subscription.edit.quarterly')
-      when "H"
-        t('subscriptions.subscription.edit.half_yearly')
-      when "Y"
-        t('subscriptions.subscription.edit.yearly')
-      else
-        #raise "Unknown frequency '#{freq}'"
-      end
-  end
-
-  def friendly_fee(join_form, freq)
-    fee = join_form.fee(freq)
-    if fee.present? && fee > 0
-      number_to_currency(fee, locale: locale)
-    else
-      ""
-    end
-  end
-
   def format_source(source)
     match = source.match(/http.*:\/\/(w{3}.)?([a-zA-Z\-_.]*)/)
     match ? match.captures[1] : source
@@ -230,29 +154,7 @@ module SubscriptionsHelper
   end
 
 
-  def merge_data(subscription)
-    # For Email Merge
-    result = subscription.attributes
-    result.merge!(subscription.person.attributes)
 
-    result.merge!({
-        'frequency' => (friendly_frequency(subscription[:frequency])||"").downcase,
-        'fee' => friendly_fee(subscription.join_form, subscription[:frequency]),
-        'formatted_up_front_payment' => number_to_currency(subscription[:up_front_payment], locale: locale),
-        'url' => "#{join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}",
-        'edit_url' => "#{edit_join_url(subscription.join_form.union.short_name, subscription.join_form.short_name, subscription.token, locale: 'en')}",
-        'signature_url' => subscription.signature_image.url
-      })
-
-    admin = defined?(current_person) && current_person.present? ? current_person : subscription.join_form.admin
-    union = subscription.join_form.union
-
-    result['admin'] = admin.slice(:id, :first_name, :last_name, :email, :mobile).reject{|k,v| v.nil? } if admin.present?
-    result['union'] = union.slice(:id, :name, :short_name ).reject{|k,v| v.nil? } if union.present?
-
-    result = result.reject{|k,v| v.nil? }
-    result
-  end
 
   def set_join_form
     id = params[:join_form_id] || params.dig(:subscription, :join_form_id) || @subscription.join_form.id
@@ -262,6 +164,7 @@ module SubscriptionsHelper
     else
       @join_form = @union.join_forms.where("short_name ilike ?",id).first if @join_form.nil?
     end
+
     @subscription.join_form = @join_form if @subscription
   end
 

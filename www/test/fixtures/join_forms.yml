@@ -6,11 +6,11 @@ DEFAULT: &DEFAULT
   base_rate_id: 'groupnva'
   base_rate_establishment: 100.00
   base_rate_weekly: 9.99
-  base_rate_fortnightly: 9.99
-  base_rate_monthly: 9.99
-  base_rate_quarterly: 9.99
-  base_rate_half_yearly: 9.99
-  base_rate_yearly: 9.99
+  base_rate_fortnightly: 19.99
+  base_rate_monthly: 29.99
+  base_rate_quarterly: 39.99
+  base_rate_half_yearly: 49.99
+  base_rate_yearly: 59.99
   union: owner
   admin: admin
   organiser: admin
@@ -37,6 +37,17 @@ column_list: &COLS_ON
   <<: *DEFAULT
   schema: "{\"columns\":[\"worksite\",\"employer\"]}"
   short_name: column_list
+js_testing1:
+  <<: *COLS_ON
+  short_name: js_testing1
+js_testing2:
+  <<: *COLS_ON
+  payroll_deduction_on: true
+  direct_debit_release_on: true
+  credit_card_on: false
+  direct_debit_on: false
+  signature_required: true
+  short_name: js_testing2
 address_off:
   <<: *DEFAULT
   short_name: address_off

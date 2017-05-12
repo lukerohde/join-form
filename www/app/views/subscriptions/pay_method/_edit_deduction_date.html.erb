@@ -1,16 +1,20 @@
 <%= fields_for @subscription do |f| %>
-  <div class="form-group">
-    <%= f.label :deduction_date %><br/>
-    <%= f.select :deduction_date,
-      options_for_select(@presenter.deduction_date_options, @presenter.deduction_date_default),
-      {
-        include_blank: false,
-      },
-      # data: {
-      #   placeholder: t('activerecord.attributes.subscription.deduction_date'),
-      # },
-      class: "form-control",
-      style: "width: 100%;"
-    %>
-  </div>
+  <% if @presenter.deduction_date_shown? %>
+    <div class="form-group">
+      <%= f.label :deduction_date, @presenter.deduction_date_label %><br/>
+      <%= f.select :deduction_date,
+        options_for_select(@presenter.deduction_date_options, @presenter.deduction_date_default),
+        {
+          include_blank: false,
+        },
+        # data: {
+        #   placeholder: t('activerecord.attributes.subscription.deduction_date'),
+        # },
+        class: "form-control",
+        style: "width: 100%;"
+      %>
+    </div>
+  <% else %>
+    <%= f.hidden_field :deduction_date, value: @presenter.deduction_date_default %>
+  <% end %>
 <% end %>

@@ -71,6 +71,7 @@ en:
       subscription:
         frequency: "Payment Frequency"
         pay_method: "Payment Method"
+        deduction_date: "Deduction Date"
         account_name: "Name Of Account Holder / Name On Card"
         bsb: "BSB"
         account_number: "Account Number"
@@ -99,6 +100,8 @@ en:
       not_blank: "can't be blank"
   subscriptions:
     form:
+      first_deduction_date: "Preferred Deduction Date"
+      next_deduction_date: "Preferred Next Deduction Date"
       submit_join: "Join Now"
       submit_renew: "Renew Now"
       submit_next: "Next"
@@ -149,6 +152,8 @@ en:
         payroll_deduction_title: "Payroll Deduction Authority"
         payroll_deduction_terms: "I authorize my employer to deduct %{fee} per week (being my %{union} fees) and forward them to the %{union} and release my contact details to the %{union}."
         use_existing: "Use my existing payment method"
+        use_existing_bank_account: "Use the bank account I have on file"
+        use_existing_credit_card: "Use the credit card I have file"
         application_fee: "Application Fee:"
         member_discount: "Member Discount:"
         total: "Dues payable in advance:"
