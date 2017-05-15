@@ -411,6 +411,7 @@ module SubscriptionsHelper
 
     if subscription.pay_method_saved?
       result[:establishment_fee] = subscription.total
+      result[:next_payment_date] = subscription.deduction_date if subscription.deduction_date_required?
       pm =
         case subscription.pay_method
           when "CC"

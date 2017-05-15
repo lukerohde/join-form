@@ -2,7 +2,7 @@ class SubscriptionsController < ApplicationController
   before_action :allow_iframe
   before_action :authenticate_person!, except: [:show, :new, :create, :edit, :update, :refresh]
   before_action :set_subscription_with_api_lookup, only: [:show, :edit, :update, :destroy, :end_point_put]
-  #before_action :set_subscription, only: [:refresh]
+  before_action :set_subscription, only: [:refresh]
   before_action :set_join_form, except: [:index, :temp_report]
   before_action :facebook_new, only: [:create]
   skip_before_action :verify_authenticity_token, if: :api_request?, only: [:create]
@@ -77,7 +77,6 @@ class SubscriptionsController < ApplicationController
   # PATCH/PUT /subscriptions/1.json
   def update
     respond_to do |format|
-      #binding.pry if $break
       if save_step
         format.html { redirect_to next_step, notice: next_step_notice }
         format.json { render :show, status: :ok, location: @subscription }
@@ -90,8 +89,7 @@ class SubscriptionsController < ApplicationController
 
   # POST /subscriptions/refresh
   def refresh
-    @subscription = Subscription.new(subscription_params.except(:person_attributes))
-    #@presenter = SubscriptionPresenter.new(@subscription)
+    @subscription.assign_attributes(subscription_params.except(:person_attributes))
 
     respond_to do |format|
       format.html { render partial: "subscriptions/pay_method/edit", layout: false }
@@ -107,6 +105,7 @@ class SubscriptionsController < ApplicationController
   end
 
   def save_step
+
     result = false
     if @subscription.new_record?
       result = @subscription.save
@@ -116,7 +115,7 @@ class SubscriptionsController < ApplicationController
       else
         result = @subscription.update(subscription_params)
       end
-      result = @subscription.save if result && @subscription.signature_vector.present?  # workaround possible bug with carrierwave not saving the name of the image uploaded until second save
+      result = @subscription.save_without_validation! if result && @subscription.signature_vector.present?  # workaround possible bug with carrierwave not saving the name of the image uploaded until second save
     end
 
     if result
@@ -210,7 +209,7 @@ class SubscriptionsController < ApplicationController
   private
     def set_subscription
       @subscription = Subscription.find_by_token(params[:id])
-      @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
+      @subscription = Subscription.find_by_id(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
       #@presenter = SubscriptionPresenter.new(@subscription)
     end
 

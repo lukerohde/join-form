@@ -24,7 +24,7 @@ class SubscriptionPresenter
   end
 
   def frequency_shown?
-    @subscription.pay_method != "PRD"
+    @subscription.actual_pay_method != "PRD"
   end
 
   def frequency_options
@@ -50,8 +50,8 @@ class SubscriptionPresenter
     result = []
 
     if subscription.has_existing_pay_method?
-      result << [I18n.t('subscriptions.pay_method.edit.use_existing_bank_account'), "-"] if subscription.pay_method == "AB"
-      result << [I18n.t('subscriptions.pay_method.edit.use_existing_credit_card'), "-"] if subscription.pay_method == "CC"
+      result << [I18n.t('subscriptions.pay_method.edit.use_existing_bank_account'), "-"] if subscription.actual_pay_method == "AB"
+      result << [I18n.t('subscriptions.pay_method.edit.use_existing_credit_card'), "-"] if subscription.actual_pay_method == "CC"
     end
     #result << [t('subscriptions.pay_method.edit.use_existing'), "-"] if subscription.has_existing_pay_method?
     result << [I18n.t('subscriptions.pay_method.edit.credit_card'), 'CC'] if subscription.join_form.credit_card_on
@@ -112,6 +112,12 @@ class SubscriptionPresenter
       ActionController::Base.helpers.number_to_currency(fee, locale: I18n.locale)
     else
       ""
+    end
+  end
+
+  def next_charge
+    if @subscription.next_payment_date.present? && @subscription.has_existing_pay_method? && @subscription.next_payment_date >= Date.today
+      I18n.t("subscriptions.form.next_charge", next_charge: I18n.l(@subscription.next_payment_date, format: :long))
     end
   end
 

@@ -107,6 +107,7 @@ en:
       submit_renew: "Renew Now"
       submit_next: "Next"
       submit_processing: "Processing..."
+      next_charge: "Your next debit is currently scheduled for %{next_charge}"
     verify_email:
       instruction: "Please check your email and follow the verification link to continue."
       explanation: "We have sent the verification email to the email address already in our system, which may be different to the email you just provided."

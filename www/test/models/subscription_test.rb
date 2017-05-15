@@ -240,4 +240,5 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
 
+
 end

@@ -162,4 +162,59 @@ class SubscriptionsControllerAjaxTest < Capybara::Rails::JSTestCase #ActionDispa
     assert @subscription.deduction_date.nil?, "deduction date should not be set"
   end
 
+  test "existing cc pay_method, when AB and CC are valid, has next_payment_date" do
+
+    @join_form = join_forms(:js_testing1)
+    @union = @join_form.union
+
+    @subscription = subscriptions(:completed_cc_subscription_no_api_call)
+    np  = @subscription.next_payment_date
+
+    visit edit_join_path(:en, @union, @join_form, @subscription.token)
+
+    assert has_select?("Payment Method", selected: "Use the credit card I have file"), "should default to existing payment method"
+    assert has_no_select?("Deduction Date"), "The fixture is quarterly so deduction date shouldn't be shown."
+    page.must_have_content "Your next debit is currently scheduled for"
+
+    click_button "Renew Now"
+    page.must_have_content "Online Membership Card"
+
+    @subscription.reload
+    assert @subscription.deduction_date_required? == false, "when there was no deduction date, it shouldn't be required after posting,  this prevents the next payment date getting written over the api"
+  end
+
+  test "existing dd pay_method, when AB and CC aren't valid, has no next_payment_date" do
+    #Capybara.current_driver = :selenium
+
+    @join_form = join_forms(:js_testing2)
+    @union = @join_form.union
+
+    @subscription = subscriptions(:completed_dd_subscription_no_api_call)
+    np  = @subscription.next_payment_date
+
+    visit edit_join_path(:en, @union, @join_form, @subscription.token)
+
+    assert has_select?("Payment Method", selected: "Get my bank account from my employer"), "should not default to existing payment method"
+
+    #TODO fix bug switching to existing bank account, partial accounts fields not hidden, so aren't posted back, and pay method isn't posted back, the option can't render
+    select_wait "Use the bank account I have on file", from: "Payment Method"
+    assert has_no_select?("Deduction Date"), "The fixture is quarterly so deduction date shouldn't be shown."
+    select_wait "Weekly - $9.99", from: "Payment Frequency"
+    page.wont_have_content "Your next debit is currently scheduled for" # fixture has no advanced next payment date
+    dd = find('#subscription_deduction_date').all('option')[2].text # first and second option are defaults for cc and dd respectively, pick thrid
+    select_wait dd, from: "Deduction Date"
+
+    page.execute_script('sig.regenerate([{"lx":10,"ly":10,"mx":60,"my":60},{"lx":60,"ly":10,"mx":10,"my":60}])')
+
+    click_button "Renew Now"
+    page.must_have_content "Online Membership Card"
+
+    @subscription.reload
+    assert @subscription.deduction_date_required? == true, "when there was a deduction date, it should be required after posting,  this prevents the next payment date getting written over the api"
+    assert @subscription.deduction_date == Date.parse(dd), "deducction date wasn't set"
+
+    assert @subscription.signature_image.url.present?, "expected signature image" # TODO got to get rid of the double save thing.
+  end
+
+
 end

@@ -147,8 +147,8 @@ class Subscription < ApplicationRecord
     # When a signature is already saved and I'm OOP
     (errors.empty? &&
       (
-        (self.pay_method == "AB" && self.join_form.direct_debit_on && has_existing_pay_method?) ||
-        (self.pay_method == "CC" && self.join_form.credit_card_on && has_existing_pay_method?) ||
+        (self.pay_method == "AB" && (self.join_form.direct_debit_on || @use_existing) && has_existing_pay_method?) ||
+        (self.pay_method == "CC" && (self.join_form.credit_card_on || @use_existing) && has_existing_pay_method?) ||
         (self.pay_method == "PRD" && self.join_form.payroll_deduction_on) ||
         (self.pay_method == "ABR" && self.join_form.direct_debit_release_on)
       ) && (!self.join_form.signature_required || self.signature_vector.present?)
@@ -264,6 +264,12 @@ class Subscription < ApplicationRecord
     Array(Date.today..Date.today.next_year - 1).reject(&:weekend?)
   end
 
+  def actual_pay_method
+    # if pay_method has been overwritten with the symbol for use existing
+    # then return the pay_method that was last saved
+    pay_method == "-" ? pay_method_was : pay_method
+  end
+
   # Options start from next day for AB pay method, and exclude weekends
   # Options start from next day for ABR pay method, and exclude weekends
   # Options start from today for the CC pay method, and exclude weekends
@@ -273,7 +279,7 @@ class Subscription < ApplicationRecord
     return deferral_dates if join_form.deferral_on
     return [] unless deduction_date_required?
 
-    min_date = case pay_method
+    min_date = case actual_pay_method
     when "CC" then Date.today
     when "AB", "ABR" then Date.today.next_day
     end
@@ -293,7 +299,7 @@ class Subscription < ApplicationRecord
   end
 
   def deduction_date_required?
-    join_form.deduction_date_on && (join_form.deferral_on || (self.pay_method != "PRD" && ["W", "F", "M"].include?(self.frequency)))
+    join_form.deduction_date_on && (join_form.deferral_on || (self.actual_pay_method != "PRD" && ["W", "F", "M"].include?(self.frequency)))
   end
 
   private
@@ -415,7 +421,9 @@ class Subscription < ApplicationRecord
   def validate_pay_method
     case pay_method
     # not a super elegant place to put this, but I don't want to save a dash, and I don't want to validate existing details (because they're not persisted).
-    when "-" then self.restore_pay_method!
+    when "-"
+      self.restore_pay_method!
+      @use_existing = true
     when "CC"
       errors.add(:card_number,I18n.translate("subscriptions.errors.credit_card")) unless stripe_token.present?
     when "AB"

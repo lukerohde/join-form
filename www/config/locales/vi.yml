@@ -81,6 +81,7 @@ vi:
       submit_renew: "Đổi mới ngay"
       submit_next: "Tiếp tục"
       submit_processing: "Đang tiến hành..."
+      next_charge: "Your next debit is scheduled for %{next_charge}"
     verify_email:
       instruction: "Vui lòng kiểm tra hộp thư email của bạn và làm theo đường dẫn xác nhận để tiếp tục."
       explanation: " Chúng tôi đã gửi email xác nhận đến địa chỉ email đã nằm trong hệ thống của chúng tôi, cái mà có thể khác với email bạn vừa mới cung cấp."

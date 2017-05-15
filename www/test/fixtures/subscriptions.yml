@@ -112,14 +112,15 @@ completed_cc_subscription_no_api_call:
   partial_card_number: "XXXXXXXXXXXXX242"
   end_point_put_required: true
   completed_at: <%=Time.now%>
-  deduction_date: <%=Date.today%>
+  #deduction_date: <%=Date.today%>
   expiry_month: 12
   expiry_year: 2018
   updated_at: <%=Time.now%>
+  next_payment_date: <%=Date.today + 7.days %>
 completed_dd_subscription_no_api_call:
   <<: *COLUMN_LIST
   token: completed_dd_no_api_call
-  frequency: "M"
+  frequency: "Q"
   pay_method: "AB"
   bsb: "saDuK6DT1VBePzIuuNKL2DVjglQy+jRvgHmHtWOBLMdXu7O5KZOfzzwMTM1z\n162oPnfCFDvcp/Si2HHgggBQgeuQsatxkH9E3EKvMreAfJ9iwOtli0qqJdNq\nm8SwMz278VrWM5u6v19azhp9kVXkhGyhpAZ6OE021lQF8r0a45yig15qdvfI\n11xvmPizQFR/RiiagxyYn9gTzYTkDQZTu61HzEvYRpkE/JmgGCnJriQ80LNf\nDxHGazvv1PjwxQCbpn/vu4u+F7/jumrFPj1wK/JkzpbPTCYhzZHJg3tAA9+K\nN/0q7t1XlUM3Uh0ySo+Im7aaDBn+tCer1LEl9rd5iQ==\n"
   plan: "groupnva"

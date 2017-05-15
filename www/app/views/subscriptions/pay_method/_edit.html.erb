@@ -33,6 +33,10 @@
     <% end %>
     <br/>
 
+  	<% if @presenter.next_charge %>
+  	  <p><div class="next-charge"><strong><i><%= @presenter.next_charge %></i></strong></div></p>
+  	<% end %>
+
     <div id="pay-method-container">
       <%= render 'subscriptions/pay_method/edit_pay_method' %>
     </div>
@@ -69,7 +73,7 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
-    payMethod.init("<%= refresh_subscription_path %>");
+    payMethod.init("<%= refresh_subscription_path(id: @subscription.token) %>");
   })
 
 </script>

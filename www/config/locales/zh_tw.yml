@@ -81,6 +81,7 @@ zh_tw:
       submit_renew: "更新"
       submit_next: "下一步"
       submit_processing: "處理中"
+      next_charge: "Your next debit is scheduled for %{next_charge}"
     verify_email:
       instruction: "請先登入電子信箱，系統將自動發送審核信件，請按確認連結"
       explanation: "系統已經自動發送審核信件到您的信箱中 而該電子信箱地址，可能與你所提供的郵件地址不同"
