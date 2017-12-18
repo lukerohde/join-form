@@ -23,10 +23,10 @@ services:
       - BUNDLE_PATH=/bundle
       - GEM_HOME=/bundle
     volumes_from:
-      - bundle_ubuntu_2.3.1
+      - bundle_ubuntu_2.3.6
     volumes:
       - joinform-www-sync:/app:nocopy # sync source into app, need to run docker-sync
-  bundle_ubuntu_2.3.1:
+  bundle_ubuntu_2.3.6:
     image: busybox
     volumes:
       - /bundle
