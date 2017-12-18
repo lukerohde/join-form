@@ -1,0 +1,14 @@
+# This is our production compose file - not changed for docker-sync or similar
+
+version: "2"
+services:
+  db:
+    image: postgres:9.6
+    restart: always
+  www:
+    build: ./www
+    command: ./script/docker_start
+    ports:
+      - "3000:3000"
+    links:
+      - db

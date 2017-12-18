@@ -1,0 +1,44 @@
+# this is our development docker-compose building on top of the production docker-compose, just mounting
+# the sync image - not redefining anything else
+
+#https://github.com/EugenMayer/docker-sync-boilerplate
+#https://github.com/EugenMayer/docker-sync/wiki/8.-Strategies
+#https://github.com/EugenMayer/docker-sync/wiki/Keep-your-docker-compose.yml-portable
+#https://github.com/EugenMayer/docker-sync/wiki/2.-Configuration#docker-syncyml
+#https://docs.docker.com/compose/rails/
+#https://medium.com/magnetis-backstage/how-to-cache-bundle-install-with-docker-7bed453a5800
+#https://gist.github.com/philm/a9b124f8f87a7fb9a3d9
+
+version: "2"
+services:
+  db:
+    environment:
+      - PGDATA=/pgdata
+    volumes_from:
+      - pgdata
+    ports:
+      - "5432:5432"
+  www:
+    environment:
+      - BUNDLE_PATH=/bundle
+      - GEM_HOME=/bundle
+    volumes_from:
+      - bundle_alpine_2.3.6
+      #- bundle_ubuntu_2.3.6
+      #- bundle_ubuntu_2.3.1
+    volumes:
+      - joinform-www-sync:/app:nocopy # sync source into app, need to run docker-sync
+  bundle_alpine_2.3.6:
+  #bundle_ubuntu_2.3.6:
+  #bundle_ubuntu_2.3.1:
+    image: busybox
+    volumes:
+      - /bundle
+  pgdata:
+    image: busybox
+    volumes:
+      - /pgdata
+# that the important thing
+volumes:
+  joinform-www-sync:
+    external: true

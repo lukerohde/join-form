@@ -1,0 +1,23 @@
+#!/bin/sh
+
+echo "Configuring nokogiri"
+bundle config build.nokogiri --use-system-libraries
+
+echo "Bundling gems"
+bundle check || bundle install --jobs 4 --retry 3
+
+echo "Generating Spring binstubs"
+bundle exec spring binstub --all
+
+echo "Clearing logs"
+bundle exec rake log:clear
+
+echo "Setting up new db if one doesn't exist"
+# bin/rake db:drop
+bundle exec rake db:version 2>/dev/null || bundle exec rake db:setup;
+
+echo "Removing contents of tmp dirs"
+bundle exec rake tmp:clear
+rm ./tmp/pids/*
+
+bundle exec rails s -p 3000 -b '0.0.0.0'
