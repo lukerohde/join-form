@@ -11,14 +11,14 @@ class SubscriptionsController < ApplicationController
   before_action :clear_pending, only: [:update]
 
   #layout 'subscription', except: [:index]
-  
+
   include SubscriptionsHelper
 
   # GET /subscriptions
   # GET /subscriptions.json
   def index
     @subscription_search = SubscriptionSearch.new(search_params)
-    
+
     @subscriptions = @subscription_search.results.eager_load([:person, :join_form]).order('subscriptions.updated_at desc').where('not subscriptions.person_id is null')
     @subscriptions = @subscriptions.where(['people.union_id = ?', current_person.union_id])
   end
@@ -52,12 +52,12 @@ class SubscriptionsController < ApplicationController
   def create
     @subscription = Subscription.new(subscription_params)
     @subscription.renewal = false
-    
+
      # this is a crude hack to hide address, and probably should be a part of the address model on person
     #   - country_code can be provided by the underpayment calculator as a query param for prefilling
     #   - alternatively the system will geolocate the IP address
     @subscription.set_country_code(params["country_code"] || request.location.try(:country_code))
-    
+
     respond_to do |format|
       if save_step
         format.html { redirect_to next_step, notice: next_step_notice }
@@ -88,7 +88,7 @@ class SubscriptionsController < ApplicationController
     # If saving to the API failed, provide a way for the user to retry
     nuw_end_point_person_put(@subscription)
     notify(true) # send notices, even though its admin logged in
-    notice = @subscription.end_point_put_required ? "Subscription failed to save" :  "Subscription saved and message(s) sent" 
+    notice = @subscription.end_point_put_required ? "Subscription failed to save" :  "Subscription saved and message(s) sent"
     redirect_to request.referer, notice: notice
   end
 
@@ -96,12 +96,12 @@ class SubscriptionsController < ApplicationController
     result = false
     if @subscription.new_record?
       result = @subscription.save
-    else 
+    else
       if subscription_params['pay_method'] == "CC"
         result = @subscription.update_with_payment(subscription_params, @union)
       else
         result = @subscription.update(subscription_params)
-      end 
+      end
       result = @subscription.save if result && @subscription.signature_vector.present?  # workaround possible bug with carrierwave not saving the name of the image uploaded until second save
     end
 
@@ -109,26 +109,26 @@ class SubscriptionsController < ApplicationController
       # TODO Guarentee delivery
       nuw_end_point_person_put(@subscription)
       notify # I imagine notify can update the time stamp and prevent the delayed message from sending.
-    end 
+    end
     result
   end
 
   def temp_report
     report = ""
     ctot = 0
-    ftot = 0 
+    ftot = 0
 
     JoinForm.all.each do |j|
       subscriptions = j.subscriptions.where(['created_at > ? and not person_id is null', Time.parse(params[:since]||'1900-01-01')])
       subscriptions.each do |s|
-        if (s.updated_at < (Time.now - 1.hour) && !s.end_point_put_required) 
+        if (s.updated_at < (Time.now - 1.hour) && !s.end_point_put_required)
           nuw_end_point_reload(s) rescue nil
         end
-      end  
-      
+      end
+
       complete = subscriptions.select{|s| ['Paying', 'Awaiting 1st payment'].include?(s.status) }
       followup = subscriptions.select{|s| !['Paying', 'Awaiting 1st payment'].include?(s.status) }
-      
+
       ctot += complete.count
       ftot += followup.count
 
@@ -164,10 +164,10 @@ class SubscriptionsController < ApplicationController
   end
 
   def next_step_notice
-    return t('subscriptions.steps.done') if @subscription.pay_method_saved? && @subscription.subscription_saved? && (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved? 
-    return t('subscriptions.steps.payment') if @subscription.subscription_saved?&& (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved? 
-    return t('subscriptions.steps.plan') if (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved? 
-    return t('subscriptions.steps.address') if @subscription.contact_details_saved?  
+    return t('subscriptions.steps.done') if @subscription.pay_method_saved? && @subscription.subscription_saved? && (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved?
+    return t('subscriptions.steps.payment') if @subscription.subscription_saved?&& (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved?
+    return t('subscriptions.steps.plan') if (@subscription.address_saved? || !@subscription.address_required?) && @subscription.contact_details_saved?
+    return t('subscriptions.steps.address') if @subscription.contact_details_saved?
     return t('subscriptions.steps.welcome')
   end
 
@@ -194,15 +194,15 @@ class SubscriptionsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_subscription
-      @subscription = Subscription.find_by_token(params[:id])    
+      @subscription = Subscription.find_by_token(params[:id])
       @subscription = Subscription.find(params[:id]) if @subscription.nil? and current_person # only allow if user logged in
       if @subscription.nil?
         forbidden
       else
         if @subscription.external_id && @subscription.updated_at < (Time.now - 1.hour) && !@subscription.end_point_put_required
-          # If the subscription is linked (has external_id) 
+          # If the subscription is linked (has external_id)
           # Use when person is returning to their subscription, after more than 1 hour.
-          @subscription = nuw_end_point_reload(@subscription) 
+          @subscription = nuw_end_point_reload(@subscription)
         end
 
         # blank these so they cannot be returned
@@ -214,7 +214,7 @@ class SubscriptionsController < ApplicationController
           @subscription.person.email = "" if temporary_email?(@subscription.person.email)
           @subscription.person.first_name = "" if temporary_first_name?(@subscription.person.first_name)
           @subscription.person.last_name = "" if temporary_last_name?(@subscription.person.last_name)
-        end 
+        end
         @subscription.signature_vector = "" unless current_person.present? || params[:pdf] == 'true' # users can't sign, but do see the signature; non-users always have to sign and don't see the sig
       end
     end
@@ -225,12 +225,12 @@ class SubscriptionsController < ApplicationController
       pparams = params[:person_attributes]
 
       # don't check resubscribe if the person is invalid, but do allow duplicate email. TODO dry up valiation logic - Subscription.new(params).valid? has a problem with duplicate email unfortunately so I can't use that.
-      return if pparams[:first_name].blank? || !Person.email_valid?(pparams[:email]) 
-      # Check membership via API and create a subscription #TODO update this systems subscription with membership info 
+      return if pparams[:first_name].blank? || !Person.email_valid?(pparams[:email])
+      # Check membership via API and create a subscription #TODO update this systems subscription with membership info
       @subscription = nuw_end_point_load(params, @join_form)
       if @subscription
         @subscription.renewal = true
-        
+
         # If an existing subcription exists, determine secure and appropriate action
         if current_person && current_person.union.id == @join_form.union.id
           # This is really nasty - TODO I want the logged in user to be able to avoid the verification steps, but have to review the original record first.
@@ -259,9 +259,9 @@ class SubscriptionsController < ApplicationController
     def patch_and_persist_subscription(subscription_params)
       # ActiveRecords update and assign_attributes
       # can't handle overwriting an existing record
-      # with a new record. IDs and other data gets 
+      # with a new record. IDs and other data gets
       # blanked.  This is designed to overwrite
-      # attributes with only those params that are 
+      # attributes with only those params that are
       # present
       patch_subscription(@subscription, subscription_params)
       result = @subscription.save_without_validation!
@@ -271,14 +271,14 @@ class SubscriptionsController < ApplicationController
         nuw_end_point_person_put(@subscription)
         #binding.pry if @subscription.step == 'thanks' && params[:action] == 'create'
         notify unless params[:action] == 'create' # prevent resubscribers with bank details getting a welcome on the first step
-      end 
+      end
 
       result
     end
 
     def params_match(params, subscription)
       # We want to avoid email verification if the user
-      # has provided enough information to verify their 
+      # has provided enough information to verify their
       # identity
       p1 = params[:person_attributes]
       p2 = subscription.person.attributes.symbolize_keys
@@ -289,14 +289,14 @@ class SubscriptionsController < ApplicationController
       score += 1 if p1[:email].present? && p1[:email] == p2[:email]
       #score += 1 if params[:external_id] == subscription[:external_id]
       score += 1 if p1[:dob].present? && Date.parse(p1[:dob]) == p2[:dob] rescue nil
-      
+
       score >= 3
     end
 
     def nothing_to_expose(params, subscription)
       p1 = params[:person_attributes]
       p2 = subscription.person.attributes.symbolize_keys
-      
+
       # remove blank and identical keys
       p2.reject! do |k,v|
         v.blank? || p1[k].present?
@@ -315,7 +315,7 @@ class SubscriptionsController < ApplicationController
     end
 
     def notify(resend = false)
-      #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later 
+      #PersonMailer.temp_alert(@subscription, ENV['mailgun_host']).deliver_later
       if @subscription.step == :thanks
         #JoinNoticeJob.perform_later(@subscription.id)
         admin_notice if send_admin_notice?(resend)
@@ -344,7 +344,7 @@ class SubscriptionsController < ApplicationController
 
     def welcome
       # I'm being cautious here due to the complexity, but should not be required with 'deliver_later' which would ordinarily crash in the background and send an exception
-    
+
       begin
         if template_id = @subscription.join_form.welcome_email_template_id
           EmailTemplateMailer.merge(template_id, @subscription.id, @subscription.person.email, "", "", "welcome_email").deliver_later
@@ -355,8 +355,8 @@ class SubscriptionsController < ApplicationController
       end
     end
 
-    def user_other_than_subscriber? 
-      (current_person.present? && current_person.email != @subscription.person.email) || 
+    def user_other_than_subscriber?
+      (current_person.present? && current_person.email != @subscription.person.email) ||
         (session[:authorizer_id].present? && session[:authorizer_id] != @subscription.person.email)
     end
 
@@ -370,7 +370,7 @@ class SubscriptionsController < ApplicationController
     def send_welcome?(resend = false)
       result = true
       # end point mocked in testing, don't want welcome done until membership can calculate what it has to calculate
-      result = false if @subscription.end_point_put_required && !Rails.env.test? 
+      result = false if @subscription.end_point_put_required && !Rails.env.test?
       # don't send welcome if someone is logged in, or the authorizer's email != the subcribers email
       result = false if user_other_than_subscriber? && !resend
       result
@@ -378,14 +378,14 @@ class SubscriptionsController < ApplicationController
 
     def allow_iframe
       #response.headers.except! 'X-Frame-Options'
-      #response.headers['X-Frame-Options'] = 'ALLOW-FROM https://apps.facebook.com'  
+      #response.headers['X-Frame-Options'] = 'ALLOW-FROM https://apps.facebook.com'
       response.headers.delete('X-Frame-Options')
     end
 
     def facebook_new
       # Facebook page tab sends a post request to your url
       # I'm attempting a redirect to get to make it work
-      if 
+      if
         (request.referer =~ /facebook/ && params['signed_request'].present?) ||
         (request.headers['origin'] =~ /thunderpenny/ && params['proxy'].present?)
         setup_new
@@ -394,7 +394,7 @@ class SubscriptionsController < ApplicationController
       end
     end
 
-    def clear_pending 
+    def clear_pending
       # Called before update, if update succeeds and invitation has been accepted
       @subscription.pending = false unless current_person # Don't clear pending if a user is amending an invitation
     end
@@ -420,10 +420,10 @@ class SubscriptionsController < ApplicationController
         dob_array = params[:subscription][:person_attributes].slice('dob(1i)', 'dob(2i)', 'dob(3i)').values.map(&:to_i) - [0]
         if (dob_array.length == 3 && dob = Date.new(*dob_array).iso8601 rescue nil)
           params[:subscription][:person_attributes][:dob] = dob
-        end 
+        end
         params[:subscription][:person_attributes].except!('dob(1i)', 'dob(2i)', 'dob(3i)')
       end
-      
+
       # Reject keys from pay methods that are not being submitted
       params[:subscription].except!(:stripe_token, :expiry_month, :expiry_year, :card_number, :ccv) unless params[:subscription][:pay_method] == "CC"
       params[:subscription].except!(:bsb, :account_number) unless params[:subscription][:pay_method] == "AB"
@@ -432,7 +432,7 @@ class SubscriptionsController < ApplicationController
       params[:subscription][:partial_card_number] = params[:subscription][:card_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:card_number].present?
       params[:subscription][:partial_account_number] = params[:subscription][:account_number].gsub(/\d(?=.{3})/,'X') if params[:subscription][:account_number].present?
       params[:subscription][:partial_bsb] = params[:subscription][:bsb].gsub(/\d(?=.{3})/,'X') if params[:subscription][:bsb].present?
-      
+
       params[:subscription][:end_point_put_required] = true
       result = params.require(:subscription).permit(permitted_params << [data: (@join_form.schema_data[:columns]||[])])
     end

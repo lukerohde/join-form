@@ -3,7 +3,7 @@
 version: "2"
 services:
   db:
-    image: postgres:9.6
+    image: postgres:9.6.8
     restart: always
   www:
     build: ./www

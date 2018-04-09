@@ -26,6 +26,8 @@ services:
       - bundle_ubuntu_2.3.6
     volumes:
       - joinform-www-sync:/app:nocopy # sync source into app, need to run docker-sync
+    tty: true
+    stdin_open: true
   bundle_ubuntu_2.3.6:
     image: busybox
     volumes:

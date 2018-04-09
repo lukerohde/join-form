@@ -7,4 +7,3 @@
 heroku pg:backups capture
 mkdir -p backup
 curl -o backup/latest.dump `heroku pg:backups public-url`
-pg_restore --verbose --clean --no-acl --no-owner -d join_form_development backup/latest.dump
