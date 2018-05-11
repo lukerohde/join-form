@@ -21,18 +21,20 @@
 
   <%= f.hidden_field :plan, value: @subscription.join_form.base_rate_id %>
 
-  <div class="form-group">
-    <%= f.label :frequency %><br>
-    <%= f.select :frequency,
-      frequency_options(@subscription),
-      {
-          include_blank: true,
-      },
-      data: {
-        placeholder: t('activerecord.attributes.subscription.frequency'),
-      },
-      class: "form-control",
-      style: "width: 100%;"
-    %>
-  </div>
+  <% unless frequency_options(@subscription).blank? %>
+    <div class="form-group">
+      <%= f.label :frequency %><br>
+      <%= f.select :frequency,
+        frequency_options(@subscription),
+        {
+            include_blank: true,
+        },
+        data: {
+          placeholder: t('activerecord.attributes.subscription.frequency'),
+        },
+        class: "form-control",
+        style: "width: 100%;"
+      %>
+    </div>
+  <% end %>
 </div>

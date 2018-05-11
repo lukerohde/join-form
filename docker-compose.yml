@@ -1,12 +1,18 @@
 # This is our production compose file - not changed for docker-sync or similar
 
-version: "2"
+version: "3"
 services:
   db:
     image: postgres:9.6.8
     restart: always
+    volumes:
+      - ./pgdata:/pgdata
+    environment:
+      - PGDATA=/pgdata
   www:
     build: ./www
+    volumes:
+      - ./bundle:/usr/local/bundle
     command: ./script/docker_start
     ports:
       - "3000:3000"

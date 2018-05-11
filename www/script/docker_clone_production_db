@@ -7,7 +7,9 @@
 heroku pg:backups capture
 mkdir -p backup
 curl -o www/backup/production_db.dump `heroku pg:backups public-url`
-docker cp www/backup/production_db.dump joinform_db_1:/pgdata/
+docker-compose down
+docker-compose up -d db
+docker cp www/backup/production_db.dump join-form_db_1:/pgdata/
 docker-compose exec db su postgres -c 'psql -c "SELECT pid, (SELECT pg_terminate_backend(pid)) as killed from pg_stat_activity WHERE datname = '"'"'join_form_development'"'"';"'
 docker-compose exec db su postgres -c "psql -c 'drop database join_form_development;'"
 docker-compose exec db su postgres -c "psql -c 'create database join_form_development;'"
