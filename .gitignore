@@ -30,3 +30,4 @@
 .flooignore
 
 .docker-sync
+www_root

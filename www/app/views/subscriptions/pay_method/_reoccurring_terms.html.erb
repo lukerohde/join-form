@@ -1,10 +1,10 @@
 <div>
     <small>
     <!-- TODO Refactor to share with credit card -->
-    <% if @subscription.total < 0.01 && @subscription.reoccurring_fee.blank? %>
+    <% if @subscription.total < 0.01 && @subscription.reoccurring_fee < 0.01 %>
       <%=t('subscriptions.pay_method.edit.no_amount_terms', union: @join_form.union.name) %>
     <% else %>
-      <% if @subscription.total > 0 && @subscription.reoccurring_fee.blank? %>
+      <% if @subscription.total > 0 && @subscription.reoccurring_fee < 0.01 %>
         <%=t('subscriptions.pay_method.edit.just_advance_terms', union: @join_form.union.name, advance: number_to_currency(@subscription.total, locale: locale)) %>
       <% else %>
         <% if @subscription.total > 0 %>
