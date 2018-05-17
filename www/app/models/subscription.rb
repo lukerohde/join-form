@@ -29,6 +29,7 @@ class Subscription < ApplicationRecord
   before_save :generate_signature_image
   before_save :set_data_if_blank
   before_save :set_completed_at
+  before_save :set_frequency_if_not_required
 
   def set_completed_at
     # called after validation
@@ -48,6 +49,12 @@ class Subscription < ApplicationRecord
     return :subscription if (address_saved? || !address_required?)  && contact_details_saved?
     return :address if contact_details_saved?
     :contact_details
+  end
+
+  def set_frequency_if_not_required
+    if step == :subscription && self.join_form.max_frequency.blank?
+      self.frequency = "W" # pretty nasty
+    end
   end
 
   def set_data_if_blank
@@ -112,9 +119,8 @@ class Subscription < ApplicationRecord
 
   def subscription_must_be_complete
     return if @skip_validation
-
     errors.add(:plan,I18n.translate("subscriptions.errors.not_blank")) if plan.blank?
-    errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank?
+    errors.add(:frequency,I18n.translate("subscriptions.errors.not_blank")) if frequency.blank? && self.join_form.max_frequency.present? # only raise an error if a frequency can be selected
 
     # validate presence of custom columns
     (self.schema_data[:columns]||[]).each do |column|
